@@ -448,6 +448,13 @@ function attachFallback(imgEl, imgDir, file){
   };
 }
 function activateFallbackIn(containerEl, defaultDir){
+  if(!containerEl) return; // ✅ évite le crash si l'élément n'existe pas
+  containerEl.querySelectorAll("img").forEach(img=>{
+    const file = img.getAttribute("data-file") || (img.getAttribute("src")||"").split("/").pop();
+    const dir  = img.getAttribute("data-dir") || defaultDir || "";
+    if(file) attachFallback(img, dir, file);
+  });
+}
   containerEl.querySelectorAll("img").forEach(img=>{
     const file = img.getAttribute("data-file") || (img.getAttribute("src")||"").split("/").pop();
     const dir  = img.getAttribute("data-dir") || defaultDir || "";
@@ -2093,8 +2100,8 @@ function jsEscape(s){
    ========================================================= */
 (async function boot(){
   // images fallback in header too (navbar icons)
-  activateFallbackIn(document.getElementById("topHeader"), "");
-  updateAuthUI();
+ activateFallbackIn(document.getElementById("topHeader"), "");
+if (app) activateFallbackIn(app, "");
   await initAuth();
   render();
   // fallback in first render
