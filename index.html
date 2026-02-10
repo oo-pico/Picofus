@@ -289,8 +289,8 @@
     .legendItem .num{min-width:72px}
   </style>
 
-  <!-- Supabase JS v2 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- sb JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@sb/sb-js@2"></script>
 </head>
 
 <body>
@@ -369,11 +369,11 @@
 
 <script>
 /* =========================================================
-   SUPABASE CONFIG (tes infos)
+   sb CONFIG (tes infos)
    ========================================================= */
-const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
-const SUPABASE_TABLE = "saves"; // user_id(uuid PK), data(jsonb), updated_at(timestamptz)
+const sb_URL = "https://pktrtwqavqbhdhtzkocy.sb.co";
+const sb_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
+const sb_TABLE = "saves"; // user_id(uuid PK), data(jsonb), updated_at(timestamptz)
 
 /* =========================================================
    GLOBALS / STORAGE
@@ -478,21 +478,21 @@ function activateFallbackIn(containerEl, defaultDir){
 }
 
 /* =========================================================
-   SUPABASE SYNC (localStorage <-> table saves)
+   sb SYNC (localStorage <-> table saves)
    ========================================================= */
-let supabase = null;
+let sb = null;
 let cloud = { user:null, saving:false, saveTimer:null, lastCloudUpdatedAt:null };
 
-function initSupabase(){
+function initsb(){
   try{
-    if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
-    return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    if(!sb_URL || !sb_ANON_KEY) return null;
+return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }catch(e){
-    console.error("Supabase init error:", e);
+    console.error("sb init error:", e);
     return null;
   }
 }
-supabase = initSupabase();
+sb = initsb();
 
 function getLocalCloudMeta(){
   try{ return JSON.parse(localStorage.getItem(CLOUD_META_KEY) || "null"); }
@@ -526,10 +526,10 @@ function replacePrefixedLocalStorage(lsMap){
 }
 
 async function loadFromCloudIntoLocal(){
-  if(!supabase || !cloud.user) return false;
+  if(!sb || !cloud.user) return false;
   try{
-    const { data, error } = await supabase
-      .from(SUPABASE_TABLE)
+    const { data, error } = await sb
+      .from(sb_TABLE)
       .select("data, updated_at")
       .eq("user_id", cloud.user.id)
       .maybeSingle();
@@ -562,7 +562,7 @@ async function loadFromCloudIntoLocal(){
 }
 
 async function saveLocalToCloudNow(){
-  if(!supabase || !cloud.user) return;
+  if(!sb || !cloud.user) return;
   try{
     cloud.saving = true;
     updateAuthUI();
@@ -570,8 +570,8 @@ async function saveLocalToCloudNow(){
     const ls = collectPrefixedLocalStorage();
     const payload = { version: 1, savedAt: new Date().toISOString(), ls };
 
-    const { error } = await supabase
-      .from(SUPABASE_TABLE)
+    const { error } = await sb
+      .from(sb_TABLE)
       .upsert({
         user_id: cloud.user.id,
         data: payload,
@@ -593,7 +593,7 @@ async function saveLocalToCloudNow(){
 }
 
 function scheduleCloudSave(){
-  if(!supabase || !cloud.user) return;
+  if(!sb || !cloud.user) return;
   if(cloud.saveTimer) clearTimeout(cloud.saveTimer);
   cloud.saveTimer = setTimeout(()=>saveLocalToCloudNow(), 900);
 }
@@ -603,8 +603,8 @@ const authPill = document.getElementById("authPill");
 const btnAuth = document.getElementById("btnAuth");
 
 function updateAuthUI(){
-  if(!supabase){
-    authPill.textContent = "⚠️ Supabase OFF";
+  if(!sb){
+    authPill.textContent = "⚠️ sb OFF";
     btnAuth.textContent = "🔑 Connexion";
     btnAuth.classList.remove("bad");
     btnAuth.classList.add("good");
@@ -625,13 +625,13 @@ function updateAuthUI(){
 }
 
 async function doLogin(){
-  if(!supabase) return alert("Supabase non initialisé (URL/Key manquantes).");
+  if(!sb) return alert("sb non initialisé (URL/Key manquantes).");
   const email = prompt("Email pour connexion (magic link) :");
   if(!email) return;
 
   const redirectTo = `${window.location.origin}/#/`;
 
-  const { error } = await supabase.auth.signInWithOtp({
+  const { error } = await sb.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: redirectTo }
   });
@@ -645,8 +645,8 @@ async function doLogin(){
 }
 
 async function doLogout(){
-  if(!supabase) return;
-  const { error } = await supabase.auth.signOut();
+  if(!sb) return;
+  const { error } = await sb.auth.signOut();
   if(error){
     console.error(error);
     alert("Erreur déconnexion: " + (error.message || "unknown"));
@@ -659,9 +659,9 @@ btnAuth.addEventListener("click", ()=>{
 });
 
 async function initAuth(){
-  if(!supabase) { updateAuthUI(); return; }
+  if(!sb) { updateAuthUI(); return; }
 
-  const { data } = await supabase.auth.getSession();
+  const { data } = await sb.auth.getSession();
   cloud.user = data?.session?.user || null;
   updateAuthUI();
 
@@ -669,7 +669,7 @@ async function initAuth(){
     await loadFromCloudIntoLocal();
   }
 
-  supabase.auth.onAuthStateChange(async (_event, session)=>{
+  sb.auth.onAuthStateChange(async (_event, session)=>{
     cloud.user = session?.user || null;
     updateAuthUI();
     if(cloud.user){
@@ -1612,7 +1612,7 @@ function renderHome(){
         <div class="pill">Clique les chiffres = pavé numérique</div>
       </div>
       <div class="hint" style="margin-top:0">
-        Tout est sauvegardé <b>en local</b>. Si tu te connectes, ça sync <b>cloud</b> via Supabase.
+        Tout est sauvegardé <b>en local</b>. Si tu te connectes, ça sync <b>cloud</b> via sb.
       </div>
     </div>
   `;
