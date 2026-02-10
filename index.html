@@ -393,7 +393,13 @@ function initSupabase(){
 }
 
 sb = initSupabase();
-
+// Etat Cloud (OBLIGATOIRE sinon crash)
+const cloud = {
+  user: null,
+  saving: false,
+  saveTimer: null,
+  lastCloudUpdatedAt: 0
+};
 
 /* =========================================================
    GLOBALS / STORAGE
