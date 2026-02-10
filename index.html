@@ -2135,6 +2135,9 @@ async function handleAuthCallback(){
   window.history.replaceState({}, document.title, cleanUrl);
 }
 
+<script>
+/* ... tout ton code au-dessus inchangé ... */
+
 /* =========================================================
    INIT (anti écran noir)
    ========================================================= */
@@ -2162,30 +2165,13 @@ function showFatal(err){
 }
 
 (async function boot(){
-  // 1) callback auth → ne doit JAMAIS bloquer l’UI
-  try { await handleAuthCallback(); }
-  catch(e){ console.error("handleAuthCallback failed:", e); }
+  try { await handleAuthCallback(); } catch(e){ console.error("handleAuthCallback failed:", e); }
+  try { await initAuth(); } catch(e){ console.error("initAuth failed:", e); }
 
-  // 2) init auth → ne doit JAMAIS bloquer l’UI
-  try { await initAuth(); }
-  catch(e){ console.error("initAuth failed:", e); }
+  try { render(); } catch(e){ showFatal(e); }
 
-  // 3) render → quoi qu’il arrive
-  try { render(); }
-  catch(e){ showFatal(e); }
-
-  // 4) fallback images header
   try { activateFallbackIn(document.getElementById("topHeader"), ""); }
   catch(e){ console.error("activateFallbackIn(header) failed:", e); }
-})();
-  try{
-    await handleAuthCallback();
-    await initAuth();
-    render();
-    activateFallbackIn(document.getElementById("topHeader"), "");
-  }catch(e){
-    console.error(e);
-  }
 })();
 </script>
 
