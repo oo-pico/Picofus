@@ -496,24 +496,6 @@ function activateFallbackIn(containerEl, defaultDir){
     if(file) attachFallback(img, dir, file);
   });
 }
-
-/* =========================================================
-   sb SYNC (localStorage <-> table saves)
-   ========================================================= */
-let sb = null;
-let cloud = { user:null, saving:false, saveTimer:null, lastCloudUpdatedAt:null };
-
-function initsb(){
-  try{
-    if(!sb_URL || !sb_ANON_KEY) return null;
-return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }catch(e){
-    console.error("sb init error:", e);
-    return null;
-  }
-}
-sb = initsb();
-
 function getLocalCloudMeta(){
   try{ return JSON.parse(localStorage.getItem(CLOUD_META_KEY) || "null"); }
   catch{ return null; }
@@ -591,7 +573,7 @@ async function saveLocalToCloudNow(){
     const payload = { version: 1, savedAt: new Date().toISOString(), ls };
 
     const { error } = await sb
-      .from(sb_TABLE)
+   .from(SUPABASE_TABLE)
       .upsert({
         user_id: cloud.user.id,
         data: payload,
