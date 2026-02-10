@@ -289,8 +289,9 @@
     .legendItem .num{min-width:72px}
   </style>
 
+  <!-- sb JS v2 -->
   <!-- Supabase JS v2 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -306,7 +307,7 @@
 
       <div class="nav">
         <span class="pill" id="pagePill">Accueil</span>
-        <span class="pill" id="authPill">local</span>
+        <span class="pill" id="authPill">🔒 Local</span>
 
         <button class="btn small" id="btnTabHome">🏠 Home</button>
 
@@ -330,8 +331,7 @@
           <img class="navIco" data-file="Icône Calculateur Omega.png" alt=""> XP Oméga
         </button>
 
-        <!-- IMPORTANT: bouton = cloud si pas co, local si co -->
-        <button class="btn small good" id="btnAuth">cloud</button>
+        <button class="btn small good" id="btnAuth">🔑 Connexion</button>
         <button class="btn small bad" id="btnResetAll">🧹 Reset tout</button>
       </div>
     </header>
@@ -370,13 +370,16 @@
 
 <script>
 /* =========================================================
+   sb CONFIG (tes infos)
+   ========================================================= */
+/* =========================================================
    SUPABASE CONFIG (tes infos)
    ========================================================= */
 const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
 const SUPABASE_TABLE = "saves"; // user_id(uuid PK), data(jsonb), updated_at(timestamptz)
 
-let sb = null;
+let sb = null; // on garde le nom "sb" dans TON code, mais c'est un client Supabase
 
 function initSupabase(){
   try{
@@ -390,7 +393,7 @@ function initSupabase(){
 }
 
 sb = initSupabase();
-
+// Etat Cloud (OBLIGATOIRE sinon crash)
 const cloud = {
   user: null,
   saving: false,
@@ -414,6 +417,7 @@ function clampPct(x){
   return x < 0 ? 0 : x;
 }
 
+/* Reset global = tout vider (donjons + songes + pp + omega) */
 function resetAll(){
   Object.keys(localStorage).forEach(k=>{
     if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k);
@@ -437,7 +441,7 @@ function jsEscape(s){
 }
 
 /* =========================================================
-   IMAGE FALLBACK
+   IMAGE FALLBACK (FIXÉ: plus d’erreur JS)
    ========================================================= */
 function uniq(arr){
   const seen = new Set();
@@ -498,10 +502,6 @@ function activateFallbackIn(containerEl, defaultDir){
     if(file) attachFallback(img, dir, file);
   });
 }
-
-/* =========================================================
-   CLOUD (load/save)
-   ========================================================= */
 function getLocalCloudMeta(){
   try{ return JSON.parse(localStorage.getItem(CLOUD_META_KEY) || "null"); }
   catch{ return null; }
@@ -579,7 +579,7 @@ async function saveLocalToCloudNow(){
     const payload = { version: 1, savedAt: new Date().toISOString(), ls };
 
     const { error } = await sb
-      .from(SUPABASE_TABLE)
+   .from(SUPABASE_TABLE)
       .upsert({
         user_id: cloud.user.id,
         data: payload,
@@ -606,30 +606,27 @@ function scheduleCloudSave(){
   cloud.saveTimer = setTimeout(()=>saveLocalToCloudNow(), 900);
 }
 
-/* =========================================================
-   AUTH UI / Actions (FIX: pas d’email affiché + cloud/local)
-   ========================================================= */
+/* Auth UI / Actions */
 const authPill = document.getElementById("authPill");
 const btnAuth = document.getElementById("btnAuth");
 
 function updateAuthUI(){
   if(!sb){
-    authPill.textContent = "local";
-    btnAuth.textContent = "cloud";
+    authPill.textContent = "⚠️ sb OFF";
+    btnAuth.textContent = "🔑 Connexion";
     btnAuth.classList.remove("bad");
     btnAuth.classList.add("good");
     return;
   }
-
   if(cloud.user){
-    // ✅ plus d’email affiché, uniquement cloud/local
-    authPill.textContent = cloud.saving ? "cloud (sync…)" : "cloud";
-    btnAuth.textContent = "local"; // bouton = déconnexion
+    const email = cloud.user.email || "connecté";
+    authPill.textContent = cloud.saving ? `☁️ Sync… ${email}` : `☁️ Cloud ${email}`;
+    btnAuth.textContent = "🚪 Déconnexion";
     btnAuth.classList.remove("good");
     btnAuth.classList.add("bad");
   }else{
-    authPill.textContent = "local";
-    btnAuth.textContent = "cloud"; // bouton = connexion
+    authPill.textContent = "🔒 Local";
+    btnAuth.textContent = "🔑 Connexion";
     btnAuth.classList.remove("bad");
     btnAuth.classList.add("good");
   }
@@ -640,8 +637,7 @@ async function doLogin(){
   const email = prompt("Email pour connexion (magic link) :");
   if(!email) return;
 
-  // ✅ FIX: une seule variable redirectTo (ton code avait 2 const -> crash)
-  const redirectTo = window.location.origin + window.location.pathname;
+const redirectTo = window.location.origin + window.location.pathname;
 
   const { error } = await sb.auth.signInWithOtp({
     email,
@@ -1128,7 +1124,7 @@ function openOmegaPad(field, label){
 }
 
 /* =========================================================
-   SONGES (ton code tel quel)
+   SONGES
    ========================================================= */
 const kSonges = `${LS_PREFIX}songes`;
 const SONGES_IMG_DIR = "Songes/";
@@ -1180,25 +1176,929 @@ const SONGE_LEGENDS = [
   { key:"Magicrabe",      img:"Légende animale de Magicrabe.png",     imgDir: SONGES_IMG_DIR },
 ];
 
-/* (le reste Songes/Donjons/PP/Omega/UI est inchangé par rapport à ton extrait,
-   donc je le laisse tel quel — sauf les 2 FIX qui cassent tout :
-   - doLogin redirectTo doublé
-   - boot() doublé
-   Tout le reste est IDENTIQUE. */
+function blankSongesState(){
+  const init = {
+    ui: { tab:"runs", search:"" },
+    bribesTotal: 0,
+    runs: {},
+    bribesByIntensity: {},
+    legends: {},
+  };
+  SONGE_INTENSITIES.forEach(x=>{
+    init.runs[x.id] = 0;
+    init.bribesByIntensity[String(x.num)] = 0;
+  });
+  SONGE_LEGENDS.forEach(x=>init.legends[x.key]=0);
+  return init;
+}
+function loadSongesState(){
+  try{
+    const raw = localStorage.getItem(kSonges);
+    if(!raw) return blankSongesState();
+    const p = JSON.parse(raw);
 
-/* ======== TOUT TON CODE APRÈS renderOmega / render etc. ======== */
-/* IMPORTANT : comme ton message est giga long et le chat coupe parfois,
-   j’ai gardé EXACTEMENT ta structure et j’ai corrigé LES LIGNES QUI CASSAIENT.
-   Continue à coller la suite de TON fichier ici dessous si elle existe.
-*/
+    const out = blankSongesState();
+    out.ui = p.ui || out.ui;
+    out.bribesTotal = clampNonNeg(p.bribesTotal ?? 0);
+
+    if(p.runs){
+      for(const it of SONGE_INTENSITIES){
+        out.runs[it.id] = clampNonNeg(p.runs[it.id] ?? 0);
+      }
+    }
+    if(p.bribesByIntensity){
+      for(const it of SONGE_INTENSITIES){
+        out.bribesByIntensity[String(it.num)] = clampNonNeg(p.bribesByIntensity[String(it.num)] ?? 0);
+      }
+    }
+    if(p.legends){
+      for(const l of SONGE_LEGENDS){
+        out.legends[l.key] = clampNonNeg(p.legends[l.key] ?? 0);
+      }
+    }
+    return out;
+  }catch(e){
+    return blankSongesState();
+  }
+}
+function saveSongesState(s){
+  localStorage.setItem(kSonges, JSON.stringify(s));
+  scheduleCloudSave();
+}
+
+window.resetSonges = function(){
+  if(!confirm("Reset Songes (runs + bribes + légendes) ?")) return;
+  localStorage.removeItem(kSonges);
+  scheduleCloudSave();
+  render();
+};
+
+function setSongesTab(tab){
+  const s = loadSongesState();
+  s.ui.tab = tab;
+  saveSongesState(s);
+  renderSonges();
+}
+function setSongesSearch(value){
+  const s = loadSongesState();
+  s.ui.search = String(value||"");
+  saveSongesState(s);
+  renderSonges();
+}
+
+window.openSongesBribesPad = function(){
+  const s = loadSongesState();
+  openKeypad("Bribes (global) — définir total", clampNonNeg(s.bribesTotal), (v)=>{
+    const st = loadSongesState();
+    st.bribesTotal = clampNonNeg(v);
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+window.openSongesRunPad = function(intensityId, label){
+  const s = loadSongesState();
+  openKeypad(`Runs • ${label}`, clampNonNeg(s.runs[intensityId] ?? 0), (v)=>{
+    const st = loadSongesState();
+    st.runs[intensityId] = clampNonNeg(v);
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+window.songeIncRun = function(intensityId){
+  const st = loadSongesState();
+  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) + 1);
+  saveSongesState(st);
+  renderSonges();
+};
+window.songeDecRun = function(intensityId){
+  const st = loadSongesState();
+  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) - 1);
+  saveSongesState(st);
+  renderSonges();
+};
+
+window.songeAddBribes = function(){
+  openKeypad("Intensité (1 à 10)", 1, (inten)=>{
+    inten = clampNonNeg(inten);
+    if(inten < 1 || inten > 10){
+      alert("Intensité invalide. Choisis un nombre entre 1 et 10.");
+      return;
+    }
+    openKeypad(`Ajouter bribes • Intensité ${inten}`, 0, (amount)=>{
+      const add = clampNonNeg(amount);
+      const st = loadSongesState();
+      st.bribesTotal = clampNonNeg((st.bribesTotal ?? 0) + add);
+      st.bribesByIntensity[String(inten)] = clampNonNeg((st.bribesByIntensity[String(inten)] ?? 0) + add);
+      saveSongesState(st);
+      renderSonges();
+    });
+  });
+};
+
+window.songeSubBribes = function(){
+  openKeypad("Intensité (1 à 10)", 1, (inten)=>{
+    inten = clampNonNeg(inten);
+    if(inten < 1 || inten > 10){
+      alert("Intensité invalide. Choisis un nombre entre 1 et 10.");
+      return;
+    }
+    openKeypad(`Retirer bribes • Intensité ${inten}`, 0, (amount)=>{
+      const sub = clampNonNeg(amount);
+      const st = loadSongesState();
+      st.bribesTotal = clampNonNeg((st.bribesTotal ?? 0) - sub);
+      st.bribesByIntensity[String(inten)] = clampNonNeg((st.bribesByIntensity[String(inten)] ?? 0) - sub);
+      saveSongesState(st);
+      renderSonges();
+    });
+  });
+};
+
+window.songeIncLegend = function(key){
+  const st = loadSongesState();
+  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) + 1);
+  saveSongesState(st);
+  renderSonges();
+};
+window.songeDecLegend = function(key){
+  const st = loadSongesState();
+  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) - 1);
+  saveSongesState(st);
+  renderSonges();
+};
+window.openLegendPad = function(key){
+  const s = loadSongesState();
+  openKeypad(`Légende • ${key}`, clampNonNeg(s.legends[key] ?? 0), (v)=>{
+    const st = loadSongesState();
+    st.legends[key] = clampNonNeg(v);
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+function renderSonges(){
+  const s = loadSongesState();
+  pagePill.textContent = "Songes";
+
+  const tab = s.ui?.tab || "runs";
+  const totalRuns = Object.values(s.runs||{}).reduce((a,b)=>a+n(b),0);
+  const bribesTotal = clampNonNeg(s.bribesTotal ?? 0);
+
+  const header = `
+    <div class="topline">
+      <div class="title">
+        <div class="logo" style="width:42px;height:42px;border-radius:16px">🌙</div>
+        <div>
+          <h2>Songes</h2>
+          <p class="sub">Runs par intensité • Bribes globales • Bribes cumulées par intensité • Légendes droppées.</p>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn gold" onclick="songeAddBribes()">➕ Ajouter des bribes</button>
+        <button class="btn" onclick="songeSubBribes()">➖ Retirer des bribes</button>
+        <button class="btn bad" onclick="resetSonges()">🧹 Reset Songes</button>
+      </div>
+    </div>
+  `;
+
+  const tabs = `
+    <div class="seg" style="margin-bottom:12px">
+      <button class="btn small ${tab==='runs'?'active':''}" onclick="setSongesTab('runs')">📊 Runs & Bribes</button>
+      <button class="btn small ${tab==='legends'?'active':''}" onclick="setSongesTab('legends')">🏷️ Légendes</button>
+    </div>
+  `;
+
+  const bribesKpiIcon = `
+    <span class="kico">
+      <img data-file="${escapeHtml(BRIBES_ICON_FILE)}" data-dir="" alt="">
+    </span>
+  `;
+
+  const topKpis = `
+    <div class="summary" style="margin-top:0">
+      <div class="kpi">
+        <div class="k">Bribes (global) ${bribesKpiIcon}</div>
+        <div class="v mono gold" style="cursor:pointer" onclick="openSongesBribesPad()">${fmt.format(bribesTotal)}</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Runs (total)</div>
+        <div class="v mono">${fmt.format(totalRuns)}</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Mode</div>
+        <div class="v mono">+Run = +1 run</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Astuce</div>
+        <div class="v mono">Bribes via bouton dédié</div>
+      </div>
+    </div>
+  `;
+
+  let body = "";
+
+  if(tab === "runs"){
+    const byGroup = (group) => SONGE_INTENSITIES.filter(x=>x.group===group);
+
+    const groupBlock = (groupName) => {
+      const rows = byGroup(groupName).map(it=>{
+        const count = clampNonNeg(s.runs[it.id] ?? 0);
+        const bsum = clampNonNeg(s.bribesByIntensity[String(it.num)] ?? 0);
+
+        return `
+          <div class="item">
+            <div class="ico">
+              <img data-file="${escapeHtml(it.img)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt="">
+            </div>
+            <div class="name">
+              <p class="n">${escapeHtml(it.label)}</p>
+              <p class="m">Bribes cumulées : <b class="mono">${fmt.format(bsum)}</b> <span class="pill" style="padding:4px 8px;border-radius:999px">Int. ${it.num}</span></p>
+            </div>
+            <div class="ctrls">
+              <button class="btn small" onclick="songeDecRun('${it.id}')">−</button>
+              <div class="num" onclick="openSongesRunPad('${it.id}','${jsEscape(it.label)}')">${fmt.format(count)}</div>
+              <button class="btn small gold" onclick="songeIncRun('${it.id}')">+ Run</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="calcBox" style="margin-bottom:14px">
+          <div class="calcHead">${escapeHtml(groupName.toUpperCase())}</div>
+          <div class="calcBody">
+            <div class="list">${rows}</div>
+          </div>
+        </div>
+      `;
+    };
+
+    body = `
+      <div class="row">
+        <div>
+          ${groupBlock("Rêve")}
+          ${groupBlock("Paradoxe")}
+        </div>
+
+        <div>
+          <div class="calcRightBig">
+            <div class="t">BRIBES (GLOBAL)</div>
+            <div class="v" onclick="openSongesBribesPad()">
+              <img data-file="${escapeHtml(BRIBES_ICON_FILE)}" style="width:26px;height:26px;object-fit:contain" alt="">
+              ${fmt.format(bribesTotal)}
+            </div>
+            <div class="calcNote" style="text-align:center">
+              Clique sur la valeur pour <b>définir le total</b>.<br>
+              Pour ajouter, utilise <b>“Ajouter des bribes”</b> → intensité (1..10) → ça cumule.
+            </div>
+          </div>
+
+          <div style="height:14px"></div>
+
+          <div class="section">
+            <div class="topline" style="margin-bottom:8px">
+              <div class="pill">Notes</div>
+              <div class="pill">Bribes liées aux vagues</div>
+            </div>
+            <div class="hint" style="margin-top:0">
+              Ici : tu saisis <b>les bribes réelles</b> et tu les classes par intensité.
+            </div>
+          </div>
+
+          <div style="height:14px"></div>
+
+          ${groupBlock("Cauchemar")}
+        </div>
+      </div>
+    `;
+  }
+
+  if(tab === "legends"){
+    const q = (s.ui?.search || "").toLowerCase().trim();
+
+    const tiles = SONGE_LEGENDS
+      .filter(l => !q || l.key.toLowerCase().includes(q))
+      .map(l=>{
+        const val = clampNonNeg(s.legends[l.key] ?? 0);
+        return `
+          <div class="item legendItem">
+            <div class="ico">
+              <img data-file="${escapeHtml(l.img)}" data-dir="${escapeHtml(l.imgDir || SONGES_IMG_DIR)}" alt="">
+            </div>
+            <div class="name">
+              <p class="n">${escapeHtml(l.key)}</p>
+              <p class="m">Compteur de drop légendaire</p>
+            </div>
+            <div class="ctrls">
+              <button class="btn small" onclick="songeDecLegend('${jsEscape(l.key)}')">−</button>
+              <div class="num" onclick="openLegendPad('${jsEscape(l.key)}')">${fmt.format(val)}</div>
+              <button class="btn small gold" onclick="songeIncLegend('${jsEscape(l.key)}')">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+    body = `
+      <div class="section">
+        <div class="topline" style="margin-bottom:10px">
+          <div class="title">
+            <div>
+              <h2>Légendes</h2>
+              <p class="sub">Compteurs de drops légendaires (clique sur le nombre pour saisir).</p>
+            </div>
+          </div>
+          <div class="searchRow">
+            <input
+              value="${escapeHtml(s.ui?.search || "")}"
+              oninput="setSongesSearch(this.value)"
+              placeholder="Rechercher une légende…"
+            />
+            <button class="btn bad" onclick="setSongesSearch('')">✖</button>
+          </div>
+        </div>
+
+        <div class="legendGrid">
+          ${tiles || `<div class="pill">Aucun résultat</div>`}
+        </div>
+
+        <div class="hint">
+          Astuce : <b>− / +</b> pour incrémenter, ou clique la valeur pour entrer un gros nombre au pavé numérique.
+        </div>
+      </div>
+    `;
+  }
+
+  app.innerHTML = header + tabs + topKpis + body;
+  activateFallbackIn(app, SONGES_IMG_DIR);
+}
 
 /* =========================================================
-   DONJONS UI + PAGES + RENDER (tu avais tout ça)
+   DONJONS UI
    ========================================================= */
-/* ... (tu avais déjà toutes les fonctions renderHome/renderDonjons/renderDungeon/renderSonges/renderAnomalies/renderPP/renderOmega etc.)
-   Dans TON extrait, elles sont déjà présentes jusqu’à renderOmega et render().
-   Donc on garde ça et on FIX seulement le boot() ci-dessous.
-*/
+function dungeonTotals(d){
+  const st = loadDungeonState(d.id);
+  const mobsTotal = Object.values(st.mobs||{}).reduce((a,b)=>a+n(b),0);
+  const resTotal  = Object.values(st.resources||{}).reduce((a,b)=>a+n(b),0);
+  return { mobsTotal, resTotal };
+}
+
+function renderHome(){
+  pagePill.textContent = "Accueil";
+
+  const cards = `
+    <div class="grid">
+      <div class="card">
+        <div class="card-left">
+          <div class="thumb"><img data-file="Icône Dj.png" alt=""></div>
+          <div style="min-width:0">
+            <h3>Donjons</h3>
+            <p>Compteurs mobs/ressources + prix + saisie pavé numérique</p>
+          </div>
+        </div>
+        <div class="card-right">
+          <button class="btn gold" onclick="location.hash='#/donjons'">Ouvrir</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-left">
+          <div class="thumb"><img data-file="Bribe de rêve.png" alt=""></div>
+          <div style="min-width:0">
+            <h3>Songes</h3>
+            <p>Runs par intensité, bribes, légendes</p>
+          </div>
+        </div>
+        <div class="card-right">
+          <button class="btn gold" onclick="location.hash='#/songes'">Ouvrir</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-left">
+          <div class="thumb"><img data-file="Icône anomalie.png" alt=""></div>
+          <div style="min-width:0">
+            <h3>Anomalies</h3>
+            <p>Placeholders (tu pourras y mettre tes compteurs)</p>
+          </div>
+        </div>
+        <div class="card-right">
+          <button class="btn gold" onclick="location.hash='#/anomalies'">Ouvrir</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-left">
+          <div class="thumb"><img data-file="Icône Calculateur PP.png" alt=""></div>
+          <div style="min-width:0">
+            <h3>Calculateur PP</h3>
+            <p>Drop final = base × multiplicateur PP × bonus</p>
+          </div>
+        </div>
+        <div class="card-right">
+          <button class="btn gold" onclick="location.hash='#/pp'">Ouvrir</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-left">
+          <div class="thumb"><img data-file="Icône Calculateur Omega.png" alt=""></div>
+          <div style="min-width:0">
+            <h3>XP Oméga</h3>
+            <p>Calcul XP requise pour passer d’un oméga à un autre</p>
+          </div>
+        </div>
+        <div class="card-right">
+          <button class="btn gold" onclick="location.hash='#/omega'">Ouvrir</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top:14px">
+      <div class="topline" style="margin-bottom:8px">
+        <div class="pill">Tips</div>
+        <div class="pill">Clique les chiffres = pavé numérique</div>
+      </div>
+      <div class="hint" style="margin-top:0">
+        Tout est sauvegardé <b>en local</b>. Si tu te connectes, ça sync <b>cloud</b> via sb.
+      </div>
+    </div>
+  `;
+
+  app.innerHTML = cards;
+  activateFallbackIn(app, "");
+}
+
+function renderDonjons(){
+  pagePill.textContent = "Donjons";
+
+  const cards = DUNGEONS.map(d=>{
+    const { mobsTotal, resTotal } = dungeonTotals(d);
+    return `
+      <div class="card">
+        <div class="card-left">
+          <div class="thumb">
+            <img data-file="${escapeHtml(d.thumb)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
+          </div>
+          <div style="min-width:0">
+            <h3>${escapeHtml(d.name)}</h3>
+            <p>Mobs: <b class="mono">${fmt.format(mobsTotal)}</b> • Ressources: <b class="mono">${fmt.format(resTotal)}</b></p>
+          </div>
+        </div>
+        <div class="card-right">
+          <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(d.id)}'">Ouvrir</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="topline">
+      <div class="title">
+        <div class="logo" style="width:42px;height:42px;border-radius:16px">🗝️</div>
+        <div>
+          <h2>Liste des donjons</h2>
+          <p class="sub">Clique un donjon pour voir les compteurs + prix.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      ${cards}
+    </div>
+  `;
+
+  activateFallbackIn(app, "");
+}
+
+function ensureDungeonStateShape(d, st){
+  st = st || { mobs:{}, resources:{}, prices:{} };
+
+  st.mobs = st.mobs || {};
+  st.resources = st.resources || {};
+  st.prices = st.prices || {};
+
+  (d.mobs||[]).forEach(m=>{
+    if(!(m.key in st.mobs)) st.mobs[m.key] = 0;
+  });
+  (d.resources||[]).forEach(r=>{
+    if(!(r.key in st.resources)) st.resources[r.key] = 0;
+    if(!(r.key in st.prices)) st.prices[r.key] = 0;
+  });
+
+  for(const k of Object.keys(st.mobs)) if(!(d.mobs||[]).some(m=>m.key===k)) delete st.mobs[k];
+  for(const k of Object.keys(st.resources)) if(!(d.resources||[]).some(r=>r.key===k)) delete st.resources[k];
+  for(const k of Object.keys(st.prices)) if(!(d.resources||[]).some(r=>r.key===k)) delete st.prices[k];
+
+  return st;
+}
+
+window.dInc = function(did, key){
+  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
+  const st = ensureDungeonStateShape(d, loadDungeonState(did));
+  st.mobs[key] = clampNonNeg((st.mobs[key]||0) + 1);
+  saveDungeonState(did, st);
+  renderDungeon(did);
+};
+window.dDec = function(did, key){
+  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
+  const st = ensureDungeonStateShape(d, loadDungeonState(did));
+  st.mobs[key] = clampNonNeg((st.mobs[key]||0) - 1);
+  saveDungeonState(did, st);
+  renderDungeon(did);
+};
+window.rInc = function(did, key){
+  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
+  const st = ensureDungeonStateShape(d, loadDungeonState(did));
+  st.resources[key] = clampNonNeg((st.resources[key]||0) + 1);
+  saveDungeonState(did, st);
+  renderDungeon(did);
+};
+window.rDec = function(did, key){
+  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
+  const st = ensureDungeonStateShape(d, loadDungeonState(did));
+  st.resources[key] = clampNonNeg((st.resources[key]||0) - 1);
+  saveDungeonState(did, st);
+  renderDungeon(did);
+};
+window.openMobPad = function(did, key){
+  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
+  const st = ensureDungeonStateShape(d, loadDungeonState(did));
+  openKeypad(`Mob • ${key}`, clampNonNeg(st.mobs[key] ?? 0), (v)=>{
+    const st2 = ensureDungeonStateShape(d, loadDungeonState(did));
+    st2.mobs[key] = clampNonNeg(v);
+    saveDungeonState(did, st2);
+    renderDungeon(did);
+  });
+};
+window.openResPad = function(did, key){
+  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
+  const st = ensureDungeonStateShape(d, loadDungeonState(did));
+  openKeypad(`Ressource • ${key}`, clampNonNeg(st.resources[key] ?? 0), (v)=>{
+    const st2 = ensureDungeonStateShape(d, loadDungeonState(did));
+    st2.resources[key] = clampNonNeg(v);
+    saveDungeonState(did, st2);
+    renderDungeon(did);
+  });
+};
+window.openPricePad = function(did, key){
+  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
+  const st = ensureDungeonStateShape(d, loadDungeonState(did));
+  openKeypad(`Prix/u • ${key}`, clampNonNeg(st.prices[key] ?? 0), (v)=>{
+    const st2 = ensureDungeonStateShape(d, loadDungeonState(did));
+    st2.prices[key] = clampNonNeg(v);
+    saveDungeonState(did, st2);
+    renderDungeon(did);
+  });
+};
+
+window.resetDungeon = function(did){
+  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
+  if(!confirm(`Reset ${d.name} (mobs + ressources + prix) ?`)) return;
+  localStorage.removeItem(kDungeon(did));
+  scheduleCloudSave();
+  renderDungeon(did);
+};
+
+window.totalRun = function(did){
+  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
+  const st = ensureDungeonStateShape(d, loadDungeonState(did));
+  const inc = d.totalIncrements || {};
+  for(const [k,v] of Object.entries(inc)){
+    // si k est une ressource, on incr res; sinon mobs
+    if((d.resources||[]).some(r=>r.key===k)) st.resources[k] = clampNonNeg((st.resources[k]||0) + clampNonNeg(v));
+    else st.mobs[k] = clampNonNeg((st.mobs[k]||0) + clampNonNeg(v));
+  }
+  saveDungeonState(did, st);
+  renderDungeon(did);
+};
+
+function dungeonSumKamas(d, st){
+  let total = 0;
+  for(const r of (d.resources||[])){
+    const q = clampNonNeg(st.resources?.[r.key] ?? 0);
+    const p = clampNonNeg(st.prices?.[r.key] ?? 0);
+    total += q * p;
+  }
+  return total;
+}
+
+function renderDungeon(did){
+  const d = DUNGEONS.find(x=>x.id===did);
+  if(!d){ location.hash = "#/donjons"; return; }
+
+  pagePill.textContent = d.name;
+
+  const st = ensureDungeonStateShape(d, loadDungeonState(did));
+  saveDungeonState(did, st); // normalise une fois
+
+  const mobsRows = (d.mobs||[]).map(m=>{
+    const val = clampNonNeg(st.mobs[m.key] ?? 0);
+    return `
+      <div class="item">
+        <div class="ico">
+          <img data-file="${escapeHtml(m.img)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
+        </div>
+        <div class="name">
+          <p class="n">${escapeHtml(m.key)}</p>
+          <p class="m">Compteur mob / boss</p>
+        </div>
+        <div class="ctrls">
+          <button class="btn small" onclick="dDec('${did}','${jsEscape(m.key)}')">−</button>
+          <div class="num" onclick="openMobPad('${did}','${jsEscape(m.key)}')">${fmt.format(val)}</div>
+          <button class="btn small gold" onclick="dInc('${did}','${jsEscape(m.key)}')">+</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  const resRows = (d.resources||[]).map(r=>{
+    const q = clampNonNeg(st.resources[r.key] ?? 0);
+    const p = clampNonNeg(st.prices[r.key] ?? 0);
+    const sub = q * p;
+    return `
+      <div class="item">
+        <div class="ico">
+          <img data-file="${escapeHtml(r.img)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
+        </div>
+        <div class="name">
+          <p class="n">${escapeHtml(r.key)}</p>
+          <p class="m">Sous-total : <b class="mono">${fmt.format(sub)}</b> kamas</p>
+        </div>
+        <div class="ctrls">
+          <button class="btn small" onclick="rDec('${did}','${jsEscape(r.key)}')">−</button>
+          <div class="num" onclick="openResPad('${did}','${jsEscape(r.key)}')">${fmt.format(q)}</div>
+          <button class="btn small gold" onclick="rInc('${did}','${jsEscape(r.key)}')">+</button>
+          <div class="num" style="min-width:90px" onclick="openPricePad('${did}','${jsEscape(r.key)}')">${fmt.format(p)}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  const mobsTotal = Object.values(st.mobs||{}).reduce((a,b)=>a+n(b),0);
+  const resTotal  = Object.values(st.resources||{}).reduce((a,b)=>a+n(b),0);
+  const kamasTotal = dungeonSumKamas(d, st);
+
+  app.innerHTML = `
+    <div class="topline">
+      <div class="title">
+        <div class="thumb" style="width:42px;height:42px;border-radius:16px">
+          <img data-file="${escapeHtml(d.thumb)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
+        </div>
+        <div>
+          <h2>${escapeHtml(d.name)}</h2>
+          <p class="sub">Clique sur les nombres pour saisir au pavé numérique • Prix = valeur par unité</p>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn" onclick="location.hash='#/donjons'">⬅ Retour</button>
+        <button class="btn gold" onclick="totalRun('${did}')">➕ ${escapeHtml(d.totalButtonLabel || 'Total run')}</button>
+        <button class="btn bad" onclick="resetDungeon('${did}')">🧹 Reset</button>
+      </div>
+    </div>
+
+    <div class="summary" style="margin-top:0">
+      <div class="kpi">
+        <div class="k">Total mobs/boss</div>
+        <div class="v mono">${fmt.format(mobsTotal)}</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Total ressources</div>
+        <div class="v mono">${fmt.format(resTotal)}</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Kamas estimés</div>
+        <div class="v mono gold">${fmt.format(kamasTotal)}</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Prix</div>
+        <div class="v mono">Clique le prix/u</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="section">
+        <div class="topline" style="margin-bottom:8px">
+          <div class="pill">Mobs / Boss</div>
+          <div class="pill">− / +</div>
+        </div>
+        <div class="list">${mobsRows}</div>
+      </div>
+
+      <div class="section">
+        <div class="topline" style="margin-bottom:8px">
+          <div class="pill">Ressources</div>
+          <div class="pill">Prix/u à droite</div>
+        </div>
+        <div class="list">${resRows}</div>
+        <div class="hint">
+          Chaque ligne : <b>quantité</b> + <b>prix/u</b> → sous-total. Total estimé en haut.
+        </div>
+      </div>
+    </div>
+  `;
+
+  activateFallbackIn(app, d.imgDir || "");
+}
+
+/* =========================================================
+   ANOMALIES (placeholder simple)
+   ========================================================= */
+function renderAnomalies(){
+  pagePill.textContent = "Anomalies";
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="logo" style="width:42px;height:42px;border-radius:16px">🌀</div>
+          <div>
+            <h2>Anomalies</h2>
+            <p class="sub">Zone placeholder — tu me diras quoi tracker ici et je te le code.</p>
+          </div>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:0">
+        Idées : compteur d’anomalies faites, compteur bribes/éclats, rendement kamas/h, liste drops… (on peut faire comme Donjons).
+      </div>
+    </div>
+  `;
+  activateFallbackIn(app, "");
+}
+
+/* =========================================================
+   PP PAGE
+   ========================================================= */
+function renderPP(){
+  pagePill.textContent = "Calculateur PP";
+  const s = loadPPState();
+  const { mult, final } = ppFinalDrop(s);
+
+  app.innerHTML = `
+    <div class="topline">
+      <div class="title">
+        <div class="logo" style="width:42px;height:42px;border-radius:16px">🍀</div>
+        <div>
+          <h2>Calculateur Prospection</h2>
+          <p class="sub">Clique les valeurs pour saisir au pavé numérique.</p>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn bad" onclick="localStorage.removeItem('${kPP}'); render(); scheduleCloudSave();">🧹 Reset</button>
+      </div>
+    </div>
+
+    <div class="calc3">
+      <div class="calcBox">
+        <div class="calcHead">Prospection</div>
+        <div class="calcBody">
+          <div class="calcValue" onclick="openPPPad('prospection','Prospection')">${fmt.format(clampNonNeg(s.prospection))}</div>
+          <div class="calcNote">Le multiplicateur PP est calculé via une fonction logistique (cap à 2.5).</div>
+        </div>
+      </div>
+
+      <div class="calcBox">
+        <div class="calcHead">Paramètres drop</div>
+        <div class="calcBody">
+          <div class="calcStack">
+            <div class="calcRow">
+              <div>
+                <div class="lab">Base (%)</div>
+                <div class="sub">Drop de base sur la ressource</div>
+              </div>
+              <div class="num" onclick="openPPPad('base','Drop de base (%)')">${fmt.format(clampNonNeg(s.base))}</div>
+            </div>
+
+            <div class="calcRow">
+              <div>
+                <div class="lab">Challenges (%)</div>
+                <div class="sub">Bonus challenges</div>
+              </div>
+              <div class="num" onclick="openPPPad('challenges','Bonus challenges (%)')">${fmt.format(clampNonNeg(s.challenges))}</div>
+            </div>
+
+            <div class="calcRow">
+              <div>
+                <div class="lab">Anomalie (%)</div>
+                <div class="sub">Bonus anomalie</div>
+              </div>
+              <div class="num" onclick="openPPPad('anomalie','Bonus anomalie (%)')">${fmt.format(clampNonNeg(s.anomalie))}</div>
+            </div>
+
+            <div class="calcRow">
+              <div>
+                <div class="lab">Bouclier (%)</div>
+                <div class="sub">Bonus bouclier / idoles-like</div>
+              </div>
+              <div class="num" onclick="openPPPad('shield','Bonus bouclier (%)')">${fmt.format(clampNonNeg(s.shield))}</div>
+            </div>
+
+            <div class="calcRow">
+              <div>
+                <div class="lab">Almanax (%)</div>
+                <div class="sub">Bonus almanax</div>
+              </div>
+              <div class="num" onclick="openPPPad('almanax','Bonus almanax (%)')">${fmt.format(clampNonNeg(s.almanax))}</div>
+            </div>
+          </div>
+
+          <div class="hint">
+            Formule : <b>Base × multPP × (1+challenges) × (1+anomalie) × (1+bouclier) × (1+almanax)</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="calcRightBig">
+        <div class="t">Résultats</div>
+        <div class="calcRow" style="margin-top:10px">
+          <div>
+            <div class="lab">Multiplicateur PP</div>
+            <div class="sub">cap à 2.5</div>
+          </div>
+          <div class="num static">${f2(mult)}</div>
+        </div>
+
+        <div class="v static" style="cursor:default;margin-top:10px">
+          ${f2(final)}%
+        </div>
+
+        <div class="calcNote" style="text-align:center">
+          Résultat = chance finale théorique (avant cap 100% selon mécanique IG).
+        </div>
+      </div>
+    </div>
+  `;
+  activateFallbackIn(app, "");
+}
+
+/* =========================================================
+   OMEGA PAGE
+   ========================================================= */
+function renderOmega(){
+  pagePill.textContent = "XP Oméga";
+  const s = loadOmegaState();
+  const xp = omegaXpRequired(s.cur, s.target);
+
+  app.innerHTML = `
+    <div class="topline">
+      <div class="title">
+        <div class="logo" style="width:42px;height:42px;border-radius:16px">📈</div>
+        <div>
+          <h2>Calculateur XP Oméga</h2>
+          <p class="sub">Clique les valeurs pour saisir au pavé numérique.</p>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn bad" onclick="localStorage.removeItem('${kOmega}'); render(); scheduleCloudSave();">🧹 Reset</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="section">
+        <div class="topline" style="margin-bottom:8px">
+          <div class="pill">Entrées</div>
+          <div class="pill">0 = vierge</div>
+        </div>
+
+        <div class="list">
+          <div class="item">
+            <div class="ico">🎯</div>
+            <div class="name">
+              <p class="n">Oméga actuel</p>
+              <p class="m">Niveau de départ</p>
+            </div>
+            <div class="ctrls">
+              <div class="num" onclick="openOmegaPad('cur','Oméga actuel')">${fmt.format(s.cur)}</div>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="ico">🚀</div>
+            <div class="name">
+              <p class="n">Oméga cible</p>
+              <p class="m">Niveau à atteindre</p>
+            </div>
+            <div class="ctrls">
+              <div class="num" onclick="openOmegaPad('target','Oméga cible')">${fmt.format(s.target)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint">
+          Modèle : XP(i→i+1) = 50 000 000 × 1.01^i (arrondi). (C’est un modèle, à ajuster si tu veux coller 100% IG.)
+        </div>
+      </div>
+
+      <div class="calcRightBig">
+        <div class="t">XP requise (total)</div>
+        <div class="v static" style="cursor:default">${fmt.format(xp)}</div>
+        <div class="calcNote" style="text-align:center">
+          Si la cible ≤ actuel, XP = 0.
+        </div>
+      </div>
+    </div>
+  `;
+  activateFallbackIn(app, "");
+}
 
 /* =========================================================
    RENDER (router)
@@ -1215,7 +2115,6 @@ function render(){
   if(r.page === "omega") return renderOmega();
   return renderHome();
 }
-
 async function handleAuthCallback(){
   if(!sb) return;
 
@@ -1227,6 +2126,7 @@ async function handleAuthCallback(){
     console.error("exchangeCodeForSession error:", error);
   }
 
+  // Nettoie l’URL (enlève ?code=... et autres)
   const cleanUrl =
     window.location.origin +
     window.location.pathname +
@@ -1236,20 +2136,22 @@ async function handleAuthCallback(){
 }
 
 /* =========================================================
-   INIT (FIX: un seul boot propre)
+   INIT
    ========================================================= */
+  (async function boot(){
 (async function boot(){
   try{
+    await handleAuthCallback(); // ⬅️ AJOUT ICI
     await handleAuthCallback();
     await initAuth();
     render();
     activateFallbackIn(document.getElementById("topHeader"), "");
   }catch(e){
     console.error(e);
-    // même si auth fail, on veut voir le site
-    render();
-    activateFallbackIn(document.getElementById("topHeader"), "");
   }
+})();
+  render();
+  activateFallbackIn(document.getElementById("topHeader"), "");
 })();
 </script>
 
