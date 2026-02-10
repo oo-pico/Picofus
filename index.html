@@ -2136,9 +2136,48 @@ async function handleAuthCallback(){
 }
 
 /* =========================================================
-   INIT
+   INIT (anti écran noir)
    ========================================================= */
+function showFatal(err){
+  console.error(err);
+  const app = document.getElementById("app");
+  if(app){
+    app.innerHTML = `
+      <div class="section">
+        <div class="topline">
+          <div class="title">
+            <div class="logo" style="width:42px;height:42px;border-radius:16px">⚠️</div>
+            <div>
+              <h2>Erreur JS détectée</h2>
+              <p class="sub">Ouvre la console (F12 → Console) et envoie-moi la première erreur rouge.</p>
+            </div>
+          </div>
+        </div>
+        <div class="hint" style="margin-top:0">
+          ${String(err?.message || err || "Erreur inconnue")}
+        </div>
+      </div>
+    `;
+  }
+}
+
 (async function boot(){
+  // 1) callback auth → ne doit JAMAIS bloquer l’UI
+  try { await handleAuthCallback(); }
+  catch(e){ console.error("handleAuthCallback failed:", e); }
+
+  // 2) init auth → ne doit JAMAIS bloquer l’UI
+  try { await initAuth(); }
+  catch(e){ console.error("initAuth failed:", e); }
+
+  // 3) render → quoi qu’il arrive
+  try { render(); }
+  catch(e){ showFatal(e); }
+
+  // 4) fallback images header
+  try { activateFallbackIn(document.getElementById("topHeader"), ""); }
+  catch(e){ console.error("activateFallbackIn(header) failed:", e); }
+})();
   try{
     await handleAuthCallback();
     await initAuth();
