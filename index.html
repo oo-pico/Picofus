@@ -16,12 +16,13 @@
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
-      background:radial-gradient(1200px 600px at 30% -10%, rgba(214,179,106,.08), transparent 60%),
-                 radial-gradient(900px 500px at 110% 10%, rgba(214,179,106,.06), transparent 55%),
-                 var(--bg);
+      background:
+        radial-gradient(1200px 600px at 30% -10%, rgba(214,179,106,.08), transparent 60%),
+        radial-gradient(900px 500px at 110% 10%, rgba(214,179,106,.06), transparent 55%),
+        var(--bg);
       color:var(--text);
     }
-    a{color:inherit}
+    a{color:inherit;text-decoration:none}
     .wrap{max-width:1150px;margin:0 auto;padding:22px}
     header{
       display:flex;align-items:center;justify-content:space-between;gap:16px;
@@ -30,16 +31,17 @@
       box-shadow:var(--shadow);
       position:sticky;top:10px;z-index:20;backdrop-filter:blur(10px);
     }
-    .brand{display:flex;align-items:center;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
     .logo{
       width:38px;height:38px;border-radius:12px;
       background:linear-gradient(135deg, rgba(214,179,106,.35), rgba(214,179,106,.05));
       border:1px solid rgba(214,179,106,.35);
       display:grid;place-items:center;
       font-weight:800;color:var(--gold);
+      flex-shrink:0;
     }
-    .brand h1{font-size:16px;margin:0;line-height:1}
-    .brand p{margin:0;color:var(--muted);font-size:12px}
+    .brand h1{font-size:16px;margin:0;line-height:1;white-space:nowrap}
+    .brand p{margin:0;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 
     .btn{
@@ -68,7 +70,6 @@
       max-width:360px;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    .navIco{width:16px;height:16px;object-fit:contain;display:inline-block}
 
     main{padding-top:18px}
 
@@ -90,8 +91,9 @@
       border:1px solid rgba(214,179,106,.25);
       background:rgba(214,179,106,.06);
       display:grid;place-items:center;overflow:hidden;
+      flex-shrink:0;
     }
-    .thumb img{width:100%;height:100%;object-fit:contain;image-rendering:auto}
+    .thumb img{width:100%;height:100%;object-fit:contain}
     .card h3{margin:0;font-size:15px}
     .card p{margin:3px 0 0;color:var(--muted);font-size:12px}
     .card-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
@@ -107,8 +109,6 @@
     .title{display:flex;gap:12px;align-items:center;min-width:0;}
     .title h2{margin:0;font-size:18px}
     .title .sub{margin:0;color:var(--muted);font-size:12px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-    @media (max-width: 980px){ .row{grid-template-columns:1fr} }
 
     .list{display:flex;flex-direction:column;gap:10px}
     .item{
@@ -132,166 +132,47 @@
     .name .m{font-size:12px;margin:2px 0 0;color:var(--muted)}
     .ctrls{display:flex;gap:8px;align-items:center}
     .num{
-      min-width:64px;text-align:right;
+      min-width:92px;text-align:right;
       font-variant-numeric:tabular-nums;
-      font-weight:700;
+      font-weight:800;
       padding:8px 10px;border-radius:12px;
       border:1px solid var(--stroke);
       background:rgba(0,0,0,.18);
       cursor:pointer;
     }
-    .field{
-      width:110px;
-      padding:8px 10px;border-radius:12px;
-      border:1px solid var(--stroke);
-      background:rgba(0,0,0,.18);
-      color:var(--text);
-      outline:none;
-      font-variant-numeric:tabular-nums;
+
+    /* modal */
+    .modalBack{
+      position:fixed;inset:0;background:rgba(0,0,0,.55);
+      display:none;align-items:center;justify-content:center;
+      padding:18px;z-index:999;
     }
-    .field:focus{border-color:rgba(214,179,106,.55)}
-    .mini{width:92px}
-
-    .summary{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:10px;margin-top:12px;}
-    @media (max-width: 980px){ .summary{grid-template-columns:repeat(2, minmax(0, 1fr))} }
-    .kpi{border:1px solid var(--stroke);border-radius:16px;background:rgba(255,255,255,.02);padding:10px;}
-    .kpi .k{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center}
-    .kpi .k .kico{width:16px;height:16px;display:inline-grid;place-items:center}
-    .kpi .k .kico img{width:16px;height:16px;object-fit:contain}
-    .kpi .v{margin-top:6px;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
-    .kpi .v.gold{color:var(--gold)}
-    .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.35}
-
-    /* ====== MODAL / KEYPAD ====== */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:99;}
-    .modal.open{display:flex}
-    .kbd{
-      width:min(420px, 100%);
+    .modal{
+      width:min(520px, 100%);
       border:1px solid var(--stroke);
-      border-radius:22px;
-      background:linear-gradient(180deg, #1b1b1e, #121214);
-      box-shadow:0 25px 60px rgba(0,0,0,.75);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border-radius:18px;
+      box-shadow:var(--shadow);
       padding:14px;
     }
-    .kbd-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-    .kbd-top .label{color:var(--muted);font-size:12px}
-    .kbd-top .target{font-weight:800}
-    .kbd-display{
-      border:1px solid var(--stroke);
-      background:#0b0b0c;
-      border-radius:18px;
-      padding:12px 12px;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      margin-bottom:12px;
-    }
-    .kbd-display .val{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}
-    .kbd-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;}
-    .kbd-key{
-      border:1px solid var(--stroke);
-      background:#18181a;
-      color:var(--text);
-      border-radius:16px;
-      padding:14px 10px;
-      font-size:16px;
-      cursor:pointer;
-    }
-    .kbd-key:hover{border-color:rgba(214,179,106,.45);background:#1f1f22}
-    .kbd-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-    .kbd-actions .btn{flex:1}
-    .kbd-actions .btn.small{flex:0 0 auto}
-    .mono{font-variant-numeric:tabular-nums}
-
-    /* ====== mini layout calculators ====== */
-    .calc3{display:grid;grid-template-columns:1.05fr 1.25fr .9fr;gap:14px;align-items:start}
-    @media (max-width: 980px){ .calc3{grid-template-columns:1fr} }
-    .calcBox{
-      border:1px solid var(--stroke);
-      border-radius:var(--r);
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-    .calcHead{
-      padding:10px 12px;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      border-bottom:1px solid var(--stroke);
-      font-size:12px;color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.06em;
-    }
-    .calcBody{padding:12px}
-    .calcValue{
-      display:flex;align-items:center;justify-content:center;
-      font-size:22px;font-weight:900;
-      font-variant-numeric:tabular-nums;
-      border:1px solid var(--stroke);
-      background:rgba(0,0,0,.18);
-      border-radius:16px;
-      padding:12px 10px;
-      cursor:pointer;
-    }
-    .calcValue.static{cursor:default}
-    .calcStack{display:flex;flex-direction:column;gap:10px}
-    .calcRow{
-      display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
-      border:1px solid var(--stroke);
-      background:rgba(0,0,0,.12);
-      border-radius:16px;
-      padding:10px;
-    }
-    .calcRow .lab{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-    .calcRow .sub{font-size:12px;color:var(--muted);margin-top:2px}
-    .calcRightBig{
-      border:1px solid rgba(214,179,106,.45);
-      background:linear-gradient(180deg, rgba(214,179,106,.14), rgba(214,179,106,.06));
-      border-radius:var(--r);
-      padding:12px;
-    }
-    .calcRightBig .t{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-    .calcRightBig .v{
-      margin-top:8px;
-      font-size:30px;font-weight:950;color:var(--gold);
-      font-variant-numeric:tabular-nums;
-      display:flex;justify-content:center;align-items:center;gap:10px;
-      padding:14px 10px;border-radius:16px;
-      border:1px solid rgba(214,179,106,.35);
-      background:rgba(0,0,0,.18);
-      cursor:pointer;
-    }
-    .calcNote{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.35}
-    .fieldPct{width:120px}
-
-    /* ====== Songes helpers ====== */
-    .seg{display:flex;gap:8px;flex-wrap:wrap}
-    .seg .btn{padding:8px 10px;border-radius:999px}
-    .seg .btn.active{border-color:rgba(214,179,106,.65);background:rgba(214,179,106,.10)}
-    .searchRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .searchRow input{
-      flex:1;min-width:180px;
-      padding:10px 12px;border-radius:14px;
+    .modalTop{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .modalTop h3{margin:0;font-size:16px}
+    .modalTop p{margin:2px 0 0;color:var(--muted);font-size:12px}
+    .modalBody{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .input{
+      width:100%;
+      padding:12px 12px;border-radius:14px;
       border:1px solid var(--stroke);
       background:rgba(0,0,0,.18);
       color:var(--text);
+      font-size:18px;
+      font-weight:800;
+      font-variant-numeric:tabular-nums;
       outline:none;
     }
-    .searchRow input:focus{border-color:rgba(214,179,106,.55)}
-
-    /* ====== Legends: 2 par ligne ====== */
-    .legendGrid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-    @media (max-width: 980px){ .legendGrid{grid-template-columns:1fr} }
-    .legendItem .name .n{max-width:100%}
-    .legendItem .ctrls .btn.small{padding:8px 9px}
-    .legendItem .num{min-width:72px}
+    .hint{margin-top:10px;color:var(--muted);font-size:12px}
+    .modalBtns{margin-top:12px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
   </style>
-
-  <!-- sb JS v2 -->
-  <!-- Supabase JS v2 -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -299,1879 +180,567 @@
     <header id="topHeader">
       <div class="brand">
         <div class="logo">P</div>
-        <div>
-          <h1>Picofus – Tracker</h1>
-          <p>Compteurs donjons / mobs / ressources + saisie pavé numérique</p>
+        <div style="min-width:0">
+          <h1>Picofus</h1>
+          <p>Tracker — local / cloud</p>
         </div>
       </div>
 
       <div class="nav">
-        <span class="pill" id="pagePill">Accueil</span>
-        <span class="pill" id="authPill">🔒 Local</span>
+        <a class="btn small" href="#home">Accueil</a>
+        <a class="btn small" href="#donjons">Donjons</a>
+        <a class="btn small" href="#omega">Oméga</a>
 
-        <button class="btn small" id="btnTabHome">🏠 Home</button>
+        <span class="pill" id="authPill">local</span>
 
-        <button class="btn small" id="btnTabDonjons">
-          <img class="navIco" data-file="Icône Dj.png" alt=""> Donjons
-        </button>
-
-        <button class="btn small" id="btnTabSonges">
-          <img class="navIco" data-file="Bribe de rêve.png" alt=""> Songes
-        </button>
-
-        <button class="btn small" id="btnTabAnomalies">
-          <img class="navIco" data-file="Icône anomalie.png" alt=""> Anomalies
-        </button>
-
-        <button class="btn small" id="btnTabPP">
-          <img class="navIco" data-file="Icône Calculateur PP.png" alt=""> Calculateur PP
-        </button>
-
-        <button class="btn small" id="btnTabOmega">
-          <img class="navIco" data-file="Icône Calculateur Omega.png" alt=""> XP Oméga
-        </button>
-
-        <button class="btn small good" id="btnAuth">🔑 Connexion</button>
-        <button class="btn small bad" id="btnResetAll">🧹 Reset tout</button>
+        <button class="btn small gold" id="btnLogin" type="button">cloud</button>
+        <button class="btn small bad" id="btnLogout" type="button" style="display:none">local</button>
       </div>
     </header>
 
     <main id="app"></main>
   </div>
 
-  <div class="modal" id="modal">
-    <div class="kbd" role="dialog" aria-modal="true">
-      <div class="kbd-top">
+  <!-- Modal de saisie -->
+  <div class="modalBack" id="modalBack" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalTop">
         <div>
-          <div class="label">Saisie pavé numérique</div>
-          <div class="target" id="kbdTarget">—</div>
+          <h3 id="modalTitle">Saisie</h3>
+          <p id="modalSub">Entre un nombre</p>
         </div>
-        <button class="btn small" id="kbdClose">✖</button>
+        <button class="btn small" id="modalClose" type="button">✕</button>
       </div>
-
-      <div class="kbd-display">
-        <div class="label">Valeur</div>
-        <div class="val mono" id="kbdValue">0</div>
+      <div class="modalBody">
+        <input class="input" id="modalInput" inputmode="numeric" autocomplete="off" />
+        <div class="hint">Astuce : tu peux coller un gros nombre. (Seuls les chiffres sont gardés)</div>
       </div>
-
-      <div class="kbd-grid" id="kbdGrid"></div>
-
-      <div class="kbd-actions">
-        <button class="btn bad" id="kbdClear">C</button>
-        <button class="btn" id="kbdBack">⌫</button>
-        <button class="btn gold" id="kbdOk">Valider</button>
-      </div>
-
-      <div class="hint">
-        Clique sur un nombre pour saisir. <b>Valider</b> applique la valeur. <b>C</b> remet à 0.
+      <div class="modalBtns">
+        <button class="btn small" id="modalCancel" type="button">Annuler</button>
+        <button class="btn small good" id="modalOk" type="button">OK</button>
       </div>
     </div>
   </div>
 
-<script>
-/* =========================================================
-   sb CONFIG (tes infos)
-   ========================================================= */
-/* =========================================================
-   SUPABASE CONFIG (tes infos)
-   ========================================================= */
+  <script>
+    /* =========================================================
+       CONFIG SUPABASE (optionnel)
+       ========================================================= */
 const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
-const SUPABASE_TABLE = "saves"; // user_id(uuid PK), data(jsonb), updated_at(timestamptz)
 
-let sb = null; // on garde le nom "sb" dans TON code, mais c'est un client Supabase
 
-function initSupabase(){
-  try{
-    if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
-    if(!window.supabase || !window.supabase.createClient) return null;
-    return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }catch(e){
-    console.error("Supabase init error:", e);
-    return null;
-  }
-}
+    let sb = null;        // client supabase (si configuré)
+    let isCloud = false;  // connecté ?
+    let cloudReady = false;
 
-sb = initSupabase();
-// Etat Cloud (OBLIGATOIRE sinon crash)
-const cloud = {
-  user: null,
-  saving: false,
-  saveTimer: null,
-  lastCloudUpdatedAt: 0
-};
+    /* =========================================================
+       DATA (exemple Comte + ressources)
+       Tu peux ajouter tes autres donjons ensuite.
+       ========================================================= */
+    const DUNGEONS = [
+      {
+        id: "comte",
+        name: "Comte Harebourg",
+        desc: "Compteurs donjon / ressources / kamas",
+        thumb: "images/comte/comte.png", // optionnel (si tu as)
+        items: [
+          { key:"donjons", name:"Donjons", sub:"Total runs", icon:"images/comte/comte.png" },
+          { key:"scapula", name:"Scapula du Comte Harebourg", sub:"Drop", icon:"images/comte/scapula.png" },
+          { key:"bandelette", name:"Bandelette du Comte Harebourg", sub:"Drop", icon:"images/comte/bandelette.png" },
+          { key:"pic", name:"Pic de Noctularbe", sub:"Drop", icon:"images/comte/pic.png" },
+          { key:"bec1", name:"Bec de Granduk", sub:"Drop", icon:"images/comte/bec_granduk.png" },
+          { key:"bec2", name:"Bec de Strigide", sub:"Drop", icon:"images/comte/bec_strigide.png" },
+          { key:"plume", name:"Plume de Cycloïde", sub:"Drop", icon:"images/comte/plume.png" },
+        ]
+      }
+    ];
 
-/* =========================================================
-   GLOBALS / STORAGE
-   ========================================================= */
-const LS_PREFIX = "picofus:v3:";
-const CLOUD_META_KEY = `${LS_PREFIX}cloud_meta`;
-const fmt = new Intl.NumberFormat("fr-FR");
+    /* =========================================================
+       STORAGE
+       - localStorage toujours
+       - cloud (supabase) seulement si connecté
+       ========================================================= */
+    const LS_KEY = "picofus_state_v1";
 
-function n(v){ return Number.isFinite(v) ? v : 0; }
-function clampNonNeg(x){ x = Math.trunc(Number(x)||0); return x < 0 ? 0 : x; }
-function f2(x){ return (Number(x)||0).toFixed(2); }
-function clampPct(x){
-  x = Number(String(x).replace(",", "."));
-  if(!Number.isFinite(x)) x = 0;
-  return x < 0 ? 0 : x;
-}
-
-/* Reset global = tout vider (donjons + songes + pp + omega) */
-function resetAll(){
-  Object.keys(localStorage).forEach(k=>{
-    if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k);
-  });
-  scheduleCloudSave();
-}
-
-/* =========================================================
-   SAFE HTML HELPERS
-   ========================================================= */
-function escapeHtml(s){
-  return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-function jsEscape(s){
-  return String(s ?? "").replaceAll("\\","\\\\").replaceAll("'","\\'");
-}
-
-/* =========================================================
-   IMAGE FALLBACK (FIXÉ: plus d’erreur JS)
-   ========================================================= */
-function uniq(arr){
-  const seen = new Set();
-  const out = [];
-  for(const x of arr){
-    if(!x) continue;
-    if(seen.has(x)) continue;
-    seen.add(x);
-    out.push(x);
-  }
-  return out;
-}
-function withDot(dir){ return dir.startsWith("./") ? dir : "./" + dir; }
-function stripDot(dir){ return dir.startsWith("./") ? dir.slice(2) : dir; }
-function encPath(p){ try { return encodeURI(p); } catch { return p; } }
-
-function makeCandidates(imgDir, file){
-  const d1 = stripDot(imgDir || "");
-  const d2 = withDot(imgDir || "");
-  const f1 = file || "";
-  return uniq([
-    d1 + f1,
-    d2 + f1,
-    encPath(d1 + f1),
-    encPath(d2 + f1),
-    f1,
-    "./" + f1,
-    encPath(f1),
-    encPath("./" + f1),
-    "img/" + f1,
-    "./img/" + f1,
-    "images/" + f1,
-    "./images/" + f1,
-    "assets/" + f1,
-    "./assets/" + f1,
-  ]);
-}
-
-function attachFallback(imgEl, imgDir, file){
-  const list = makeCandidates(imgDir, file);
-  imgEl.dataset.candidates = JSON.stringify(list);
-  imgEl.dataset.idx = "0";
-  imgEl.src = list[0];
-  imgEl.onerror = () => {
-    const candidates = JSON.parse(imgEl.dataset.candidates || "[]");
-    let idx = parseInt(imgEl.dataset.idx || "0", 10) + 1;
-    imgEl.dataset.idx = String(idx);
-    if(idx < candidates.length) imgEl.src = candidates[idx];
-    else imgEl.onerror = null;
-  };
-}
-
-function activateFallbackIn(containerEl, defaultDir){
-  if(!containerEl) return;
-  containerEl.querySelectorAll("img").forEach(img=>{
-    const file = img.getAttribute("data-file") || (img.getAttribute("src")||"").split("/").pop();
-    const dir  = img.getAttribute("data-dir") || defaultDir || "";
-    if(file) attachFallback(img, dir, file);
-  });
-}
-function getLocalCloudMeta(){
-  try{ return JSON.parse(localStorage.getItem(CLOUD_META_KEY) || "null"); }
-  catch{ return null; }
-}
-function setLocalCloudMeta(meta){
-  localStorage.setItem(CLOUD_META_KEY, JSON.stringify(meta));
-}
-
-function collectPrefixedLocalStorage(){
-  const ls = {};
-  for(const k of Object.keys(localStorage)){
-    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY){
-      ls[k] = localStorage.getItem(k);
+    function loadLocalState(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return {};
+        return JSON.parse(raw) || {};
+      }catch(e){
+        console.error("loadLocalState", e);
+        return {};
+      }
     }
-  }
-  return ls;
-}
-
-function replacePrefixedLocalStorage(lsMap){
-  for(const k of Object.keys(localStorage)){
-    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY){
-      localStorage.removeItem(k);
+    function saveLocalState(state){
+      localStorage.setItem(LS_KEY, JSON.stringify(state));
     }
-  }
-  for(const [k,v] of Object.entries(lsMap || {})){
-    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY){
-      localStorage.setItem(k, v);
+
+    // state = { dungeonId: { counterKey: number, ... }, omega:{cur:..., target:...} }
+    let state = loadLocalState();
+
+    function getCounter(dungeonId, key){
+      return Number(state?.[dungeonId]?.[key] ?? 0) || 0;
     }
-  }
-}
-
-async function loadFromCloudIntoLocal(){
-  if(!sb || !cloud.user) return false;
-  try{
-    const { data, error } = await sb
-      .from(SUPABASE_TABLE)
-      .select("data, updated_at")
-      .eq("user_id", cloud.user.id)
-      .maybeSingle();
-
-    if(error){
-      console.error("Cloud load error:", error);
-      return false;
+    function setCounter(dungeonId, key, value){
+      if(!state[dungeonId]) state[dungeonId] = {};
+      state[dungeonId][key] = clampInt(value);
+      saveLocalState(state);
+      // (cloud sync optionnel: plus tard)
     }
-    if(!data || !data.data) return false;
-
-    const payload = data.data;
-    const cloudUpdatedAt = data.updated_at ? new Date(data.updated_at).getTime() : Date.now();
-
-    const localMeta = getLocalCloudMeta();
-    const localUpdatedAt = localMeta?.localUpdatedAt ? Number(localMeta.localUpdatedAt) : 0;
-
-    if(cloudUpdatedAt >= localUpdatedAt){
-      replacePrefixedLocalStorage(payload.ls || {});
-      setLocalCloudMeta({ localUpdatedAt: cloudUpdatedAt, lastCloudUpdatedAt: cloudUpdatedAt });
-      cloud.lastCloudUpdatedAt = cloudUpdatedAt;
-      return true;
-    }else{
-      cloud.lastCloudUpdatedAt = cloudUpdatedAt;
-      return false;
+    function incCounter(dungeonId, key, delta){
+      const v = getCounter(dungeonId, key) + delta;
+      setCounter(dungeonId, key, v);
     }
-  }catch(e){
-    console.error("Cloud load exception:", e);
-    return false;
-  }
-}
 
-async function saveLocalToCloudNow(){
-  if(!sb || !cloud.user) return;
-  try{
-    cloud.saving = true;
-    updateAuthUI();
-
-    const ls = collectPrefixedLocalStorage();
-    const payload = { version: 1, savedAt: new Date().toISOString(), ls };
-
-    const { error } = await sb
-   .from(SUPABASE_TABLE)
-      .upsert({
-        user_id: cloud.user.id,
-        data: payload,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "user_id" });
-
-    if(error){
-      console.error("Cloud save error:", error);
-      return;
+    function clampInt(v){
+      const n = Number(String(v).replace(/[^\d-]/g, "")) || 0;
+      return Math.max(0, Math.floor(n));
     }
-    const now = Date.now();
-    setLocalCloudMeta({ localUpdatedAt: now, lastCloudUpdatedAt: cloud.lastCloudUpdatedAt || now });
-  }catch(e){
-    console.error("Cloud save exception:", e);
-  }finally{
-    cloud.saving = false;
-    updateAuthUI();
-  }
-}
 
-function scheduleCloudSave(){
-  if(!sb || !cloud.user) return;
-  if(cloud.saveTimer) clearTimeout(cloud.saveTimer);
-  cloud.saveTimer = setTimeout(()=>saveLocalToCloudNow(), 900);
-}
-
-/* Auth UI / Actions */
-const authPill = document.getElementById("authPill");
-const btnAuth = document.getElementById("btnAuth");
-
-function updateAuthUI(){
-  if(!sb){
-    authPill.textContent = "⚠️ sb OFF";
-    btnAuth.textContent = "🔑 Connexion";
-    btnAuth.classList.remove("bad");
-    btnAuth.classList.add("good");
-    return;
-  }
-
-  if(cloud.user){
-    authPill.textContent = cloud.saving ? "☁️ Sync…" : "☁️ Cloud connecté";
-    btnAuth.textContent = "🚪 Déconnexion";
-    btnAuth.classList.remove("good");
-    btnAuth.classList.add("bad");
-  }else{
-    authPill.textContent = "🔒 Local";
-    btnAuth.textContent = "🔑 Connexion";
-    btnAuth.classList.remove("bad");
-    btnAuth.classList.add("good");
-  }
-}
-
-async function doLogin(){
-  if(!sb) return alert("sb non initialisé (URL/Key manquantes).");
-  const email = prompt("Email pour connexion (magic link) :");
-  if(!email) return;
-
-const redirectTo = window.location.origin + window.location.pathname;
-
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: redirectTo }
-  });
-
-  if(error){
-    console.error(error);
-    alert("Erreur connexion: " + (error.message || "unknown"));
-    return;
-  }
-  alert("✅ Lien envoyé par email. Ouvre-le pour te connecter (retour sur le site).");
-}
-
-async function doLogout(){
-  if(!sb) return;
-  const { error } = await sb.auth.signOut();
-  if(error){
-    console.error(error);
-    alert("Erreur déconnexion: " + (error.message || "unknown"));
-  }
-}
-
-btnAuth.addEventListener("click", ()=>{
-  if(cloud.user) doLogout();
-  else doLogin();
-});
-
-async function initAuth(){
-  if(!sb) { updateAuthUI(); return; }
-
-  const { data } = await sb.auth.getSession();
-  cloud.user = data?.session?.user || null;
-  updateAuthUI();
-
-  if(cloud.user){
-    await loadFromCloudIntoLocal();
-  }
-
-  sb.auth.onAuthStateChange(async (_event, session)=>{
-    cloud.user = session?.user || null;
-    updateAuthUI();
-    if(cloud.user){
-      await loadFromCloudIntoLocal();
-      render();
-      scheduleCloudSave();
-    }else{
-      render();
+    /* =========================================================
+       ROUTER
+       ========================================================= */
+    function getRoute(){
+      const h = (location.hash || "#home").replace(/^#/, "");
+      const parts = h.split("/").filter(Boolean);
+      if(parts.length === 0) return { page:"home" };
+      if(parts[0] === "home") return { page:"home" };
+      if(parts[0] === "donjons") return { page:"donjons" };
+      if(parts[0] === "dungeon") return { page:"dungeon", id: parts[1] || "" };
+      if(parts[0] === "omega") return { page:"omega" };
+      return { page:"home" };
     }
-  });
-}
 
-/* =========================================================
-   KEY PAD (numeric)
-   ========================================================= */
-const modal = document.getElementById("modal");
-const kbdTarget = document.getElementById("kbdTarget");
-const kbdValue = document.getElementById("kbdValue");
-const kbdGrid = document.getElementById("kbdGrid");
-const btnClose = document.getElementById("kbdClose");
-const btnClear = document.getElementById("kbdClear");
-const btnBack = document.getElementById("kbdBack");
-const btnOk = document.getElementById("kbdOk");
+    function navTo(hash){
+      location.hash = hash;
+    }
 
-let keypad = { open:false, buffer:"0", onApply:null, title:"" };
+    /* =========================================================
+       MODAL INPUT (clic sur le nombre)
+       ========================================================= */
+    const modalBack = document.getElementById("modalBack");
+    const modalInput = document.getElementById("modalInput");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSub = document.getElementById("modalSub");
+    const modalClose = document.getElementById("modalClose");
+    const modalCancel = document.getElementById("modalCancel");
+    const modalOk = document.getElementById("modalOk");
 
-function openKeypad(title, currentValue, onApply){
-  keypad.open = true;
-  keypad.title = title;
-  keypad.buffer = String(clampNonNeg(currentValue));
-  keypad.onApply = onApply;
-  kbdTarget.textContent = title;
-  kbdValue.textContent = keypad.buffer;
-  modal.classList.add("open");
-}
-function closeKeypad(){ keypad.open = false; modal.classList.remove("open"); }
-function setBuffer(next){ keypad.buffer = next; kbdValue.textContent = keypad.buffer; }
-function pushDigit(d){ if(keypad.buffer === "0") setBuffer(String(d)); else setBuffer(keypad.buffer + String(d)); }
-function backspace(){ if(keypad.buffer.length <= 1) setBuffer("0"); else setBuffer(keypad.buffer.slice(0,-1)); }
-function clearBuf(){ setBuffer("0"); }
-function applyBuf(){
-  const val = clampNonNeg(parseInt(keypad.buffer,10));
-  if(typeof keypad.onApply === "function") keypad.onApply(val);
-  closeKeypad();
-}
+    let modalResolve = null;
 
-(function buildKeypad(){
-  kbdGrid.innerHTML = "";
-  for(let i=1;i<=9;i++){
-    const b = document.createElement("button");
-    b.className = "kbd-key";
-    b.textContent = String(i);
-    b.addEventListener("click", ()=>pushDigit(i));
-    kbdGrid.appendChild(b);
-  }
-  const blank1 = document.createElement("div");
-  const zero = document.createElement("button");
-  zero.className = "kbd-key";
-  zero.textContent = "0";
-  zero.addEventListener("click", ()=>pushDigit(0));
-  const blank2 = document.createElement("div");
-  kbdGrid.appendChild(blank1);
-  kbdGrid.appendChild(zero);
-  kbdGrid.appendChild(blank2);
-})();
+    function openNumberModal(title, sub, initialValue){
+      modalTitle.textContent = title || "Saisie";
+      modalSub.textContent = sub || "Entre un nombre";
+      modalInput.value = String(initialValue ?? "");
+      modalBack.style.display = "flex";
+      modalBack.setAttribute("aria-hidden", "false");
 
-btnClose.addEventListener("click", closeKeypad);
-modal.addEventListener("click", (e)=>{ if(e.target === modal) closeKeypad(); });
-btnClear.addEventListener("click", clearBuf);
-btnBack.addEventListener("click", backspace);
-btnOk.addEventListener("click", applyBuf);
-window.addEventListener("keydown", (e)=>{
-  if(!keypad.open) return;
-  if(e.key >= "0" && e.key <= "9") pushDigit(e.key);
-  else if(e.key === "Backspace") backspace();
-  else if(e.key === "Escape") closeKeypad();
-  else if(e.key === "Enter") applyBuf();
-});
+      setTimeout(()=> modalInput.focus(), 0);
 
-/* =========================================================
-   ROUTER / APP ROOT
-   ========================================================= */
-const app = document.getElementById("app");
-const pagePill = document.getElementById("pagePill");
+      return new Promise((resolve)=>{
+        modalResolve = resolve;
+      });
+    }
 
-document.getElementById("btnTabHome").addEventListener("click", ()=>{ location.hash = "#/"; });
-document.getElementById("btnTabDonjons").addEventListener("click", ()=>{ location.hash = "#/donjons"; });
-document.getElementById("btnTabSonges").addEventListener("click", ()=>{ location.hash = "#/songes"; });
-document.getElementById("btnTabAnomalies").addEventListener("click", ()=>{ location.hash = "#/anomalies"; });
-document.getElementById("btnTabPP").addEventListener("click", ()=>{ location.hash = "#/pp"; });
-document.getElementById("btnTabOmega").addEventListener("click", ()=>{ location.hash = "#/omega"; });
+    function closeNumberModal(result){
+      modalBack.style.display = "none";
+      modalBack.setAttribute("aria-hidden", "true");
+      const r = modalResolve;
+      modalResolve = null;
+      if(r) r(result);
+    }
 
-document.getElementById("btnResetAll").addEventListener("click", ()=>{
-  if(confirm("Reset TOUTES les données (tous les donjons + Songes + calculateurs) ?")){
-    resetAll();
-    render();
-  }
-});
+    modalClose.onclick = () => closeNumberModal(null);
+    modalCancel.onclick = () => closeNumberModal(null);
+    modalOk.onclick = () => closeNumberModal(modalInput.value);
 
-function getRoute(){
-  const h = location.hash.replace("#","").trim();
-  if(!h || h === "/") return { page:"home" };
-  if(h === "/donjons") return { page:"donjons" };
-  if(h === "/songes") return { page:"songes" };
-  if(h === "/anomalies") return { page:"anomalies" };
-  if(h === "/pp") return { page:"pp" };
-  if(h === "/omega") return { page:"omega" };
-  const m = h.match(/^\/d\/([^\/]+)$/);
-  if(m) return { page:"dungeon", id:decodeURIComponent(m[1]) };
-  return { page:"home" };
-}
-window.addEventListener("hashchange", render);
+    modalBack.addEventListener("click", (e)=>{
+      if(e.target === modalBack) closeNumberModal(null);
+    });
 
-/* =========================================================
-   DONJONS DATA
-   ========================================================= */
-const DUNGEONS = [
-  {
-    id: "dechireuse",
-    name: "Déchireuse",
-    thumb: "Déchireuse.png",
-    imgDir: "Déchireuse/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Déchireuse": 1, "Domptueuse": 13, "Ébourifauve": 13, "Voracle": 13 },
-    mobs: [
-      { key:"Déchireuse", img:"Déchireuse.png" },
-      { key:"Domptueuse", img:"Domptueuse.png" },
-      { key:"Ébourifauve", img:"Ébourifauve.png" },
-      { key:"Voracle", img:"Voracle.png" },
-    ],
-    resources: [
-      { key:"Toison de la Déchireuse", img:"Toison de la Déchireuse.png" },
-      { key:"Griffe de la Déchireuse", img:"Griffe de la Déchireuse.png" },
-      { key:"Tresse de Domptueuse", img:"Tresse de Domptueuse.png" },
-      { key:"Frange d'Ébourifauve", img:"Frange d'Ébourifauve.png" },
-      { key:"Mise en plis de Voracle", img:"Mise en plis de Voracle.png" },
-      { key:"Daguosseuse de Domptueuse", img:"Daguosseuse de Domptueuse.png" },
-      { key:"Bandeau d'Ébourifauve", img:"Bandeau d'Ébourifauve.png" },
-      { key:"Os Divinatoire de Voracle", img:"Os Divinatoire de Voracle.png" },
-      { key:"Squame du Graogarm", img:"Squame du Graogarm.png" },
-      { key:"Peigne de Rhoarim", img:"Peigne de Rhoarim.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Uniforme de chasseur-mangeur", img:"Uniforme de chasseur-mangeur.png" },
-    ],
-  },
-  {
-    id: "tempetes",
-    name: "Tempêtes Éliocalypse",
-    thumb: "servitude.png",
-    imgDir: "4 cavaliers/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: {
-      "Servitude": 1, "Guerre": 1, "Corruption": 1, "Misère": 1,
-      "Armécréante": 1, "Olgoth": 1, "Pistilangue": 1, "Ferailleur": 1
-    },
-    mobs: [
-      { key:"Servitude", img:"servitude.png" },
-      { key:"Guerre", img:"guerre.png" },
-      { key:"Corruption", img:"Corruption.png" },
-      { key:"Misère", img:"Misère.png" },
-      { key:"Armécréante", img:"Armécréante.png" },
-      { key:"Olgoth", img:"Olgoth.png" },
-      { key:"Pistilangue", img:"Langue de Pistilangue.png" },
-      { key:"Ferailleur", img:"ferrailleur.png" },
-    ],
-    resources: [
-      { key:"Verrou de Servitude", img:"Verrou de Servitude.png" },
-      { key:"Bonnet de Guerre", img:"Bonnet de Guerre.png" },
-      { key:"Corne de Corruption", img:"Corne de Corruption.png" },
-      { key:"Plume de Misère", img:"Plume de Misère.png" },
-      { key:"Capuche d'Armécréante", img:"Capuche d'Armécréante.png" },
-      { key:"Fragment d'armure", img:"Fragment d'armure.png" },
-      { key:"Langue de Pistilangue", img:"Langue de Pistilangue.png" },
-      { key:"Épaulière de Ferrailleur", img:"Épaulière de Ferrailleur.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-    ],
-  },
-  {
-    id: "bethel",
-    name: "Bethel Akarna",
-    thumb: "Bethel Akarna.png",
-    imgDir: "Bethel/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: {
-      "Bethel": 1, "Crânonier": 7, "Funespadon": 7, "Macrab": 11, "Tournoyé": 7, "Zombruth": 7
-    },
-    mobs: [
-      { key:"Bethel", img:"Bethel Akarna.png" },
-      { key:"Crânonier", img:"Crânonier.png" },
-      { key:"Funespadon", img:"Funespadon.png" },
-      { key:"Macrab", img:"Macrab.png" },
-      { key:"Tournoyé", img:"Tournoyé.png" },
-      { key:"Zombruth", img:"Zombruth.png" },
-    ],
-    resources: [
-      { key:"Queue de Bethel Akarna", img:"Queue de Bethel Akarna.png" },
-      { key:"Coquille de Submergé", img:"Coquille de Submergé.png" },
-      { key:"Aquarakne de Crânonier", img:"Aquarakne de Crânonier.png" },
-      { key:"Protection de Funespadon", img:"Protection de Funespadon.png" },
-      { key:"Bout d'Armure de Macrab", img:"Bout d'Armure de Macrab.png" },
-      { key:"Pointe de Lance de Tournoyé", img:"Pointe de Lance de Tournoyé.png" },
-      { key:"Chair de Zombruth", img:"Chair de Zombruth.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-    ],
-  },
-  {
-    id: "eternel",
-    name: "Éternel Conflit",
-    thumb: "L'Éternel Conflit.png",
-    imgDir: "Eternel conflit/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: {
-      "Éternel Conflit": 1, "Brutasmodan": 8, "Démoloch": 8, "Diabélial": 8, "Maléphisto": 8, "Typhomet": 7
-    },
-    mobs: [
-      { key:"Éternel Conflit", img:"L'Éternel Conflit.png" },
-      { key:"Brutasmodan", img:"Brutasmodan.png" },
-      { key:"Démoloch", img:"Démoloch.png" },
-      { key:"Diabélial", img:"Diabélial.png" },
-      { key:"Maléphisto", img:"Maléphisto.png" },
-      { key:"Typhomet", img:"Typhomet.png" },
-    ],
-    resources: [
-      { key:"Masque cauchemardesque de l'Éternel Conflit", img:"Masque cauchemardesque de l'Éternel Conflit.png" },
-      { key:"Pic de Ravageur", img:"Pic de Ravageur.png" },
-      { key:"Mâchoire de Brutasmodan", img:"Mâchoire de Brutasmodan.png" },
-      { key:"Tentacule de Démoloch", img:"Tentacule de Démoloch.png" },
-      { key:"Langue de Diabélial", img:"Langue de Diabélial.png" },
-      { key:"Épaule de Maléphisto", img:"Épaule de Maléphisto.png" },
-      { key:"Corne de Typhomet", img:"Corne de Typhomet.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Shuclier", img:"Shuclier.png" },
-    ],
-  },
-  {
-    id: "torke",
-    name: "Torkélonia",
-    thumb: "Torkélonia.png",
-    imgDir: "Torkélonia/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Torkélonia": 1, "Alashasss": 7, "Cronnibal": 8, "Caïguille": 9, "Voapah": 7, "Kashkaille": 8 },
-    mobs: [
-      { key:"Torkélonia", img:"Torkélonia.png" },
-      { key:"Alashasss", img:"Alashasss.png" },
-      { key:"Cronnibal", img:"Cronnibal.png" },
-      { key:"Caïguille", img:"Caïguille.png" },
-      { key:"Voapah", img:"Voapah.png" },
-      { key:"Kashkaille", img:"Kashkaille.png" },
-    ],
-    resources: [
-      { key:"Écaille de Torkélonia", img:"Écaille de Torkélonia.png" },
-      { key:"Œil de Crocodaille albinos", img:"Œil de Crocodaille albinos.png" },
-      { key:"Pagne d'Alashasss", img:"Pagne d'Alashasss.png" },
-      { key:"Canine de Cronnibal", img:"Canine de Cronnibal.png" },
-      { key:"Poupée de Caïguille", img:"Poupée de Caïguille.png" },
-      { key:"Bandeau de Voapah", img:"Bandeau de Voapah.png" },
-      { key:"Langue de Kashkaille", img:"Langue de Kashkaille.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Torvil", img:"Torvil.png" },
-    ],
-  },
-  {
-    id: "venerable",
-    name: "Vénérable Endormi",
-    thumb: "Vénérable Endormi.png",
-    imgDir: "Vénérable endormi/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Vénérable Endormi": 1, "Brutapir": 8, "Lapilope": 8, "Gyrafor": 10, "Gropotam": 7, "Amphibouc": 6 },
-    mobs: [
-      { key:"Vénérable Endormi", img:"Vénérable Endormi.png" },
-      { key:"Brutapir", img:"Brutapir.png" },
-      { key:"Lapilope", img:"Lapilope.png" },
-      { key:"Gyrafor", img:"Gyrafor.png" },
-      { key:"Gropotam", img:"Gropotam.png" },
-      { key:"Amphibouc", img:"Amphibouc.png" },
-    ],
-    resources: [
-      { key:"Corne du Vénérable Endormi", img:"Corne du Vénérable Endormi.png" },
-      { key:"Crinière du Vénérable Endormi", img:"Crinière du Vénérable Endormi.png" },
-      { key:"Défense de Brutapir", img:"Défense de Brutapir.png" },
-      { key:"Corne de Lapilope", img:"Corne de Lapilope.png" },
-      { key:"Corne de Gyrafor", img:"Corne de Gyrafor.png" },
-      { key:"Front osseux de Gropotam", img:"Front osseux de Gropotam.png" },
-      { key:"Corne d'Amphibouc", img:"Corne d'Amphibouc.png" },
-      { key:"Groin de Brutapir", img:"Groin de Brutapir.png" },
-      { key:"Oreille de Lapilope", img:"Oreille de Lapilope.png" },
-      { key:"Lampe de Gyrafor", img:"Lampe de Gyrafor.png" },
-      { key:"Mâchoire de Gropotam", img:"Mâchoire de Gropotam.png" },
-      { key:"Langue d'Amphibouc", img:"Langue d'Amphibouc.png" },
-      { key:"Squame du Graogarm", img:"Squame du Graogarm.png" },
-      { key:"Peau de zarbivore", img:"Peau de zarbivore.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Uniforme de chasseur-mangeur", img:"Uniforme de chasseur-mangeur.png" },
-    ],
-  },
-  {
-    id: "comte",
-    name: "Comte Harebourg",
-    thumb: "comte.png",
-    imgDir: "Comte/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Comte Harebourg": 1, "Sinistrofu": 6, "Noctu": 9, "Cyclo": 9, "Granduk": 8, "Strigide": 7 },
-    mobs: [
-      { key:"Comte Harebourg", img:"comte.png" },
-      { key:"Granduk", img:"granduk.png" },
-      { key:"Strigide", img:"strigide.png" },
-      { key:"Sinistrofu", img:"sinistrofu.png" },
-      { key:"Noctu", img:"noctu.png" },
-      { key:"Cyclo", img:"cyclo.png" },
-    ],
-    resources: [
-      { key:"Bandelette de Comte", img:"bandelette comte.png" },
-      { key:"Scapula du Comte", img:"scapu comte.png" },
-      { key:"Pic de Noctu", img:"pic de noctu.png" },
-      { key:"Bec de Granduk", img:"bec de granduk.png" },
-      { key:"Bec de Strigide", img:"bec de strigide.png" },
-      { key:"Plume Cyclo", img:"plume cyclo.png" },
-      { key:"Aile de Noctu", img:"aille de noctu.png" },
-      { key:"Aile de Sinistrofu", img:"aille de sinistrofu.png" },
-      { key:"Queue de Sini", img:"queue de sini.png" },
-      { key:"Œil de Cyclo", img:"oeil de cyclo.png" },
-      { key:"Plume de Granduk", img:"plume de granduk.png" },
-      { key:"Griffe de Strigide", img:"griffe de strigide.png" },
-      { key:"Viande Goûtue", img:"viande goutue.png" },
-      { key:"Bidoche Goûtue", img:"bidoche goutue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Ceinture de Glourdorak", img:"ceinture glourdorak.png" },
-    ],
-  },
-];
+    modalInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") closeNumberModal(modalInput.value);
+      if(e.key === "Escape") closeNumberModal(null);
+    });
 
-/* =========================================================
-   STORAGE HELPERS (donjons)
-   ========================================================= */
-const kDungeon = (id) => `${LS_PREFIX}${id}`;
-function loadDungeonState(id){
-  try{
-    const raw = localStorage.getItem(kDungeon(id));
-    if(!raw) return { mobs:{}, resources:{}, prices:{} };
-    const p = JSON.parse(raw);
-    return { mobs:p.mobs||{}, resources:p.resources||{}, prices:p.prices||{} };
-  }catch(e){ return { mobs:{}, resources:{}, prices:{} }; }
-}
-function saveDungeonState(id, state){
-  localStorage.setItem(kDungeon(id), JSON.stringify(state));
-  scheduleCloudSave();
-}
+    /* =========================================================
+       AUTH UI (LOCAL/CLOUD) — SANS EMAIL
+       ========================================================= */
+    const authPill = document.getElementById("authPill");
+    const btnLogin = document.getElementById("btnLogin");
+    const btnLogout = document.getElementById("btnLogout");
 
-/* =========================================================
-   CALCULATEUR PP (DEFAULT = vierge/0)
-   ========================================================= */
-const kPP = `${LS_PREFIX}pp`;
-function loadPPState(){
-  try{
-    const raw = localStorage.getItem(kPP);
-    if(!raw) return { prospection:0, base:0, challenges:0, anomalie:0, shield:0, almanax:0 };
-    const p = JSON.parse(raw);
-    return {
-      prospection: clampNonNeg(p.prospection ?? 0),
-      base: clampPct(p.base ?? 0),
-      challenges: clampPct(p.challenges ?? 0),
-      anomalie: clampPct(p.anomalie ?? 0),
-      shield: clampPct(p.shield ?? 0),
-      almanax: clampPct(p.almanax ?? 0),
+    function updateAuthUI(){
+      // On n'affiche JAMAIS l'email. Juste local/cloud.
+      authPill.textContent = isCloud ? "cloud" : "local";
+      authPill.title = isCloud ? "Connecté (cloud)" : "Mode local";
+
+      btnLogin.style.display = isCloud ? "none" : "inline-flex";
+      btnLogout.style.display = isCloud ? "inline-flex" : "none";
+    }
+
+    /* =========================================================
+       SUPABASE (optionnel)
+       - si pas configuré: tout marche en local
+       ========================================================= */
+    function hasSupabaseConfig(){
+      return !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+    }
+
+    async function initSupabase(){
+      if(!hasSupabaseConfig()){
+        cloudReady = false;
+        isCloud = false;
+        updateAuthUI();
+        return;
+      }
+
+      // Charger supabase-js via CDN (sans casser le site si ça fail)
+      try{
+        await loadScriptOnce("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2");
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        cloudReady = true;
+
+        // état session
+        const { data } = await sb.auth.getSession();
+        isCloud = !!data?.session;
+
+        // listener
+        sb.auth.onAuthStateChange((_event, session)=>{
+          isCloud = !!session;
+          updateAuthUI();
+        });
+
+        updateAuthUI();
+      }catch(e){
+        console.error("Supabase init failed:", e);
+        sb = null;
+        cloudReady = false;
+        isCloud = false;
+        updateAuthUI();
+      }
+    }
+
+    function loadScriptOnce(src){
+      return new Promise((resolve, reject)=>{
+        const existing = document.querySelector(`script[data-src="${src}"]`);
+        if(existing) return resolve();
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.dataset.src = src;
+        s.onload = ()=> resolve();
+        s.onerror = ()=> reject(new Error("Failed to load "+src));
+        document.head.appendChild(s);
+      });
+    }
+
+    btnLogin.onclick = async ()=>{
+      // "cloud" = login
+      if(!cloudReady || !sb){
+        alert("Cloud non configuré. Ajoute SUPABASE_URL et SUPABASE_ANON_KEY dans le fichier.");
+        return;
+      }
+      // Login simple par magic link
+      const email = prompt("Email (non affiché ensuite) :");
+      if(!email) return;
+
+      const { error } = await sb.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.origin + window.location.pathname + window.location.hash }
+      });
+      if(error){
+        console.error(error);
+        alert("Erreur login: " + error.message);
+      }else{
+        alert("Check ta boîte mail pour te connecter.");
+      }
     };
-  }catch(e){
-    return { prospection:0, base:0, challenges:0, anomalie:0, shield:0, almanax:0 };
-  }
-}
-function savePPState(s){ localStorage.setItem(kPP, JSON.stringify(s)); scheduleCloudSave(); }
 
-function ppMultiplier(prospection){
-  const pp = Number(prospection)||0;
-  const m = 0.74 + (1.755 / (1 + Math.exp((250 - pp) / 85)));
-  return Math.min(2.5, m);
-}
-function ppFinalDrop(s){
-  const mult = ppMultiplier(s.prospection);
-  const base = clampPct(s.base);
-  const final = base
-    * mult
-    * (1 + clampPct(s.challenges)/100)
-    * (1 + clampPct(s.anomalie)/100)
-    * (1 + clampPct(s.shield)/100)
-    * (1 + clampPct(s.almanax)/100);
-  return { mult, final };
-}
-function openPPPad(field, label){
-  const s = loadPPState();
-  const cur = field === "prospection" ? clampNonNeg(s.prospection) : clampNonNeg(s[field]);
-  openKeypad(label, cur, (v)=>{
-    const st = loadPPState();
-    if(field === "prospection") st.prospection = clampNonNeg(v);
-    else st[field] = clampPct(v);
-    savePPState(st);
-    render();
-  });
-}
-
-/* =========================================================
-   CALCULATEUR OMEGA (DEFAULT = 0 / 0)
-   ========================================================= */
-const kOmega = `${LS_PREFIX}omega`;
-function loadOmegaState(){
-  try{
-    const raw = localStorage.getItem(kOmega);
-    if(!raw) return { cur: 0, target: 0 };
-    const p = JSON.parse(raw);
-    return { cur: clampNonNeg(p.cur ?? 0), target: clampNonNeg(p.target ?? 0) };
-  }catch(e){
-    return { cur: 0, target: 0 };
-  }
-}
-function saveOmegaState(s){ localStorage.setItem(kOmega, JSON.stringify(s)); scheduleCloudSave(); }
-function omegaXpToNext(i){ return Math.round(50000000 * Math.pow(1.01, i)); }
-function omegaXpRequired(cur, target){
-  cur = clampNonNeg(cur);
-  target = clampNonNeg(target);
-  if(target <= cur) return 0;
-  let sum = 0;
-  for(let i=cur; i<target; i++) sum += omegaXpToNext(i);
-  return sum;
-}
-function openOmegaPad(field, label){
-  const s = loadOmegaState();
-  openKeypad(label, clampNonNeg(s[field]), (v)=>{
-    const st = loadOmegaState();
-    st[field] = clampNonNeg(v);
-    saveOmegaState(st);
-    render();
-  });
-}
-
-/* =========================================================
-   SONGES
-   ========================================================= */
-const kSonges = `${LS_PREFIX}songes`;
-const SONGES_IMG_DIR = "Songes/";
-const BRIBES_ICON_FILE = "Bribe de rêve.png";
-
-const SONGE_INTENSITIES = [
-  { id:"reve1",     num:1,  label:"Rêve 1",     group:"Rêve",     img:"Reve 1.png" },
-  { id:"reve2",     num:2,  label:"Rêve 2",     group:"Rêve",     img:"Reve 2.png" },
-  { id:"reve3",     num:3,  label:"Rêve 3",     group:"Rêve",     img:"Reve 3.png" },
-  { id:"paradoxe1", num:4,  label:"Paradoxe 1", group:"Paradoxe", img:"Paradox 1.png" },
-  { id:"paradoxe2", num:5,  label:"Paradoxe 2", group:"Paradoxe", img:"Paradox 2.png" },
-  { id:"paradoxe3", num:6,  label:"Paradoxe 3", group:"Paradoxe", img:"Paradox 3.png" },
-  { id:"paradoxe4", num:7,  label:"Paradoxe 4", group:"Paradoxe", img:"Paradox 4.png" },
-  { id:"cauchemar1",num:8,  label:"Cauchemar 1",group:"Cauchemar",img:"Cauchemar 1.png" },
-  { id:"cauchemar2",num:9,  label:"Cauchemar 2",group:"Cauchemar",img:"Cauchemar 2.png" },
-  { id:"cauchemar3",num:10, label:"Cauchemar 3",group:"Cauchemar",img:"Cauchemar 3.png" },
-];
-
-const SONGE_LEGENDS = [
-  { key:"Oto Mustam",      img:"Légende d'Oto Mustam.png",            imgDir: SONGES_IMG_DIR },
-  { key:"Menalt",         img:"Légende de Menalt.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Mériana",        img:"Légende de Mériana.png",               imgDir: SONGES_IMG_DIR },
-  { key:"Jahash",         img:"Légende de Jahash Jurgen.png",         imgDir: SONGES_IMG_DIR },
-  { key:"Amayiro",        img:"Légende d'Amayiro.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Dame Jhessica",  img:"Légende de Dame Jhessica.png",         imgDir: SONGES_IMG_DIR },
-  { key:"Thanatena",      img:"Légende de Thanatena.png",             imgDir: SONGES_IMG_DIR },
-  { key:"Helséphine",     img:"Légende d'Helséphine.png",             imgDir: SONGES_IMG_DIR },
-  { key:"Henual",         img:"Légende d'Henual.png",                 imgDir: SONGES_IMG_DIR },
-  { key:"Servitude",      img:"Légende de Servitude.png",             imgDir: SONGES_IMG_DIR },
-  { key:"Guerre",         img:"Légende de Guerre.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Misère",         img:"Légende de Misère.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Corruption",     img:"Légende de Corruption.png",            imgDir: SONGES_IMG_DIR },
-  { key:"Mille Lieues",   img:"Légende de Mille Lieues.png",          imgDir: SONGES_IMG_DIR },
-  { key:"Rykke Errel",    img:"Légende de Rykke Errel.png",           imgDir: SONGES_IMG_DIR },
-  { key:"Ganymède",       img:"Légende de Ganymède.png",              imgDir: SONGES_IMG_DIR },
-  { key:"Fallanster",     img:"Légende de Fallanster.png",            imgDir: SONGES_IMG_DIR },
-  { key:"Crocobur",       img:"Légende de Crocobur.png",              imgDir: SONGES_IMG_DIR },
-  { key:"Dodge",          img:"Légende de Dodge.png",                 imgDir: SONGES_IMG_DIR },
-  { key:"Brâm Barbe-Monde",img:"Légende de Brâm Barbe-Monde.png",     imgDir: SONGES_IMG_DIR },
-  { key:"Brumaire",       img:"Légende de Brumaire.png",              imgDir: SONGES_IMG_DIR },
-  { key:"Buhorado",       img:"Légende de Buhorado.png",              imgDir: SONGES_IMG_DIR },
-  { key:"Cul Botté",      img:"Légende du Cul Botté.png",             imgDir: SONGES_IMG_DIR },
-  { key:"Destin",         img:"Légende du Destin.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Miroir",         img:"Légende du Miroir.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Trompe-la-Mort", img:"Légende du Trompe-la-Mort.png",        imgDir: SONGES_IMG_DIR },
-  { key:"Kwakarticho",    img:"Légende animale de Kwakarticho.png",   imgDir: SONGES_IMG_DIR },
-  { key:"Poukachi",       img:"Légende animale de Poukachi.png",      imgDir: SONGES_IMG_DIR },
-  { key:"Bakushana",      img:"Légende animale de Bakushana.png",     imgDir: SONGES_IMG_DIR },
-  { key:"Magicrabe",      img:"Légende animale de Magicrabe.png",     imgDir: SONGES_IMG_DIR },
-];
-
-function blankSongesState(){
-  const init = {
-    ui: { tab:"runs", search:"" },
-    bribesTotal: 0,
-    runs: {},
-    bribesByIntensity: {},
-    legends: {},
-  };
-  SONGE_INTENSITIES.forEach(x=>{
-    init.runs[x.id] = 0;
-    init.bribesByIntensity[String(x.num)] = 0;
-  });
-  SONGE_LEGENDS.forEach(x=>init.legends[x.key]=0);
-  return init;
-}
-function loadSongesState(){
-  try{
-    const raw = localStorage.getItem(kSonges);
-    if(!raw) return blankSongesState();
-    const p = JSON.parse(raw);
-
-    const out = blankSongesState();
-    out.ui = p.ui || out.ui;
-    out.bribesTotal = clampNonNeg(p.bribesTotal ?? 0);
-
-    if(p.runs){
-      for(const it of SONGE_INTENSITIES){
-        out.runs[it.id] = clampNonNeg(p.runs[it.id] ?? 0);
+    btnLogout.onclick = async ()=>{
+      // "local" = logout
+      if(sb && cloudReady){
+        await sb.auth.signOut();
       }
+      isCloud = false;
+      updateAuthUI();
+    };
+
+    // callback (magic link)
+    async function handleAuthCallback(){
+      if(!sb) return;
+      const hasCode = window.location.search.includes("code=");
+      if(!hasCode) return;
+
+      const { error } = await sb.auth.exchangeCodeForSession(window.location.href);
+      if(error) console.error("exchangeCodeForSession error:", error);
+
+      const cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
+      window.history.replaceState({}, document.title, cleanUrl);
     }
-    if(p.bribesByIntensity){
-      for(const it of SONGE_INTENSITIES){
-        out.bribesByIntensity[String(it.num)] = clampNonNeg(p.bribesByIntensity[String(it.num)] ?? 0);
-      }
-    }
-    if(p.legends){
-      for(const l of SONGE_LEGENDS){
-        out.legends[l.key] = clampNonNeg(p.legends[l.key] ?? 0);
-      }
-    }
-    return out;
-  }catch(e){
-    return blankSongesState();
-  }
-}
-function saveSongesState(s){
-  localStorage.setItem(kSonges, JSON.stringify(s));
-  scheduleCloudSave();
-}
 
-window.resetSonges = function(){
-  if(!confirm("Reset Songes (runs + bribes + légendes) ?")) return;
-  localStorage.removeItem(kSonges);
-  scheduleCloudSave();
-  render();
-};
+    /* =========================================================
+       RENDER
+       ========================================================= */
+    const app = document.getElementById("app");
 
-function setSongesTab(tab){
-  const s = loadSongesState();
-  s.ui.tab = tab;
-  saveSongesState(s);
-  renderSonges();
-}
-function setSongesSearch(value){
-  const s = loadSongesState();
-  s.ui.search = String(value||"");
-  saveSongesState(s);
-  renderSonges();
-}
-
-window.openSongesBribesPad = function(){
-  const s = loadSongesState();
-  openKeypad("Bribes (global) — définir total", clampNonNeg(s.bribesTotal), (v)=>{
-    const st = loadSongesState();
-    st.bribesTotal = clampNonNeg(v);
-    saveSongesState(st);
-    renderSonges();
-  });
-};
-
-window.openSongesRunPad = function(intensityId, label){
-  const s = loadSongesState();
-  openKeypad(`Runs • ${label}`, clampNonNeg(s.runs[intensityId] ?? 0), (v)=>{
-    const st = loadSongesState();
-    st.runs[intensityId] = clampNonNeg(v);
-    saveSongesState(st);
-    renderSonges();
-  });
-};
-
-window.songeIncRun = function(intensityId){
-  const st = loadSongesState();
-  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) + 1);
-  saveSongesState(st);
-  renderSonges();
-};
-window.songeDecRun = function(intensityId){
-  const st = loadSongesState();
-  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) - 1);
-  saveSongesState(st);
-  renderSonges();
-};
-
-window.songeAddBribes = function(){
-  openKeypad("Intensité (1 à 10)", 1, (inten)=>{
-    inten = clampNonNeg(inten);
-    if(inten < 1 || inten > 10){
-      alert("Intensité invalide. Choisis un nombre entre 1 et 10.");
-      return;
-    }
-    openKeypad(`Ajouter bribes • Intensité ${inten}`, 0, (amount)=>{
-      const add = clampNonNeg(amount);
-      const st = loadSongesState();
-      st.bribesTotal = clampNonNeg((st.bribesTotal ?? 0) + add);
-      st.bribesByIntensity[String(inten)] = clampNonNeg((st.bribesByIntensity[String(inten)] ?? 0) + add);
-      saveSongesState(st);
-      renderSonges();
-    });
-  });
-};
-
-window.songeSubBribes = function(){
-  openKeypad("Intensité (1 à 10)", 1, (inten)=>{
-    inten = clampNonNeg(inten);
-    if(inten < 1 || inten > 10){
-      alert("Intensité invalide. Choisis un nombre entre 1 et 10.");
-      return;
-    }
-    openKeypad(`Retirer bribes • Intensité ${inten}`, 0, (amount)=>{
-      const sub = clampNonNeg(amount);
-      const st = loadSongesState();
-      st.bribesTotal = clampNonNeg((st.bribesTotal ?? 0) - sub);
-      st.bribesByIntensity[String(inten)] = clampNonNeg((st.bribesByIntensity[String(inten)] ?? 0) - sub);
-      saveSongesState(st);
-      renderSonges();
-    });
-  });
-};
-
-window.songeIncLegend = function(key){
-  const st = loadSongesState();
-  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) + 1);
-  saveSongesState(st);
-  renderSonges();
-};
-window.songeDecLegend = function(key){
-  const st = loadSongesState();
-  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) - 1);
-  saveSongesState(st);
-  renderSonges();
-};
-window.openLegendPad = function(key){
-  const s = loadSongesState();
-  openKeypad(`Légende • ${key}`, clampNonNeg(s.legends[key] ?? 0), (v)=>{
-    const st = loadSongesState();
-    st.legends[key] = clampNonNeg(v);
-    saveSongesState(st);
-    renderSonges();
-  });
-};
-
-function renderSonges(){
-  const s = loadSongesState();
-  pagePill.textContent = "Songes";
-
-  const tab = s.ui?.tab || "runs";
-  const totalRuns = Object.values(s.runs||{}).reduce((a,b)=>a+n(b),0);
-  const bribesTotal = clampNonNeg(s.bribesTotal ?? 0);
-
-  const header = `
-    <div class="topline">
-      <div class="title">
-        <div class="logo" style="width:42px;height:42px;border-radius:16px">🌙</div>
-        <div>
-          <h2>Songes</h2>
-          <p class="sub">Runs par intensité • Bribes globales • Bribes cumulées par intensité • Légendes droppées.</p>
-        </div>
-      </div>
-      <div class="nav">
-        <button class="btn gold" onclick="songeAddBribes()">➕ Ajouter des bribes</button>
-        <button class="btn" onclick="songeSubBribes()">➖ Retirer des bribes</button>
-        <button class="btn bad" onclick="resetSonges()">🧹 Reset Songes</button>
-      </div>
-    </div>
-  `;
-
-  const tabs = `
-    <div class="seg" style="margin-bottom:12px">
-      <button class="btn small ${tab==='runs'?'active':''}" onclick="setSongesTab('runs')">📊 Runs & Bribes</button>
-      <button class="btn small ${tab==='legends'?'active':''}" onclick="setSongesTab('legends')">🏷️ Légendes</button>
-    </div>
-  `;
-
-  const bribesKpiIcon = `
-    <span class="kico">
-      <img data-file="${escapeHtml(BRIBES_ICON_FILE)}" data-dir="" alt="">
-    </span>
-  `;
-
-  const topKpis = `
-    <div class="summary" style="margin-top:0">
-      <div class="kpi">
-        <div class="k">Bribes (global) ${bribesKpiIcon}</div>
-        <div class="v mono gold" style="cursor:pointer" onclick="openSongesBribesPad()">${fmt.format(bribesTotal)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Runs (total)</div>
-        <div class="v mono">${fmt.format(totalRuns)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Mode</div>
-        <div class="v mono">+Run = +1 run</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Astuce</div>
-        <div class="v mono">Bribes via bouton dédié</div>
-      </div>
-    </div>
-  `;
-
-  let body = "";
-
-  if(tab === "runs"){
-    const byGroup = (group) => SONGE_INTENSITIES.filter(x=>x.group===group);
-
-    const groupBlock = (groupName) => {
-      const rows = byGroup(groupName).map(it=>{
-        const count = clampNonNeg(s.runs[it.id] ?? 0);
-        const bsum = clampNonNeg(s.bribesByIntensity[String(it.num)] ?? 0);
-
-        return `
-          <div class="item">
-            <div class="ico">
-              <img data-file="${escapeHtml(it.img)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt="">
-            </div>
-            <div class="name">
-              <p class="n">${escapeHtml(it.label)}</p>
-              <p class="m">Bribes cumulées : <b class="mono">${fmt.format(bsum)}</b> <span class="pill" style="padding:4px 8px;border-radius:999px">Int. ${it.num}</span></p>
-            </div>
-            <div class="ctrls">
-              <button class="btn small" onclick="songeDecRun('${it.id}')">−</button>
-              <div class="num" onclick="openSongesRunPad('${it.id}','${jsEscape(it.label)}')">${fmt.format(count)}</div>
-              <button class="btn small gold" onclick="songeIncRun('${it.id}')">+ Run</button>
+    function renderHome(){
+      app.innerHTML = `
+        <div class="section">
+          <div class="topline">
+            <div class="title">
+              <div>
+                <h2>Accueil</h2>
+                <p class="sub">Ton tracker farm — simple, rapide, propre.</p>
+              </div>
             </div>
           </div>
-        `;
-      }).join("");
 
-      return `
-        <div class="calcBox" style="margin-bottom:14px">
-          <div class="calcHead">${escapeHtml(groupName.toUpperCase())}</div>
-          <div class="calcBody">
-            <div class="list">${rows}</div>
+          <div class="grid" style="margin-top:10px">
+            <div class="card">
+              <div class="card-left">
+                <div class="thumb">🏰</div>
+                <div style="min-width:0">
+                  <h3>Donjons</h3>
+                  <p>Compteurs, drops, kamas…</p>
+                </div>
+              </div>
+              <div class="card-right">
+                <button class="btn small gold" onclick="location.hash='#donjons'">Ouvrir</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-left">
+                <div class="thumb">⚡</div>
+                <div style="min-width:0">
+                  <h3>Oméga</h3>
+                  <p>Outil simple (placeholder propre).</p>
+                </div>
+              </div>
+              <div class="card-right">
+                <button class="btn small gold" onclick="location.hash='#omega'">Ouvrir</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-left">
+                <div class="thumb">☁️</div>
+                <div style="min-width:0">
+                  <h3>Statut</h3>
+                  <p>${isCloud ? "cloud (connecté)" : "local (déconnecté)"}</p>
+                </div>
+              </div>
+              <div class="card-right">
+                <span class="pill">${isCloud ? "cloud" : "local"}</span>
+              </div>
+            </div>
           </div>
         </div>
       `;
-    };
+    }
 
-    body = `
-      <div class="row">
-        <div>
-          ${groupBlock("Rêve")}
-          ${groupBlock("Paradoxe")}
-        </div>
-
-        <div>
-          <div class="calcRightBig">
-            <div class="t">BRIBES (GLOBAL)</div>
-            <div class="v" onclick="openSongesBribesPad()">
-              <img data-file="${escapeHtml(BRIBES_ICON_FILE)}" style="width:26px;height:26px;object-fit:contain" alt="">
-              ${fmt.format(bribesTotal)}
+    function renderDonjons(){
+      const cards = DUNGEONS.map(d => `
+        <div class="card">
+          <div class="card-left">
+            <div class="thumb">
+              ${d.thumb ? `<img src="${d.thumb}" alt="">` : "🏰"}
             </div>
-            <div class="calcNote" style="text-align:center">
-              Clique sur la valeur pour <b>définir le total</b>.<br>
-              Pour ajouter, utilise <b>“Ajouter des bribes”</b> → intensité (1..10) → ça cumule.
+            <div style="min-width:0">
+              <h3>${escapeHtml(d.name)}</h3>
+              <p>${escapeHtml(d.desc)}</p>
             </div>
           </div>
+          <div class="card-right">
+            <button class="btn small gold" onclick="location.hash='#dungeon/${d.id}'">Ouvrir</button>
+          </div>
+        </div>
+      `).join("");
 
-          <div style="height:14px"></div>
+      app.innerHTML = `
+        <div class="section">
+          <div class="topline">
+            <div class="title">
+              <div>
+                <h2>Donjons</h2>
+                <p class="sub">Choisis un projet.</p>
+              </div>
+            </div>
+          </div>
+          <div class="grid">${cards}</div>
+        </div>
+      `;
+    }
 
+    function renderDungeon(id){
+      const d = DUNGEONS.find(x => x.id === id);
+      if(!d){
+        app.innerHTML = `
           <div class="section">
-            <div class="topline" style="margin-bottom:8px">
-              <div class="pill">Notes</div>
-              <div class="pill">Bribes liées aux vagues</div>
-            </div>
-            <div class="hint" style="margin-top:0">
-              Ici : tu saisis <b>les bribes réelles</b> et tu les classes par intensité.
+            <h2>Donjon introuvable</h2>
+            <p class="sub">Retour.</p>
+            <div style="margin-top:10px">
+              <button class="btn small gold" onclick="location.hash='#donjons'">Donjons</button>
             </div>
           </div>
+        `;
+        return;
+      }
 
-          <div style="height:14px"></div>
-
-          ${groupBlock("Cauchemar")}
-        </div>
-      </div>
-    `;
-  }
-
-  if(tab === "legends"){
-    const q = (s.ui?.search || "").toLowerCase().trim();
-
-    const tiles = SONGE_LEGENDS
-      .filter(l => !q || l.key.toLowerCase().includes(q))
-      .map(l=>{
-        const val = clampNonNeg(s.legends[l.key] ?? 0);
+      const list = d.items.map(it=>{
+        const v = getCounter(d.id, it.key);
         return `
-          <div class="item legendItem">
-            <div class="ico">
-              <img data-file="${escapeHtml(l.img)}" data-dir="${escapeHtml(l.imgDir || SONGES_IMG_DIR)}" alt="">
-            </div>
+          <div class="item">
+            <div class="ico">${it.icon ? `<img src="${it.icon}" alt="">` : "•"}</div>
             <div class="name">
-              <p class="n">${escapeHtml(l.key)}</p>
-              <p class="m">Compteur de drop légendaire</p>
+              <p class="n">${escapeHtml(it.name)}</p>
+              <p class="m">${escapeHtml(it.sub || "")}</p>
             </div>
             <div class="ctrls">
-              <button class="btn small" onclick="songeDecLegend('${jsEscape(l.key)}')">−</button>
-              <div class="num" onclick="openLegendPad('${jsEscape(l.key)}')">${fmt.format(val)}</div>
-              <button class="btn small gold" onclick="songeIncLegend('${jsEscape(l.key)}')">+</button>
+              <button class="btn small" onclick="window.__dec('${d.id}','${it.key}')">-</button>
+              <div class="num" title="Clique pour saisir" onclick="window.__set('${d.id}','${it.key}', ${v})">${formatInt(v)}</div>
+              <button class="btn small" onclick="window.__inc('${d.id}','${it.key}')">+</button>
             </div>
           </div>
         `;
       }).join("");
 
-    body = `
-      <div class="section">
-        <div class="topline" style="margin-bottom:10px">
-          <div class="title">
-            <div>
-              <h2>Légendes</h2>
-              <p class="sub">Compteurs de drops légendaires (clique sur le nombre pour saisir).</p>
-            </div>
-          </div>
-          <div class="searchRow">
-            <input
-              value="${escapeHtml(s.ui?.search || "")}"
-              oninput="setSongesSearch(this.value)"
-              placeholder="Rechercher une légende…"
-            />
-            <button class="btn bad" onclick="setSongesSearch('')">✖</button>
-          </div>
-        </div>
-
-        <div class="legendGrid">
-          ${tiles || `<div class="pill">Aucun résultat</div>`}
-        </div>
-
-        <div class="hint">
-          Astuce : <b>− / +</b> pour incrémenter, ou clique la valeur pour entrer un gros nombre au pavé numérique.
-        </div>
-      </div>
-    `;
-  }
-
-  app.innerHTML = header + tabs + topKpis + body;
-  activateFallbackIn(app, SONGES_IMG_DIR);
-}
-
-/* =========================================================
-   DONJONS UI
-   ========================================================= */
-function dungeonTotals(d){
-  const st = loadDungeonState(d.id);
-  const mobsTotal = Object.values(st.mobs||{}).reduce((a,b)=>a+n(b),0);
-  const resTotal  = Object.values(st.resources||{}).reduce((a,b)=>a+n(b),0);
-  return { mobsTotal, resTotal };
-}
-
-function renderHome(){
-  pagePill.textContent = "Accueil";
-
-  const cards = `
-    <div class="grid">
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb"><img data-file="Icône Dj.png" alt=""></div>
-          <div style="min-width:0">
-            <h3>Donjons</h3>
-            <p>Compteurs mobs/ressources + prix + saisie pavé numérique</p>
-          </div>
-        </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/donjons'">Ouvrir</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb"><img data-file="Bribe de rêve.png" alt=""></div>
-          <div style="min-width:0">
-            <h3>Songes</h3>
-            <p>Runs par intensité, bribes, légendes</p>
-          </div>
-        </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/songes'">Ouvrir</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb"><img data-file="Icône anomalie.png" alt=""></div>
-          <div style="min-width:0">
-            <h3>Anomalies</h3>
-            <p>Placeholders (tu pourras y mettre tes compteurs)</p>
-          </div>
-        </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/anomalies'">Ouvrir</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb"><img data-file="Icône Calculateur PP.png" alt=""></div>
-          <div style="min-width:0">
-            <h3>Calculateur PP</h3>
-            <p>Drop final = base × multiplicateur PP × bonus</p>
-          </div>
-        </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/pp'">Ouvrir</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb"><img data-file="Icône Calculateur Omega.png" alt=""></div>
-          <div style="min-width:0">
-            <h3>XP Oméga</h3>
-            <p>Calcul XP requise pour passer d’un oméga à un autre</p>
-          </div>
-        </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/omega'">Ouvrir</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="section" style="margin-top:14px">
-      <div class="topline" style="margin-bottom:8px">
-        <div class="pill">Tips</div>
-        <div class="pill">Clique les chiffres = pavé numérique</div>
-      </div>
-      <div class="hint" style="margin-top:0">
-        Tout est sauvegardé <b>en local</b>. Si tu te connectes, ça sync <b>cloud</b> via sb.
-      </div>
-    </div>
-  `;
-
-  app.innerHTML = cards;
-  activateFallbackIn(app, "");
-}
-
-function renderDonjons(){
-  pagePill.textContent = "Donjons";
-
-  const cards = DUNGEONS.map(d=>{
-    const { mobsTotal, resTotal } = dungeonTotals(d);
-    return `
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb">
-            <img data-file="${escapeHtml(d.thumb)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
-          </div>
-          <div style="min-width:0">
-            <h3>${escapeHtml(d.name)}</h3>
-            <p>Mobs: <b class="mono">${fmt.format(mobsTotal)}</b> • Ressources: <b class="mono">${fmt.format(resTotal)}</b></p>
-          </div>
-        </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(d.id)}'">Ouvrir</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  app.innerHTML = `
-    <div class="topline">
-      <div class="title">
-        <div class="logo" style="width:42px;height:42px;border-radius:16px">🗝️</div>
-        <div>
-          <h2>Liste des donjons</h2>
-          <p class="sub">Clique un donjon pour voir les compteurs + prix.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid">
-      ${cards}
-    </div>
-  `;
-
-  activateFallbackIn(app, "");
-}
-
-function ensureDungeonStateShape(d, st){
-  st = st || { mobs:{}, resources:{}, prices:{} };
-
-  st.mobs = st.mobs || {};
-  st.resources = st.resources || {};
-  st.prices = st.prices || {};
-
-  (d.mobs||[]).forEach(m=>{
-    if(!(m.key in st.mobs)) st.mobs[m.key] = 0;
-  });
-  (d.resources||[]).forEach(r=>{
-    if(!(r.key in st.resources)) st.resources[r.key] = 0;
-    if(!(r.key in st.prices)) st.prices[r.key] = 0;
-  });
-
-  for(const k of Object.keys(st.mobs)) if(!(d.mobs||[]).some(m=>m.key===k)) delete st.mobs[k];
-  for(const k of Object.keys(st.resources)) if(!(d.resources||[]).some(r=>r.key===k)) delete st.resources[k];
-  for(const k of Object.keys(st.prices)) if(!(d.resources||[]).some(r=>r.key===k)) delete st.prices[k];
-
-  return st;
-}
-
-window.dInc = function(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  st.mobs[key] = clampNonNeg((st.mobs[key]||0) + 1);
-  saveDungeonState(did, st);
-  renderDungeon(did);
-};
-window.dDec = function(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  st.mobs[key] = clampNonNeg((st.mobs[key]||0) - 1);
-  saveDungeonState(did, st);
-  renderDungeon(did);
-};
-window.rInc = function(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  st.resources[key] = clampNonNeg((st.resources[key]||0) + 1);
-  saveDungeonState(did, st);
-  renderDungeon(did);
-};
-window.rDec = function(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  st.resources[key] = clampNonNeg((st.resources[key]||0) - 1);
-  saveDungeonState(did, st);
-  renderDungeon(did);
-};
-window.openMobPad = function(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  openKeypad(`Mob • ${key}`, clampNonNeg(st.mobs[key] ?? 0), (v)=>{
-    const st2 = ensureDungeonStateShape(d, loadDungeonState(did));
-    st2.mobs[key] = clampNonNeg(v);
-    saveDungeonState(did, st2);
-    renderDungeon(did);
-  });
-};
-window.openResPad = function(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  openKeypad(`Ressource • ${key}`, clampNonNeg(st.resources[key] ?? 0), (v)=>{
-    const st2 = ensureDungeonStateShape(d, loadDungeonState(did));
-    st2.resources[key] = clampNonNeg(v);
-    saveDungeonState(did, st2);
-    renderDungeon(did);
-  });
-};
-window.openPricePad = function(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  openKeypad(`Prix/u • ${key}`, clampNonNeg(st.prices[key] ?? 0), (v)=>{
-    const st2 = ensureDungeonStateShape(d, loadDungeonState(did));
-    st2.prices[key] = clampNonNeg(v);
-    saveDungeonState(did, st2);
-    renderDungeon(did);
-  });
-};
-
-window.resetDungeon = function(did){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  if(!confirm(`Reset ${d.name} (mobs + ressources + prix) ?`)) return;
-  localStorage.removeItem(kDungeon(did));
-  scheduleCloudSave();
-  renderDungeon(did);
-};
-
-window.totalRun = function(did){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  const inc = d.totalIncrements || {};
-  for(const [k,v] of Object.entries(inc)){
-    // si k est une ressource, on incr res; sinon mobs
-    if((d.resources||[]).some(r=>r.key===k)) st.resources[k] = clampNonNeg((st.resources[k]||0) + clampNonNeg(v));
-    else st.mobs[k] = clampNonNeg((st.mobs[k]||0) + clampNonNeg(v));
-  }
-  saveDungeonState(did, st);
-  renderDungeon(did);
-};
-
-function dungeonSumKamas(d, st){
-  let total = 0;
-  for(const r of (d.resources||[])){
-    const q = clampNonNeg(st.resources?.[r.key] ?? 0);
-    const p = clampNonNeg(st.prices?.[r.key] ?? 0);
-    total += q * p;
-  }
-  return total;
-}
-
-function renderDungeon(did){
-  const d = DUNGEONS.find(x=>x.id===did);
-  if(!d){ location.hash = "#/donjons"; return; }
-
-  pagePill.textContent = d.name;
-
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  saveDungeonState(did, st); // normalise une fois
-
-  const mobsRows = (d.mobs||[]).map(m=>{
-    const val = clampNonNeg(st.mobs[m.key] ?? 0);
-    return `
-      <div class="item">
-        <div class="ico">
-          <img data-file="${escapeHtml(m.img)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
-        </div>
-        <div class="name">
-          <p class="n">${escapeHtml(m.key)}</p>
-          <p class="m">Compteur mob / boss</p>
-        </div>
-        <div class="ctrls">
-          <button class="btn small" onclick="dDec('${did}','${jsEscape(m.key)}')">−</button>
-          <div class="num" onclick="openMobPad('${did}','${jsEscape(m.key)}')">${fmt.format(val)}</div>
-          <button class="btn small gold" onclick="dInc('${did}','${jsEscape(m.key)}')">+</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  const resRows = (d.resources||[]).map(r=>{
-    const q = clampNonNeg(st.resources[r.key] ?? 0);
-    const p = clampNonNeg(st.prices[r.key] ?? 0);
-    const sub = q * p;
-    return `
-      <div class="item">
-        <div class="ico">
-          <img data-file="${escapeHtml(r.img)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
-        </div>
-        <div class="name">
-          <p class="n">${escapeHtml(r.key)}</p>
-          <p class="m">Sous-total : <b class="mono">${fmt.format(sub)}</b> kamas</p>
-        </div>
-        <div class="ctrls">
-          <button class="btn small" onclick="rDec('${did}','${jsEscape(r.key)}')">−</button>
-          <div class="num" onclick="openResPad('${did}','${jsEscape(r.key)}')">${fmt.format(q)}</div>
-          <button class="btn small gold" onclick="rInc('${did}','${jsEscape(r.key)}')">+</button>
-          <div class="num" style="min-width:90px" onclick="openPricePad('${did}','${jsEscape(r.key)}')">${fmt.format(p)}</div>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  const mobsTotal = Object.values(st.mobs||{}).reduce((a,b)=>a+n(b),0);
-  const resTotal  = Object.values(st.resources||{}).reduce((a,b)=>a+n(b),0);
-  const kamasTotal = dungeonSumKamas(d, st);
-
-  app.innerHTML = `
-    <div class="topline">
-      <div class="title">
-        <div class="thumb" style="width:42px;height:42px;border-radius:16px">
-          <img data-file="${escapeHtml(d.thumb)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
-        </div>
-        <div>
-          <h2>${escapeHtml(d.name)}</h2>
-          <p class="sub">Clique sur les nombres pour saisir au pavé numérique • Prix = valeur par unité</p>
-        </div>
-      </div>
-      <div class="nav">
-        <button class="btn" onclick="location.hash='#/donjons'">⬅ Retour</button>
-        <button class="btn gold" onclick="totalRun('${did}')">➕ ${escapeHtml(d.totalButtonLabel || 'Total run')}</button>
-        <button class="btn bad" onclick="resetDungeon('${did}')">🧹 Reset</button>
-      </div>
-    </div>
-
-    <div class="summary" style="margin-top:0">
-      <div class="kpi">
-        <div class="k">Total mobs/boss</div>
-        <div class="v mono">${fmt.format(mobsTotal)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Total ressources</div>
-        <div class="v mono">${fmt.format(resTotal)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Kamas estimés</div>
-        <div class="v mono gold">${fmt.format(kamasTotal)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Prix</div>
-        <div class="v mono">Clique le prix/u</div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="section">
-        <div class="topline" style="margin-bottom:8px">
-          <div class="pill">Mobs / Boss</div>
-          <div class="pill">− / +</div>
-        </div>
-        <div class="list">${mobsRows}</div>
-      </div>
-
-      <div class="section">
-        <div class="topline" style="margin-bottom:8px">
-          <div class="pill">Ressources</div>
-          <div class="pill">Prix/u à droite</div>
-        </div>
-        <div class="list">${resRows}</div>
-        <div class="hint">
-          Chaque ligne : <b>quantité</b> + <b>prix/u</b> → sous-total. Total estimé en haut.
-        </div>
-      </div>
-    </div>
-  `;
-
-  activateFallbackIn(app, d.imgDir || "");
-}
-
-/* =========================================================
-   ANOMALIES (placeholder simple)
-   ========================================================= */
-function renderAnomalies(){
-  pagePill.textContent = "Anomalies";
-  app.innerHTML = `
-    <div class="section">
-      <div class="topline">
-        <div class="title">
-          <div class="logo" style="width:42px;height:42px;border-radius:16px">🌀</div>
-          <div>
-            <h2>Anomalies</h2>
-            <p class="sub">Zone placeholder — tu me diras quoi tracker ici et je te le code.</p>
-          </div>
-        </div>
-      </div>
-      <div class="hint" style="margin-top:0">
-        Idées : compteur d’anomalies faites, compteur bribes/éclats, rendement kamas/h, liste drops… (on peut faire comme Donjons).
-      </div>
-    </div>
-  `;
-  activateFallbackIn(app, "");
-}
-
-/* =========================================================
-   PP PAGE
-   ========================================================= */
-function renderPP(){
-  pagePill.textContent = "Calculateur PP";
-  const s = loadPPState();
-  const { mult, final } = ppFinalDrop(s);
-
-  app.innerHTML = `
-    <div class="topline">
-      <div class="title">
-        <div class="logo" style="width:42px;height:42px;border-radius:16px">🍀</div>
-        <div>
-          <h2>Calculateur Prospection</h2>
-          <p class="sub">Clique les valeurs pour saisir au pavé numérique.</p>
-        </div>
-      </div>
-      <div class="nav">
-        <button class="btn bad" onclick="localStorage.removeItem('${kPP}'); render(); scheduleCloudSave();">🧹 Reset</button>
-      </div>
-    </div>
-
-    <div class="calc3">
-      <div class="calcBox">
-        <div class="calcHead">Prospection</div>
-        <div class="calcBody">
-          <div class="calcValue" onclick="openPPPad('prospection','Prospection')">${fmt.format(clampNonNeg(s.prospection))}</div>
-          <div class="calcNote">Le multiplicateur PP est calculé via une fonction logistique (cap à 2.5).</div>
-        </div>
-      </div>
-
-      <div class="calcBox">
-        <div class="calcHead">Paramètres drop</div>
-        <div class="calcBody">
-          <div class="calcStack">
-            <div class="calcRow">
+      app.innerHTML = `
+        <div class="section">
+          <div class="topline">
+            <div class="title">
               <div>
-                <div class="lab">Base (%)</div>
-                <div class="sub">Drop de base sur la ressource</div>
+                <h2>${escapeHtml(d.name)}</h2>
+                <p class="sub">Clique sur un nombre pour saisir direct.</p>
               </div>
-              <div class="num" onclick="openPPPad('base','Drop de base (%)')">${fmt.format(clampNonNeg(s.base))}</div>
             </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn small" onclick="location.hash='#donjons'">← Donjons</button>
+              <button class="btn small bad" onclick="window.__resetDungeon('${d.id}')">Reset</button>
+            </div>
+          </div>
 
-            <div class="calcRow">
+          <div class="list">${list}</div>
+        </div>
+      `;
+    }
+
+    function renderOmega(){
+      // Placeholder propre (tu pourras recoller ton calcul omega plus tard sans casser le CSS)
+      const cur = Number(state?.omega?.cur ?? 0) || 0;
+      const target = Number(state?.omega?.target ?? 0) || 0;
+
+      app.innerHTML = `
+        <div class="section">
+          <div class="topline">
+            <div class="title">
               <div>
-                <div class="lab">Challenges (%)</div>
-                <div class="sub">Bonus challenges</div>
+                <h2>Oméga</h2>
+                <p class="sub">Saisie directe. (Tu me redonneras ton bloc calcul si tu veux remettre le modèle complet.)</p>
               </div>
-              <div class="num" onclick="openPPPad('challenges','Bonus challenges (%)')">${fmt.format(clampNonNeg(s.challenges))}</div>
             </div>
+          </div>
 
-            <div class="calcRow">
-              <div>
-                <div class="lab">Anomalie (%)</div>
-                <div class="sub">Bonus anomalie</div>
+          <div class="list">
+            <div class="item">
+              <div class="ico">⚡</div>
+              <div class="name">
+                <p class="n">Oméga actuel</p>
+                <p class="m">Clique sur le nombre pour saisir</p>
               </div>
-              <div class="num" onclick="openPPPad('anomalie','Bonus anomalie (%)')">${fmt.format(clampNonNeg(s.anomalie))}</div>
-            </div>
-
-            <div class="calcRow">
-              <div>
-                <div class="lab">Bouclier (%)</div>
-                <div class="sub">Bonus bouclier / idoles-like</div>
+              <div class="ctrls">
+                <div class="num" onclick="window.__setOmega('cur', ${cur})">${formatInt(cur)}</div>
               </div>
-              <div class="num" onclick="openPPPad('shield','Bonus bouclier (%)')">${fmt.format(clampNonNeg(s.shield))}</div>
             </div>
 
-            <div class="calcRow">
-              <div>
-                <div class="lab">Almanax (%)</div>
-                <div class="sub">Bonus almanax</div>
+            <div class="item">
+              <div class="ico">🎯</div>
+              <div class="name">
+                <p class="n">Oméga cible</p>
+                <p class="m">Clique sur le nombre pour saisir</p>
               </div>
-              <div class="num" onclick="openPPPad('almanax','Bonus almanax (%)')">${fmt.format(clampNonNeg(s.almanax))}</div>
-            </div>
-          </div>
-
-          <div class="hint">
-            Formule : <b>Base × multPP × (1+challenges) × (1+anomalie) × (1+bouclier) × (1+almanax)</b>
-          </div>
-        </div>
-      </div>
-
-      <div class="calcRightBig">
-        <div class="t">Résultats</div>
-        <div class="calcRow" style="margin-top:10px">
-          <div>
-            <div class="lab">Multiplicateur PP</div>
-            <div class="sub">cap à 2.5</div>
-          </div>
-          <div class="num static">${f2(mult)}</div>
-        </div>
-
-        <div class="v static" style="cursor:default;margin-top:10px">
-          ${f2(final)}%
-        </div>
-
-        <div class="calcNote" style="text-align:center">
-          Résultat = chance finale théorique (avant cap 100% selon mécanique IG).
-        </div>
-      </div>
-    </div>
-  `;
-  activateFallbackIn(app, "");
-}
-
-/* =========================================================
-   OMEGA PAGE
-   ========================================================= */
-function renderOmega(){
-  pagePill.textContent = "XP Oméga";
-  const s = loadOmegaState();
-  const xp = omegaXpRequired(s.cur, s.target);
-
-  app.innerHTML = `
-    <div class="topline">
-      <div class="title">
-        <div class="logo" style="width:42px;height:42px;border-radius:16px">📈</div>
-        <div>
-          <h2>Calculateur XP Oméga</h2>
-          <p class="sub">Clique les valeurs pour saisir au pavé numérique.</p>
-        </div>
-      </div>
-      <div class="nav">
-        <button class="btn bad" onclick="localStorage.removeItem('${kOmega}'); render(); scheduleCloudSave();">🧹 Reset</button>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="section">
-        <div class="topline" style="margin-bottom:8px">
-          <div class="pill">Entrées</div>
-          <div class="pill">0 = vierge</div>
-        </div>
-
-        <div class="list">
-          <div class="item">
-            <div class="ico">🎯</div>
-            <div class="name">
-              <p class="n">Oméga actuel</p>
-              <p class="m">Niveau de départ</p>
-            </div>
-            <div class="ctrls">
-              <div class="num" onclick="openOmegaPad('cur','Oméga actuel')">${fmt.format(s.cur)}</div>
-            </div>
-          </div>
-
-          <div class="item">
-            <div class="ico">🚀</div>
-            <div class="name">
-              <p class="n">Oméga cible</p>
-              <p class="m">Niveau à atteindre</p>
-            </div>
-            <div class="ctrls">
-              <div class="num" onclick="openOmegaPad('target','Oméga cible')">${fmt.format(s.target)}</div>
+              <div class="ctrls">
+                <div class="num" onclick="window.__setOmega('target', ${target})">${formatInt(target)}</div>
+              </div>
             </div>
           </div>
         </div>
+      `;
+    }
 
-        <div class="hint">
-          Modèle : XP(i→i+1) = 50 000 000 × 1.01^i (arrondi). (C’est un modèle, à ajuster si tu veux coller 100% IG.)
-        </div>
-      </div>
+    function render(){
+      updateAuthUI();
+      const r = getRoute();
+      if(r.page === "home") return renderHome();
+      if(r.page === "donjons") return renderDonjons();
+      if(r.page === "dungeon") return renderDungeon(r.id);
+      if(r.page === "omega") return renderOmega();
+      return renderHome();
+    }
 
-      <div class="calcRightBig">
-        <div class="t">XP requise (total)</div>
-        <div class="v static" style="cursor:default">${fmt.format(xp)}</div>
-        <div class="calcNote" style="text-align:center">
-          Si la cible ≤ actuel, XP = 0.
-        </div>
-      </div>
-    </div>
-  `;
-  activateFallbackIn(app, "");
-}
+    /* =========================================================
+       ACTIONS GLOBALS (pour onclick)
+       ========================================================= */
+    window.__inc = (d,k)=>{ incCounter(d,k, +1); render(); };
+    window.__dec = (d,k)=>{ incCounter(d,k, -1); render(); };
 
-/* =========================================================
-   RENDER (router)
-   ========================================================= */
-function render(){
-  updateAuthUI();
-  const r = getRoute();
-  if(r.page === "home") return renderHome();
-  if(r.page === "donjons") return renderDonjons();
-  if(r.page === "dungeon") return renderDungeon(r.id);
-  if(r.page === "songes") return renderSonges();
-  if(r.page === "anomalies") return renderAnomalies();
-  if(r.page === "pp") return renderPP();
-  if(r.page === "omega") return renderOmega();
-  return renderHome();
-}
+    window.__set = async (d,k,current)=>{
+      const val = await openNumberModal("Saisie", "Entre un nombre", current);
+      if(val === null) return;
+      setCounter(d,k, val);
+      render();
+    };
 
-async function handleAuthCallback(){
-  if(!sb) return;
+    window.__resetDungeon = (d)=>{
+      if(!confirm("Reset tous les compteurs de ce donjon ?")) return;
+      state[d] = {};
+      saveLocalState(state);
+      render();
+    };
 
-  const hasCode = window.location.search.includes("code=");
-  if(!hasCode) return;
+    window.__setOmega = async (key, current)=>{
+      const val = await openNumberModal("Oméga", key === "cur" ? "Oméga actuel" : "Oméga cible", current);
+      if(val === null) return;
+      if(!state.omega) state.omega = {};
+      state.omega[key] = clampInt(val);
+      saveLocalState(state);
+      render();
+    };
 
-  const { error } = await sb.auth.exchangeCodeForSession(window.location.href);
-  if(error){
-    console.error("exchangeCodeForSession error:", error);
-  }
+    /* =========================================================
+       HELPERS
+       ========================================================= */
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function formatInt(n){
+      const x = Number(n) || 0;
+      return x.toLocaleString("fr-FR");
+    }
 
-  // Nettoie l’URL (enlève ?code=... et autres)
-  const cleanUrl =
-    window.location.origin +
-    window.location.pathname +
-    window.location.hash;
+    /* =========================================================
+       BOOT
+       ========================================================= */
+    window.addEventListener("hashchange", render);
 
-  window.history.replaceState({}, document.title, cleanUrl);
-}
-
-/* =========================================================
-   INIT FINAL (anti écran noir)
-   ========================================================= */
-function showFatal(err){
-  console.error(err);
-  const appEl = document.getElementById("app");
-  if(appEl){
-    appEl.innerHTML = `
-      <div class="section">
-        <div class="topline">
-          <div class="title">
-            <div class="logo" style="width:42px;height:42px;border-radius:16px">⚠️</div>
-            <div>
-              <h2>Erreur JS détectée</h2>
-              <p class="sub">Ouvre la console (F12 → Console) et copie la première erreur rouge.</p>
-            </div>
-          </div>
-        </div>
-        <div class="hint" style="margin-top:0">
-          ${String(err?.message || err || "Erreur inconnue")}
-        </div>
-      </div>
-    `;
-  }
-}
-
-(async function boot(){
-  try { await handleAuthCallback(); } catch(e){ console.error("handleAuthCallback failed:", e); }
-  try { await initAuth(); } catch(e){ console.error("initAuth failed:", e); }
-
-  try { render(); } catch(e){ showFatal(e); }
-
-  try { activateFallbackIn(document.getElementById("topHeader"), ""); }
-  catch(e){ console.error("activateFallbackIn(header) failed:", e); }
-})();
-</script>
-
+    (async function boot(){
+      try{
+        await initSupabase();
+        if(sb) await handleAuthCallback();
+        render();
+      }catch(e){
+        console.error(e);
+        render();
+      }
+    })();
+  </script>
 </body>
 </html>
