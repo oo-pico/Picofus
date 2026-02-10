@@ -290,7 +290,8 @@
   </style>
 
   <!-- sb JS v2 -->
-  <script src="https://cdn.jsdelivr.net/npm/@sb/sb-js@2"></script>
+  <!-- Supabase JS v2 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -371,9 +372,28 @@
 /* =========================================================
    sb CONFIG (tes infos)
    ========================================================= */
-const sb_URL = "https://pktrtwqavqbhdhtzkocy.sb.co";
-const sb_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
-const sb_TABLE = "saves"; // user_id(uuid PK), data(jsonb), updated_at(timestamptz)
+/* =========================================================
+   SUPABASE CONFIG (tes infos)
+   ========================================================= */
+const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
+const SUPABASE_TABLE = "saves"; // user_id(uuid PK), data(jsonb), updated_at(timestamptz)
+
+let sb = null; // on garde le nom "sb" dans TON code, mais c'est un client Supabase
+
+function initSupabase(){
+  try{
+    if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
+    if(!window.supabase || !window.supabase.createClient) return null;
+    return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }catch(e){
+    console.error("Supabase init error:", e);
+    return null;
+  }
+}
+
+sb = initSupabase();
+
 
 /* =========================================================
    GLOBALS / STORAGE
@@ -529,7 +549,7 @@ async function loadFromCloudIntoLocal(){
   if(!sb || !cloud.user) return false;
   try{
     const { data, error } = await sb
-      .from(sb_TABLE)
+      .from(SUPABASE_TABLE)
       .select("data, updated_at")
       .eq("user_id", cloud.user.id)
       .maybeSingle();
