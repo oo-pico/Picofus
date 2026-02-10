@@ -2126,6 +2126,7 @@ async function handleAuthCallback(){
     console.error("exchangeCodeForSession error:", error);
   }
 
+  // Nettoie l’URL (enlève ?code=... et autres)
   const cleanUrl =
     window.location.origin +
     window.location.pathname +
@@ -2137,16 +2138,15 @@ async function handleAuthCallback(){
 /* =========================================================
    INIT
    ========================================================= */
-  (async function boot(){
+(async function boot(){
   try{
-    await handleAuthCallback(); // ⬅️ AJOUT ICI
+    await handleAuthCallback();
     await initAuth();
+    render();
+    activateFallbackIn(document.getElementById("topHeader"), "");
   }catch(e){
     console.error(e);
   }
-})();
-  render();
-  activateFallbackIn(document.getElementById("topHeader"), "");
 })();
 </script>
 
