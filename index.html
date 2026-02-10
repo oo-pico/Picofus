@@ -618,9 +618,9 @@ function updateAuthUI(){
     btnAuth.classList.add("good");
     return;
   }
+
   if(cloud.user){
-    const email = cloud.user.email || "connecté";
-    authPill.textContent = cloud.saving ? `☁️ Sync… ${email}` : `☁️ Cloud ${email}`;
+    authPill.textContent = cloud.saving ? "☁️ Sync…" : "☁️ Cloud connecté";
     btnAuth.textContent = "🚪 Déconnexion";
     btnAuth.classList.remove("good");
     btnAuth.classList.add("bad");
