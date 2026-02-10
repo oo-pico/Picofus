@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Picofus – Tracker</title>
+
   <style>
     :root{
       --bg:#0e0e0f; --panel:#151517; --panel-soft:#1b1b1e; --stroke:#26262a;
@@ -40,6 +41,7 @@
     .brand h1{font-size:16px;margin:0;line-height:1}
     .brand p{margin:0;color:var(--muted);font-size:12px}
     .nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+
     .btn{
       border:1px solid var(--stroke);
       background:rgba(255,255,255,.03);
@@ -55,12 +57,18 @@
     .btn:active{transform:translateY(1px)}
     .btn.gold{border-color:rgba(214,179,106,.55);background:rgba(214,179,106,.08)}
     .btn.bad{border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.08)}
+    .btn.good{border-color:rgba(69,208,122,.5);background:rgba(69,208,122,.08)}
     .btn.small{padding:8px 10px;border-radius:12px;font-size:13px}
+
     .pill{
       font-size:12px;color:var(--muted);
       border:1px solid var(--stroke);background:rgba(255,255,255,.02);
       padding:7px 10px;border-radius:999px;
+      display:inline-flex;align-items:center;gap:8px;
+      max-width:360px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
+    .navIco{width:16px;height:16px;object-fit:contain;display:inline-block}
 
     main{padding-top:18px}
 
@@ -154,14 +162,14 @@
     .kpi .v.gold{color:var(--gold)}
     .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.35}
 
-    /* ====== MODAL / KEYPAD (non transparent) ====== */
+    /* ====== MODAL / KEYPAD (opaque) ====== */
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:99;}
     .modal.open{display:flex}
     .kbd{
       width:min(420px, 100%);
       border:1px solid var(--stroke);
       border-radius:22px;
-      background:linear-gradient(180deg, #1b1b1e, #121214); /* OPAQUE */
+      background:linear-gradient(180deg, #1b1b1e, #121214);
       box-shadow:0 25px 60px rgba(0,0,0,.75);
       padding:14px;
     }
@@ -170,7 +178,7 @@
     .kbd-top .target{font-weight:800}
     .kbd-display{
       border:1px solid var(--stroke);
-      background:#0b0b0c; /* OPAQUE */
+      background:#0b0b0c;
       border-radius:18px;
       padding:12px 12px;
       display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -180,7 +188,7 @@
     .kbd-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;}
     .kbd-key{
       border:1px solid var(--stroke);
-      background:#18181a; /* OPAQUE */
+      background:#18181a;
       color:var(--text);
       border-radius:16px;
       padding:14px 10px;
@@ -191,7 +199,6 @@
     .kbd-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
     .kbd-actions .btn{flex:1}
     .kbd-actions .btn.small{flex:0 0 auto}
-    .hide{display:none!important}
     .mono{font-variant-numeric:tabular-nums}
 
     /* ====== mini layout calculators ====== */
@@ -246,10 +253,11 @@
       margin-top:8px;
       font-size:30px;font-weight:950;color:var(--gold);
       font-variant-numeric:tabular-nums;
-      display:flex;justify-content:center;
+      display:flex;justify-content:center;align-items:center;gap:10px;
       padding:14px 10px;border-radius:16px;
       border:1px solid rgba(214,179,106,.35);
       background:rgba(0,0,0,.18);
+      cursor:pointer;
     }
     .calcNote{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.35}
     .fieldPct{width:120px}
@@ -280,10 +288,14 @@
     .legendItem .ctrls .btn.small{padding:8px 9px}
     .legendItem .num{min-width:72px}
   </style>
+
+  <!-- Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+
 <body>
   <div class="wrap">
-    <header>
+    <header id="topHeader">
       <div class="brand">
         <div class="logo">P</div>
         <div>
@@ -294,14 +306,31 @@
 
       <div class="nav">
         <span class="pill" id="pagePill">Accueil</span>
+        <span class="pill" id="authPill">🔒 Local</span>
 
         <button class="btn small" id="btnTabHome">🏠 Home</button>
-        <button class="btn small" id="btnTabDonjons">⚔️ Donjons</button>
-        <button class="btn small" id="btnTabSonges">🌙 Songes</button>
-        <button class="btn small" id="btnTabAnomalies">🌀 Anomalies</button>
-        <button class="btn small" id="btnTabPP">📌 Calculateur PP</button>
-        <button class="btn small" id="btnTabOmega">📈 XP Oméga</button>
 
+        <button class="btn small" id="btnTabDonjons">
+          <img class="navIco" data-file="Icône Dj.png" alt=""> Donjons
+        </button>
+
+        <button class="btn small" id="btnTabSonges">
+          <img class="navIco" data-file="Bribe de rêve.png" alt=""> Songes
+        </button>
+
+        <button class="btn small" id="btnTabAnomalies">
+          <img class="navIco" data-file="Icône anomalie.png" alt=""> Anomalies
+        </button>
+
+        <button class="btn small" id="btnTabPP">
+          <img class="navIco" data-file="Icône Calculateur PP.png" alt=""> Calculateur PP
+        </button>
+
+        <button class="btn small" id="btnTabOmega">
+          <img class="navIco" data-file="Icône Calculateur Omega.png" alt=""> XP Oméga
+        </button>
+
+        <button class="btn small good" id="btnAuth">🔑 Connexion</button>
         <button class="btn small bad" id="btnResetAll">🧹 Reset tout</button>
       </div>
     </header>
@@ -340,12 +369,405 @@
 
 <script>
 /* =========================================================
-   IMPORTANT :
-   Ton .html est dans: ...\\DofusTracker\\
-   Et tes images sont dans des dossiers au même niveau.
-   Songes : dossier "Songes/" dans DofusTracker.
+   SUPABASE CONFIG (déjà rempli avec tes infos)
    ========================================================= */
+const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
+const SUPABASE_TABLE = "saves"; // table: user_id(uuid PK), data(jsonb), updated_at(timestamptz)
 
+/* =========================================================
+   GLOBALS / STORAGE
+   ========================================================= */
+const LS_PREFIX = "picofus:v3:";
+const CLOUD_META_KEY = `${LS_PREFIX}cloud_meta`; // local metadata (timestamp)
+const fmt = new Intl.NumberFormat("fr-FR");
+
+function n(v){ return Number.isFinite(v) ? v : 0; }
+function clampNonNeg(x){ x = Math.trunc(Number(x)||0); return x < 0 ? 0 : x; }
+function f2(x){ return (Number(x)||0).toFixed(2); }
+function clampPct(x){
+  x = Number(String(x).replace(",", "."));
+  if(!Number.isFinite(x)) x = 0;
+  return x < 0 ? 0 : x;
+}
+
+function resetAll(){
+  Object.keys(localStorage).forEach(k=>{ if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k); });
+  scheduleCloudSave();
+}
+
+/* =========================================================
+   IMAGE FALLBACK (ultra robuste)
+   ========================================================= */
+function uniq(arr){
+  const seen = new Set();
+  const out = [];
+  for(const x of arr){
+    if(!x) continue;
+    if(seen.has(x)) continue;
+    seen.add(x);
+    out.push(x);
+  }
+  return out;
+}
+function withDot(dir){ return dir.startsWith("./") ? dir : "./" + dir; }
+function stripDot(dir){ return dir.startsWith("./") ? dir.slice(2) : dir; }
+function encPath(p){ try { return encodeURI(p); } catch { return p; } }
+function makeCandidates(imgDir, file){
+  const d1 = stripDot(imgDir || "");
+  const d2 = withDot(imgDir || "");
+  const f1 = file || "";
+  return uniq([
+    d1 + f1,
+    d2 + f1,
+    encPath(d1 + f1),
+    encPath(d2 + f1),
+    f1,
+    "./" + f1,
+    encPath(f1),
+    encPath("./" + f1),
+    "img/" + f1,
+    "./img/" + f1,
+    "images/" + f1,
+    "./images/" + f1,
+    "assets/" + f1,
+    "./assets/" + f1,
+  ]);
+}
+function attachFallback(imgEl, imgDir, file){
+  const list = makeCandidates(imgDir, file);
+  imgEl.dataset.candidates = JSON.stringify(list);
+  imgEl.dataset.idx = "0";
+  imgEl.src = list[0];
+  imgEl.onerror = () => {
+    const candidates = JSON.parse(imgEl.dataset.candidates || "[]");
+    let idx = parseInt(imgEl.dataset.idx || "0", 10) + 1;
+    imgEl.dataset.idx = String(idx);
+    if(idx < candidates.length) imgEl.src = candidates[idx];
+    else imgEl.onerror = null;
+  };
+}
+function activateFallbackIn(containerEl, defaultDir){
+  containerEl.querySelectorAll("img").forEach(img=>{
+    const file = img.getAttribute("data-file") || (img.getAttribute("src")||"").split("/").pop();
+    const dir  = img.getAttribute("data-dir") || defaultDir || "";
+    if(file) attachFallback(img, dir, file);
+  });
+}
+
+/* =========================================================
+   SUPABASE SYNC (localStorage <-> table saves)
+   ========================================================= */
+let supabase = null;
+let cloud = { ready:false, user:null, saving:false, saveTimer:null, lastCloudUpdatedAt:null };
+
+function initSupabase(){
+  try{
+    if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
+    return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }catch(e){
+    console.error("Supabase init error:", e);
+    return null;
+  }
+}
+supabase = initSupabase();
+
+function getLocalCloudMeta(){
+  try{ return JSON.parse(localStorage.getItem(CLOUD_META_KEY) || "null"); }
+  catch{ return null; }
+}
+function setLocalCloudMeta(meta){
+  localStorage.setItem(CLOUD_META_KEY, JSON.stringify(meta));
+}
+
+function collectPrefixedLocalStorage(){
+  const ls = {};
+  for(const k of Object.keys(localStorage)){
+    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY){
+      ls[k] = localStorage.getItem(k);
+    }
+  }
+  return ls;
+}
+function replacePrefixedLocalStorage(lsMap){
+  // remove existing
+  for(const k of Object.keys(localStorage)){
+    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY){
+      localStorage.removeItem(k);
+    }
+  }
+  // set new
+  for(const [k,v] of Object.entries(lsMap || {})){
+    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY){
+      localStorage.setItem(k, v);
+    }
+  }
+}
+
+async function loadFromCloudIntoLocal(){
+  if(!supabase || !cloud.user) return false;
+  try{
+    const { data, error } = await supabase
+      .from(SUPABASE_TABLE)
+      .select("data, updated_at")
+      .eq("user_id", cloud.user.id)
+      .maybeSingle();
+
+    if(error){
+      console.error("Cloud load error:", error);
+      return false;
+    }
+    if(!data || !data.data) return false;
+
+    const payload = data.data;
+    const cloudUpdatedAt = data.updated_at ? new Date(data.updated_at).getTime() : Date.now();
+
+    // decide overwrite: if cloud newer than local meta -> overwrite; else keep local
+    const localMeta = getLocalCloudMeta();
+    const localUpdatedAt = localMeta?.localUpdatedAt ? Number(localMeta.localUpdatedAt) : 0;
+
+    if(cloudUpdatedAt >= localUpdatedAt){
+      replacePrefixedLocalStorage(payload.ls || {});
+      setLocalCloudMeta({ localUpdatedAt: cloudUpdatedAt, lastCloudUpdatedAt: cloudUpdatedAt });
+      cloud.lastCloudUpdatedAt = cloudUpdatedAt;
+      return true;
+    }else{
+      // local is newer -> keep local, push later
+      cloud.lastCloudUpdatedAt = cloudUpdatedAt;
+      return false;
+    }
+  }catch(e){
+    console.error("Cloud load exception:", e);
+    return false;
+  }
+}
+
+async function saveLocalToCloudNow(){
+  if(!supabase || !cloud.user) return;
+  try{
+    cloud.saving = true;
+    updateAuthUI();
+
+    const ls = collectPrefixedLocalStorage();
+    const payload = {
+      version: 1,
+      savedAt: new Date().toISOString(),
+      ls
+    };
+
+    const { error } = await supabase
+      .from(SUPABASE_TABLE)
+      .upsert({
+        user_id: cloud.user.id,
+        data: payload,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "user_id" });
+
+    if(error){
+      console.error("Cloud save error:", error);
+      return;
+    }
+    const now = Date.now();
+    setLocalCloudMeta({ localUpdatedAt: now, lastCloudUpdatedAt: cloud.lastCloudUpdatedAt || now });
+  }catch(e){
+    console.error("Cloud save exception:", e);
+  }finally{
+    cloud.saving = false;
+    updateAuthUI();
+  }
+}
+
+function scheduleCloudSave(){
+  if(!supabase || !cloud.user) return;
+  if(cloud.saveTimer) clearTimeout(cloud.saveTimer);
+  cloud.saveTimer = setTimeout(()=>saveLocalToCloudNow(), 900);
+}
+
+/* Auth UI / Actions */
+const authPill = document.getElementById("authPill");
+const btnAuth = document.getElementById("btnAuth");
+
+function updateAuthUI(){
+  if(!supabase){
+    authPill.textContent = "⚠️ Supabase OFF";
+    btnAuth.textContent = "🔑 Connexion";
+    btnAuth.classList.remove("bad");
+    btnAuth.classList.add("good");
+    return;
+  }
+  if(cloud.user){
+    const email = cloud.user.email || "connecté";
+    authPill.textContent = cloud.saving ? `☁️ Sync… ${email}` : `☁️ Cloud ${email}`;
+    btnAuth.textContent = "🚪 Déconnexion";
+    btnAuth.classList.remove("good");
+    btnAuth.classList.add("bad");
+  }else{
+    authPill.textContent = "🔒 Local";
+    btnAuth.textContent = "🔑 Connexion";
+    btnAuth.classList.remove("bad");
+    btnAuth.classList.add("good");
+  }
+}
+
+async function doLogin(){
+  if(!supabase) return alert("Supabase non initialisé (URL/Key manquantes).");
+  const email = prompt("Email pour connexion (magic link) :");
+  if(!email) return;
+
+  const redirectTo = window.location.origin + "/#/";
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: redirectTo }
+  });
+
+  if(error){
+    console.error(error);
+    alert("Erreur connexion: " + (error.message || "unknown"));
+    return;
+  }
+  alert("✅ Lien envoyé par email. Ouvre-le pour te connecter (retour sur le site).");
+}
+
+async function doLogout(){
+  if(!supabase) return;
+  const { error } = await supabase.auth.signOut();
+  if(error){
+    console.error(error);
+    alert("Erreur déconnexion: " + (error.message || "unknown"));
+  }
+}
+
+btnAuth.addEventListener("click", ()=>{
+  if(cloud.user) doLogout();
+  else doLogin();
+});
+
+async function initAuth(){
+  if(!supabase) { updateAuthUI(); return; }
+
+  const { data } = await supabase.auth.getSession();
+  cloud.user = data?.session?.user || null;
+  updateAuthUI();
+
+  if(cloud.user){
+    await loadFromCloudIntoLocal();
+  }
+
+  supabase.auth.onAuthStateChange(async (_event, session)=>{
+    cloud.user = session?.user || null;
+    updateAuthUI();
+    if(cloud.user){
+      await loadFromCloudIntoLocal();
+      render();
+      scheduleCloudSave(); // ensure we push if local newer
+    }else{
+      render();
+    }
+  });
+}
+
+/* =========================================================
+   KEY PAD (numeric)
+   ========================================================= */
+const modal = document.getElementById("modal");
+const kbdTarget = document.getElementById("kbdTarget");
+const kbdValue = document.getElementById("kbdValue");
+const kbdGrid = document.getElementById("kbdGrid");
+const btnClose = document.getElementById("kbdClose");
+const btnClear = document.getElementById("kbdClear");
+const btnBack = document.getElementById("kbdBack");
+const btnOk = document.getElementById("kbdOk");
+
+let keypad = { open:false, buffer:"0", onApply:null, title:"" };
+
+function openKeypad(title, currentValue, onApply){
+  keypad.open = true;
+  keypad.title = title;
+  keypad.buffer = String(clampNonNeg(currentValue));
+  keypad.onApply = onApply;
+  kbdTarget.textContent = title;
+  kbdValue.textContent = keypad.buffer;
+  modal.classList.add("open");
+}
+function closeKeypad(){ keypad.open = false; modal.classList.remove("open"); }
+function setBuffer(next){ keypad.buffer = next; kbdValue.textContent = keypad.buffer; }
+function pushDigit(d){ if(keypad.buffer === "0") setBuffer(String(d)); else setBuffer(keypad.buffer + String(d)); }
+function backspace(){ if(keypad.buffer.length <= 1) setBuffer("0"); else setBuffer(keypad.buffer.slice(0,-1)); }
+function clearBuf(){ setBuffer("0"); }
+function applyBuf(){
+  const val = clampNonNeg(parseInt(keypad.buffer,10));
+  if(typeof keypad.onApply === "function") keypad.onApply(val);
+  closeKeypad();
+}
+(function buildKeypad(){
+  kbdGrid.innerHTML = "";
+  for(let i=1;i<=9;i++){
+    const b = document.createElement("button");
+    b.className = "kbd-key";
+    b.textContent = String(i);
+    b.addEventListener("click", ()=>pushDigit(i));
+    kbdGrid.appendChild(b);
+  }
+  const blank1 = document.createElement("div");
+  const zero = document.createElement("button");
+  zero.className = "kbd-key";
+  zero.textContent = "0";
+  zero.addEventListener("click", ()=>pushDigit(0));
+  const blank2 = document.createElement("div");
+  kbdGrid.appendChild(blank1);
+  kbdGrid.appendChild(zero);
+  kbdGrid.appendChild(blank2);
+})();
+btnClose.addEventListener("click", closeKeypad);
+modal.addEventListener("click", (e)=>{ if(e.target === modal) closeKeypad(); });
+btnClear.addEventListener("click", clearBuf);
+btnBack.addEventListener("click", backspace);
+btnOk.addEventListener("click", applyBuf);
+window.addEventListener("keydown", (e)=>{
+  if(!keypad.open) return;
+  if(e.key >= "0" && e.key <= "9") pushDigit(e.key);
+  else if(e.key === "Backspace") backspace();
+  else if(e.key === "Escape") closeKeypad();
+  else if(e.key === "Enter") applyBuf();
+});
+
+/* =========================================================
+   ROUTER / APP ROOT
+   ========================================================= */
+const app = document.getElementById("app");
+const pagePill = document.getElementById("pagePill");
+
+document.getElementById("btnTabHome").addEventListener("click", ()=>{ location.hash = "#/"; });
+document.getElementById("btnTabDonjons").addEventListener("click", ()=>{ location.hash = "#/donjons"; });
+document.getElementById("btnTabSonges").addEventListener("click", ()=>{ location.hash = "#/songes"; });
+document.getElementById("btnTabAnomalies").addEventListener("click", ()=>{ location.hash = "#/anomalies"; });
+document.getElementById("btnTabPP").addEventListener("click", ()=>{ location.hash = "#/pp"; });
+document.getElementById("btnTabOmega").addEventListener("click", ()=>{ location.hash = "#/omega"; });
+
+document.getElementById("btnResetAll").addEventListener("click", ()=>{
+  if(confirm("Reset TOUTES les données (tous les donjons + Songes + calculateurs) ?")){
+    resetAll();
+    render();
+  }
+});
+
+function getRoute(){
+  const h = location.hash.replace("#","").trim();
+  if(!h || h === "/") return { page:"home" };
+  if(h === "/donjons") return { page:"donjons" };
+  if(h === "/songes") return { page:"songes" };
+  if(h === "/anomalies") return { page:"anomalies" };
+  if(h === "/pp") return { page:"pp" };
+  if(h === "/omega") return { page:"omega" };
+  const m = h.match(/^\/d\/([^\/]+)$/);
+  if(m) return { page:"dungeon", id:m[1] };
+  return { page:"home" };
+}
+window.addEventListener("hashchange", render);
+
+/* =========================================================
+   DONJONS DATA
+   ========================================================= */
 const DUNGEONS = [
   {
     id: "dechireuse",
@@ -543,7 +965,8 @@ const DUNGEONS = [
     thumb: "comte.png",
     imgDir: "Comte/",
     totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Comte": 1, "Sinistrofu": 6, "Noctu": 9, "Cyclo": 9, "Granduk": 8, "Strigide": 7 },
+    // ✅ FIX : +1 sur "Comte Harebourg" (le nom réel affiché)
+    totalIncrements: { "Comte Harebourg": 1, "Sinistrofu": 6, "Noctu": 9, "Cyclo": 9, "Granduk": 8, "Strigide": 7 },
     mobs: [
       { key:"Comte Harebourg", img:"comte.png" },
       { key:"Granduk", img:"granduk.png" },
@@ -573,8 +996,9 @@ const DUNGEONS = [
   },
 ];
 
-/* ====================== Storage helpers ====================== */
-const LS_PREFIX = "picofus:v3:";
+/* =========================================================
+   STORAGE HELPERS (donjons)
+   ========================================================= */
 const kDungeon = (id) => `${LS_PREFIX}${id}`;
 function loadDungeonState(id){
   try{
@@ -584,23 +1008,14 @@ function loadDungeonState(id){
     return { mobs:p.mobs||{}, resources:p.resources||{}, prices:p.prices||{} };
   }catch(e){ return { mobs:{}, resources:{}, prices:{} }; }
 }
-function saveDungeonState(id, state){ localStorage.setItem(kDungeon(id), JSON.stringify(state)); }
-function resetAll(){
-  Object.keys(localStorage).forEach(k=>{ if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k); });
+function saveDungeonState(id, state){
+  localStorage.setItem(kDungeon(id), JSON.stringify(state));
+  scheduleCloudSave();
 }
 
-/* ====================== Utils ====================== */
-const fmt = new Intl.NumberFormat("fr-FR");
-function n(v){ return Number.isFinite(v) ? v : 0; }
-function clampNonNeg(x){ x = Math.trunc(Number(x)||0); return x < 0 ? 0 : x; }
-function f2(x){ return (Number(x)||0).toFixed(2); }
-function clampPct(x){
-  x = Number(String(x).replace(",", "."));
-  if(!Number.isFinite(x)) x = 0;
-  return x < 0 ? 0 : x;
-}
-
-/* ====================== Calculateur PP ====================== */
+/* =========================================================
+   CALCULATEUR PP
+   ========================================================= */
 const kPP = `${LS_PREFIX}pp`;
 function loadPPState(){
   try{
@@ -619,7 +1034,7 @@ function loadPPState(){
     return { prospection:500, base:12, challenges:60, anomalie:0, shield:5, almanax:0 };
   }
 }
-function savePPState(s){ localStorage.setItem(kPP, JSON.stringify(s)); }
+function savePPState(s){ localStorage.setItem(kPP, JSON.stringify(s)); scheduleCloudSave(); }
 function ppMultiplier(prospection){
   const pp = Number(prospection)||0;
   const m = 0.74 + (1.755 / (1 + Math.exp((250 - pp) / 85)));
@@ -648,7 +1063,9 @@ function openPPPad(field, label){
   });
 }
 
-/* ====================== Calculateur XP Oméga ====================== */
+/* =========================================================
+   CALCULATEUR OMEGA
+   ========================================================= */
 const kOmega = `${LS_PREFIX}omega`;
 function loadOmegaState(){
   try{
@@ -660,7 +1077,7 @@ function loadOmegaState(){
     return { cur: 472, target: 482 };
   }
 }
-function saveOmegaState(s){ localStorage.setItem(kOmega, JSON.stringify(s)); }
+function saveOmegaState(s){ localStorage.setItem(kOmega, JSON.stringify(s)); scheduleCloudSave(); }
 function omegaXpToNext(i){ return Math.round(50000000 * Math.pow(1.01, i)); }
 function omegaXpRequired(cur, target){
   cur = clampNonNeg(cur);
@@ -681,157 +1098,439 @@ function openOmegaPad(field, label){
 }
 
 /* =========================================================
-   IMAGE FALLBACK (ultra robuste)
+   SONGES (refait selon tes demandes)
    ========================================================= */
-function uniq(arr){
-  const seen = new Set();
-  const out = [];
-  for(const x of arr){
-    if(!x) continue;
-    if(seen.has(x)) continue;
-    seen.add(x);
-    out.push(x);
-  }
-  return out;
-}
-function withDot(dir){ return dir.startsWith("./") ? dir : "./" + dir; }
-function stripDot(dir){ return dir.startsWith("./") ? dir.slice(2) : dir; }
-function encPath(p){ try { return encodeURI(p); } catch { return p; } }
-function makeCandidates(imgDir, file){
-  const d1 = stripDot(imgDir || "");
-  const d2 = withDot(imgDir || "");
-  const f1 = file || "";
-  return uniq([
-    d1 + f1,
-    d2 + f1,
-    encPath(d1 + f1),
-    encPath(d2 + f1),
-    f1,
-    "./" + f1,
-    encPath(f1),
-    encPath("./" + f1),
-    "img/" + f1,
-    "./img/" + f1,
-    "images/" + f1,
-    "./images/" + f1,
-    "assets/" + f1,
-    "./assets/" + f1,
-  ]);
-}
-function attachFallback(imgEl, imgDir, file){
-  const list = makeCandidates(imgDir, file);
-  imgEl.dataset.candidates = JSON.stringify(list);
-  imgEl.dataset.idx = "0";
-  imgEl.src = list[0];
-  imgEl.onerror = () => {
-    const candidates = JSON.parse(imgEl.dataset.candidates || "[]");
-    let idx = parseInt(imgEl.dataset.idx || "0", 10) + 1;
-    imgEl.dataset.idx = String(idx);
-    if(idx < candidates.length) imgEl.src = candidates[idx];
-    else imgEl.onerror = null;
+const kSonges = `${LS_PREFIX}songes`;
+const SONGES_IMG_DIR = "Songes/";
+const BRIBES_ICON_FILE = "Bribe de rêve.png";
+
+// 10 intensités = 1..10 (ordre = ce que tu as à l'écran)
+const SONGE_INTENSITIES = [
+  { id:"reve1",     num:1,  label:"Rêve 1",     group:"Rêve",     img:"Reve 1.png" },
+  { id:"reve2",     num:2,  label:"Rêve 2",     group:"Rêve",     img:"Reve 2.png" },
+  { id:"reve3",     num:3,  label:"Rêve 3",     group:"Rêve",     img:"Reve 3.png" },
+
+  { id:"paradoxe1", num:4,  label:"Paradoxe 1", group:"Paradoxe", img:"Paradox 1.png" },
+  { id:"paradoxe2", num:5,  label:"Paradoxe 2", group:"Paradoxe", img:"Paradox 2.png" },
+  { id:"paradoxe3", num:6,  label:"Paradoxe 3", group:"Paradoxe", img:"Paradox 3.png" },
+  { id:"paradoxe4", num:7,  label:"Paradoxe 4", group:"Paradoxe", img:"Paradox 4.png" },
+
+  { id:"cauchemar1",num:8,  label:"Cauchemar 1",group:"Cauchemar",img:"Cauchemar 1.png" },
+  { id:"cauchemar2",num:9,  label:"Cauchemar 2",group:"Cauchemar",img:"Cauchemar 2.png" },
+  { id:"cauchemar3",num:10, label:"Cauchemar 3",group:"Cauchemar",img:"Cauchemar 3.png" },
+];
+
+// Légendes (ta liste conservée)
+const SONGE_LEGENDS = [
+  { key:"Oto Mustam",      img:"Légende d'Oto Mustam.png",            imgDir: SONGES_IMG_DIR },
+  { key:"Menalt",         img:"Légende de Menalt.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Mériana",        img:"Légende de Mériana.png",               imgDir: SONGES_IMG_DIR },
+  { key:"Jahash",         img:"Légende de Jahash Jurgen.png",         imgDir: SONGES_IMG_DIR },
+  { key:"Amayiro",        img:"Légende d'Amayiro.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Dame Jhessica",  img:"Légende de Dame Jhessica.png",         imgDir: SONGES_IMG_DIR },
+  { key:"Thanatena",      img:"Légende de Thanatena.png",             imgDir: SONGES_IMG_DIR },
+
+  { key:"Helséphine",     img:"Légende d'Helséphine.png",             imgDir: SONGES_IMG_DIR },
+  { key:"Henual",         img:"Légende d'Henual.png",                 imgDir: SONGES_IMG_DIR },
+  { key:"Servitude",      img:"Légende de Servitude.png",             imgDir: SONGES_IMG_DIR },
+  { key:"Guerre",         img:"Légende de Guerre.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Misère",         img:"Légende de Misère.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Corruption",     img:"Légende de Corruption.png",            imgDir: SONGES_IMG_DIR },
+  { key:"Mille Lieues",   img:"Légende de Mille Lieues.png",          imgDir: SONGES_IMG_DIR },
+  { key:"Rykke Errel",    img:"Légende de Rykke Errel.png",           imgDir: SONGES_IMG_DIR },
+  { key:"Ganymède",       img:"Légende de Ganymède.png",              imgDir: SONGES_IMG_DIR },
+  { key:"Fallanster",     img:"Légende de Fallanster.png",            imgDir: SONGES_IMG_DIR },
+  { key:"Crocobur",       img:"Légende de Crocobur.png",              imgDir: SONGES_IMG_DIR },
+  { key:"Dodge",          img:"Légende de Dodge.png",                 imgDir: SONGES_IMG_DIR },
+  { key:"Brâm Barbe-Monde",img:"Légende de Brâm Barbe-Monde.png",     imgDir: SONGES_IMG_DIR },
+  { key:"Brumaire",       img:"Légende de Brumaire.png",              imgDir: SONGES_IMG_DIR },
+  { key:"Buhorado",       img:"Légende de Buhorado.png",              imgDir: SONGES_IMG_DIR },
+  { key:"Cul Botté",      img:"Légende du Cul Botté.png",             imgDir: SONGES_IMG_DIR },
+  { key:"Destin",         img:"Légende du Destin.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Miroir",         img:"Légende du Miroir.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Trompe-la-Mort", img:"Légende du Trompe-la-Mort.png",        imgDir: SONGES_IMG_DIR },
+
+  { key:"Kwakarticho",    img:"Légende animale de Kwakarticho.png",   imgDir: SONGES_IMG_DIR },
+  { key:"Poukachi",       img:"Légende animale de Poukachi.png",      imgDir: SONGES_IMG_DIR },
+  { key:"Bakushana",      img:"Légende animale de Bakushana.png",     imgDir: SONGES_IMG_DIR },
+  { key:"Magicrabe",      img:"Légende animale de Magicrabe.png",     imgDir: SONGES_IMG_DIR },
+];
+
+function blankSongesState(){
+  const init = {
+    ui: { tab:"runs", search:"" },
+    bribesTotal: 0,
+    runs: {},
+    bribesByIntensity: {}, // 1..10
+    legends: {},
   };
-}
-function activateFallbackIn(containerEl, defaultDir){
-  containerEl.querySelectorAll("img").forEach(img=>{
-    const file = img.getAttribute("data-file") || (img.getAttribute("src")||"").split("/").pop();
-    const dir  = img.getAttribute("data-dir") || defaultDir || "";
-    if(file) attachFallback(img, dir, file);
+  SONGE_INTENSITIES.forEach(x=>{
+    init.runs[x.id] = 0;
+    init.bribesByIntensity[String(x.num)] = 0;
   });
+  SONGE_LEGENDS.forEach(x=>init.legends[x.key]=0);
+  return init;
 }
+function loadSongesState(){
+  try{
+    const raw = localStorage.getItem(kSonges);
+    if(!raw) return blankSongesState();
+    const p = JSON.parse(raw);
 
-/* ====================== Keypad ====================== */
-const modal = document.getElementById("modal");
-const kbdTarget = document.getElementById("kbdTarget");
-const kbdValue = document.getElementById("kbdValue");
-const kbdGrid = document.getElementById("kbdGrid");
-const btnClose = document.getElementById("kbdClose");
-const btnClear = document.getElementById("kbdClear");
-const btnBack = document.getElementById("kbdBack");
-const btnOk = document.getElementById("kbdOk");
+    const out = blankSongesState();
+    out.ui = p.ui || out.ui;
+    out.bribesTotal = clampNonNeg(p.bribesTotal ?? 0);
 
-let keypad = { open:false, buffer:"0", onApply:null, title:"" };
+    // runs
+    if(p.runs){
+      for(const it of SONGE_INTENSITIES){
+        out.runs[it.id] = clampNonNeg(p.runs[it.id] ?? 0);
+      }
+    }
+    // bribes by intensity
+    if(p.bribesByIntensity){
+      for(const it of SONGE_INTENSITIES){
+        out.bribesByIntensity[String(it.num)] = clampNonNeg(p.bribesByIntensity[String(it.num)] ?? 0);
+      }
+    }
 
-function openKeypad(title, currentValue, onApply){
-  keypad.open = true;
-  keypad.title = title;
-  keypad.buffer = String(clampNonNeg(currentValue));
-  keypad.onApply = onApply;
-  kbdTarget.textContent = title;
-  kbdValue.textContent = keypad.buffer;
-  modal.classList.add("open");
-}
-function closeKeypad(){ keypad.open = false; modal.classList.remove("open"); }
-function setBuffer(next){ keypad.buffer = next; kbdValue.textContent = keypad.buffer; }
-function pushDigit(d){ if(keypad.buffer === "0") setBuffer(String(d)); else setBuffer(keypad.buffer + String(d)); }
-function backspace(){ if(keypad.buffer.length <= 1) setBuffer("0"); else setBuffer(keypad.buffer.slice(0,-1)); }
-function clearBuf(){ setBuffer("0"); }
-function applyBuf(){
-  const val = clampNonNeg(parseInt(keypad.buffer,10));
-  if(typeof keypad.onApply === "function") keypad.onApply(val);
-  closeKeypad();
-}
-(function buildKeypad(){
-  kbdGrid.innerHTML = "";
-  for(let i=1;i<=9;i++){
-    const b = document.createElement("button");
-    b.className = "kbd-key";
-    b.textContent = String(i);
-    b.addEventListener("click", ()=>pushDigit(i));
-    kbdGrid.appendChild(b);
+    // legends
+    if(p.legends){
+      for(const l of SONGE_LEGENDS){
+        out.legends[l.key] = clampNonNeg(p.legends[l.key] ?? 0);
+      }
+    }
+    return out;
+  }catch(e){
+    return blankSongesState();
   }
-  const blank1 = document.createElement("div");
-  const zero = document.createElement("button");
-  zero.className = "kbd-key";
-  zero.textContent = "0";
-  zero.addEventListener("click", ()=>pushDigit(0));
-  const blank2 = document.createElement("div");
-  kbdGrid.appendChild(blank1);
-  kbdGrid.appendChild(zero);
-  kbdGrid.appendChild(blank2);
-})();
-btnClose.addEventListener("click", closeKeypad);
-modal.addEventListener("click", (e)=>{ if(e.target === modal) closeKeypad(); });
-btnClear.addEventListener("click", clearBuf);
-btnBack.addEventListener("click", backspace);
-btnOk.addEventListener("click", applyBuf);
-window.addEventListener("keydown", (e)=>{
-  if(!keypad.open) return;
-  if(e.key >= "0" && e.key <= "9") pushDigit(e.key);
-  else if(e.key === "Backspace") backspace();
-  else if(e.key === "Escape") closeKeypad();
-  else if(e.key === "Enter") applyBuf();
-});
-
-/* ====================== Router ====================== */
-const app = document.getElementById("app");
-const pagePill = document.getElementById("pagePill");
-
-document.getElementById("btnTabHome").addEventListener("click", ()=>{ location.hash = "#/"; });
-document.getElementById("btnTabDonjons").addEventListener("click", ()=>{ location.hash = "#/donjons"; });
-document.getElementById("btnTabSonges").addEventListener("click", ()=>{ location.hash = "#/songes"; });
-document.getElementById("btnTabAnomalies").addEventListener("click", ()=>{ location.hash = "#/anomalies"; });
-document.getElementById("btnTabPP").addEventListener("click", ()=>{ location.hash = "#/pp"; });
-document.getElementById("btnTabOmega").addEventListener("click", ()=>{ location.hash = "#/omega"; });
-
-document.getElementById("btnResetAll").addEventListener("click", ()=>{
-  if(confirm("Reset TOUTES les données (tous les donjons + Songes + calculateurs) ?")){ resetAll(); render(); }
-});
-
-function getRoute(){
-  const h = location.hash.replace("#","").trim();
-  if(!h || h === "/") return { page:"home" };
-  if(h === "/donjons") return { page:"donjons" };
-  if(h === "/songes") return { page:"songes" };
-  if(h === "/anomalies") return { page:"anomalies" };
-  if(h === "/pp") return { page:"pp" };
-  if(h === "/omega") return { page:"omega" };
-  const m = h.match(/^\/d\/([^\/]+)$/);
-  if(m) return { page:"dungeon", id:m[1] };
-  return { page:"home" };
 }
-window.addEventListener("hashchange", render);
+function saveSongesState(s){
+  localStorage.setItem(kSonges, JSON.stringify(s));
+  scheduleCloudSave();
+}
 
-/* ====================== Pages ====================== */
+window.resetSonges = function(){
+  if(!confirm("Reset Songes (runs + bribes + légendes) ?")) return;
+  localStorage.removeItem(kSonges);
+  scheduleCloudSave();
+  render();
+};
+
+function setSongesTab(tab){
+  const s = loadSongesState();
+  s.ui.tab = tab;
+  saveSongesState(s);
+  renderSonges();
+}
+function setSongesSearch(value){
+  const s = loadSongesState();
+  s.ui.search = String(value||"");
+  saveSongesState(s);
+  renderSonges();
+}
+
+// Bribes global set (click value)
+window.openSongesBribesPad = function(){
+  const s = loadSongesState();
+  openKeypad("Bribes (global) — définir total", clampNonNeg(s.bribesTotal), (v)=>{
+    const st = loadSongesState();
+    st.bribesTotal = clampNonNeg(v);
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+// Runs pad (click number)
+window.openSongesRunPad = function(intensityId, label){
+  const s = loadSongesState();
+  openKeypad(`Runs • ${label}`, clampNonNeg(s.runs[intensityId] ?? 0), (v)=>{
+    const st = loadSongesState();
+    st.runs[intensityId] = clampNonNeg(v);
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+// +Run = +1 RUN ONLY
+window.songeIncRun = function(intensityId){
+  const st = loadSongesState();
+  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) + 1);
+  saveSongesState(st);
+  renderSonges();
+};
+window.songeDecRun = function(intensityId){
+  const st = loadSongesState();
+  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) - 1);
+  saveSongesState(st);
+  renderSonges();
+};
+
+// Add bribes: asks intensity (1..10) then amount
+window.songeAddBribes = function(){
+  openKeypad("Intensité (1 à 10)", 1, (inten)=>{
+    inten = clampNonNeg(inten);
+    if(inten < 1 || inten > 10){
+      alert("Intensité invalide. Choisis un nombre entre 1 et 10.");
+      return;
+    }
+    openKeypad(`Ajouter bribes • Intensité ${inten}`, 0, (amount)=>{
+      const add = clampNonNeg(amount);
+      const st = loadSongesState();
+      st.bribesTotal = clampNonNeg((st.bribesTotal ?? 0) + add);
+      st.bribesByIntensity[String(inten)] = clampNonNeg((st.bribesByIntensity[String(inten)] ?? 0) + add);
+      saveSongesState(st);
+      renderSonges();
+    });
+  });
+};
+
+// Remove bribes: asks intensity (1..10) then amount
+window.songeSubBribes = function(){
+  openKeypad("Intensité (1 à 10)", 1, (inten)=>{
+    inten = clampNonNeg(inten);
+    if(inten < 1 || inten > 10){
+      alert("Intensité invalide. Choisis un nombre entre 1 et 10.");
+      return;
+    }
+    openKeypad(`Retirer bribes • Intensité ${inten}`, 0, (amount)=>{
+      const sub = clampNonNeg(amount);
+      const st = loadSongesState();
+      st.bribesTotal = clampNonNeg((st.bribesTotal ?? 0) - sub);
+      st.bribesByIntensity[String(inten)] = clampNonNeg((st.bribesByIntensity[String(inten)] ?? 0) - sub);
+      saveSongesState(st);
+      renderSonges();
+    });
+  });
+};
+
+// Legends
+window.songeIncLegend = function(key){
+  const st = loadSongesState();
+  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) + 1);
+  saveSongesState(st);
+  renderSonges();
+};
+window.songeDecLegend = function(key){
+  const st = loadSongesState();
+  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) - 1);
+  saveSongesState(st);
+  renderSonges();
+};
+window.openLegendPad = function(key){
+  const s = loadSongesState();
+  openKeypad(`Légende • ${key}`, clampNonNeg(s.legends[key] ?? 0), (v)=>{
+    const st = loadSongesState();
+    st.legends[key] = clampNonNeg(v);
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+function renderSonges(){
+  const s = loadSongesState();
+  pagePill.textContent = "Songes";
+
+  const tab = s.ui?.tab || "runs";
+  const totalRuns = Object.values(s.runs||{}).reduce((a,b)=>a+n(b),0);
+  const bribesTotal = clampNonNeg(s.bribesTotal ?? 0);
+
+  const header = `
+    <div class="topline">
+      <div class="title">
+        <div class="logo" style="width:42px;height:42px;border-radius:16px">🌙</div>
+        <div>
+          <h2>Songes</h2>
+          <p class="sub">Runs par intensité • Bribes globales • Bribes cumulées par intensité • Légendes droppées.</p>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn gold" onclick="songeAddBribes()">➕ Ajouter des bribes</button>
+        <button class="btn" onclick="songeSubBribes()">➖ Retirer des bribes</button>
+        <button class="btn bad" onclick="resetSonges()">🧹 Reset Songes</button>
+      </div>
+    </div>
+  `;
+
+  const tabs = `
+    <div class="seg" style="margin-bottom:12px">
+      <button class="btn small ${tab==='runs'?'active':''}" onclick="setSongesTab('runs')">📊 Runs & Bribes</button>
+      <button class="btn small ${tab==='legends'?'active':''}" onclick="setSongesTab('legends')">🏷️ Légendes</button>
+    </div>
+  `;
+
+  const bribesKpiIcon = `
+    <span class="kico">
+      <img data-file="${escapeHtml(BRIBES_ICON_FILE)}" data-dir="" alt="">
+    </span>
+  `;
+
+  const topKpis = `
+    <div class="summary" style="margin-top:0">
+      <div class="kpi">
+        <div class="k">Bribes (global) ${bribesKpiIcon}</div>
+        <div class="v mono gold" style="cursor:pointer" onclick="openSongesBribesPad()">${fmt.format(bribesTotal)}</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Runs (total)</div>
+        <div class="v mono">${fmt.format(totalRuns)}</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Mode</div>
+        <div class="v mono">+Run = +1 run</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Astuce</div>
+        <div class="v mono">Bribes via bouton dédié</div>
+      </div>
+    </div>
+  `;
+
+  let body = "";
+
+  if(tab === "runs"){
+    const byGroup = (group) => SONGE_INTENSITIES.filter(x=>x.group===group);
+
+    const groupBlock = (groupName) => {
+      const rows = byGroup(groupName).map(it=>{
+        const count = clampNonNeg(s.runs[it.id] ?? 0);
+        const bsum = clampNonNeg(s.bribesByIntensity[String(it.num)] ?? 0);
+
+        return `
+          <div class="item">
+            <div class="ico">
+              <img data-file="${escapeHtml(it.img)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt="">
+            </div>
+            <div class="name">
+              <p class="n">${escapeHtml(it.label)}</p>
+              <p class="m">Bribes cumulées : <b class="mono">${fmt.format(bsum)}</b> <span class="pill" style="padding:4px 8px;border-radius:999px">Int. ${it.num}</span></p>
+            </div>
+            <div class="ctrls">
+              <button class="btn small" onclick="songeDecRun('${it.id}')">−</button>
+              <div class="num" onclick="openSongesRunPad('${it.id}','${jsEscape(it.label)}')">${fmt.format(count)}</div>
+              <button class="btn small gold" onclick="songeIncRun('${it.id}')">+ Run</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="calcBox" style="margin-bottom:14px">
+          <div class="calcHead">${escapeHtml(groupName.toUpperCase())}</div>
+          <div class="calcBody">
+            <div class="list">${rows}</div>
+          </div>
+        </div>
+      `;
+    };
+
+    // layout demandé: Cauchemar sous les bribes (colonne droite)
+    body = `
+      <div class="row">
+        <div>
+          ${groupBlock("Rêve")}
+          ${groupBlock("Paradoxe")}
+        </div>
+
+        <div>
+          <div class="calcRightBig">
+            <div class="t">BRIBES (GLOBAL)</div>
+            <div class="v" onclick="openSongesBribesPad()">
+              <img data-file="${escapeHtml(BRIBES_ICON_FILE)}" style="width:26px;height:26px;object-fit:contain" alt="">
+              ${fmt.format(bribesTotal)}
+            </div>
+            <div class="calcNote" style="text-align:center">
+              Clique sur la valeur pour <b>définir le total</b>.<br>
+              Pour ajouter, utilise <b>“Ajouter des bribes”</b> → tu choisis l’intensité (1..10) → ça cumule partout.
+            </div>
+          </div>
+
+          <div style="height:14px"></div>
+
+          <div class="section">
+            <div class="topline" style="margin-bottom:8px">
+              <div class="pill">Notes</div>
+              <div class="pill">Bribes liées aux vagues</div>
+            </div>
+            <div class="hint" style="margin-top:0">
+              Après la 3.5, les bribes dépendent des vagues. Ici : tu saisis <b>les bribes réelles</b> et tu les classes par intensité.
+            </div>
+          </div>
+
+          <div style="height:14px"></div>
+
+          ${groupBlock("Cauchemar")}
+        </div>
+      </div>
+    `;
+  }
+
+  if(tab === "legends"){
+    const q = (s.ui?.search || "").toLowerCase().trim();
+
+    const tiles = SONGE_LEGENDS
+      .filter(l => !q || l.key.toLowerCase().includes(q))
+      .map(l=>{
+        const val = clampNonNeg(s.legends[l.key] ?? 0);
+        return `
+          <div class="item legendItem">
+            <div class="ico">
+              <img data-file="${escapeHtml(l.img)}" data-dir="${escapeHtml(l.imgDir || SONGES_IMG_DIR)}" alt="">
+            </div>
+            <div class="name">
+              <p class="n">${escapeHtml(l.key)}</p>
+              <p class="m">Compteur de drop légendaire</p>
+            </div>
+            <div class="ctrls">
+              <button class="btn small" onclick="songeDecLegend('${jsEscape(l.key)}')">−</button>
+              <div class="num" onclick="openLegendPad('${jsEscape(l.key)}')">${fmt.format(val)}</div>
+              <button class="btn small" onclick="songeIncLegend('${jsEscape(l.key)}')">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+    const doneCount = SONGE_LEGENDS.reduce((acc,l)=> acc + (clampNonNeg(s.legends[l.key] ?? 0) > 0 ? 1 : 0), 0);
+
+    body = `
+      <div class="section">
+        <div class="topline">
+          <div class="title">
+            <div class="pill">📚 Classement</div>
+            <div class="pill">Déjà drop: <b class="mono">${fmt.format(doneCount)}</b> / <b class="mono">${fmt.format(SONGE_LEGENDS.length)}</b></div>
+          </div>
+          <div class="searchRow">
+            <input placeholder="Rechercher une légende…" value="${escapeHtml(s.ui?.search||"")}"
+              oninput="setSongesSearch(this.value)">
+            <button class="btn small" onclick="setSongesSearch('')">✖</button>
+          </div>
+        </div>
+
+        <div class="legendGrid">
+          ${tiles || ``}
+        </div>
+
+        ${tiles ? "" : `<div class="hint">Aucune légende trouvée.</div>`}
+      </div>
+    `;
+  }
+
+  app.innerHTML = `
+    <div class="section">
+      ${header}
+      ${tabs}
+      ${topKpis}
+      <div style="height:14px"></div>
+      ${body}
+    </div>
+  `;
+
+  activateFallbackIn(app, "");
+}
+
+/* =========================================================
+   PAGES: HOME / DONJONS / PP / OMEGA / DUNGEON
+   ========================================================= */
 function renderHomePage(){
   pagePill.textContent = "Accueil";
   app.innerHTML = `
@@ -865,7 +1564,7 @@ function renderHomePage(){
             <div class="thumb"><span style="color:var(--gold);font-weight:900">🌙</span></div>
             <div style="min-width:0">
               <h3>Songes</h3>
-              <p>Runs par intensité • Bribes globales • Légendes drop.</p>
+              <p>Runs par intensité • Bribes par intensité (1..10) • Légendes.</p>
             </div>
           </div>
           <div class="card-right">
@@ -878,7 +1577,7 @@ function renderHomePage(){
             <div class="thumb"><span style="color:var(--gold);font-weight:900">🌀</span></div>
             <div style="min-width:0">
               <h3>Anomalies</h3>
-              <p>À venir (suivi farm, stats, etc.).</p>
+              <p>À venir.</p>
             </div>
           </div>
           <div class="card-right">
@@ -914,7 +1613,7 @@ function renderHomePage(){
       </div>
 
       <div class="hint">
-        Navigue via les onglets en haut. Donjons + Songes sauvegarde auto + pavé numérique.
+        Mode cloud : clique sur <b>Connexion</b> (magic link) → sauvegarde/charge sur Supabase.
       </div>
     </div>
   `;
@@ -938,7 +1637,6 @@ function renderPlaceholder(title, desc){
   `;
 }
 
-/* ====================== Donjons list ====================== */
 function renderDonjonsList(){
   pagePill.textContent = "Donjons";
   const cards = DUNGEONS.map(d=>{
@@ -983,7 +1681,6 @@ function renderDonjonsList(){
       </div>
       <div class="grid">${cards}</div>
       <div class="hint">
-        Ton .html doit rester dans <b>DofusTracker</b> (racine).<br>
         Les images doivent être dans les dossiers <b>Déchireuse/</b>, <b>Torkélonia/</b>, etc.
       </div>
     </div>
@@ -992,11 +1689,9 @@ function renderDonjonsList(){
   activateFallbackIn(app, "");
 }
 
-/* ====================== Page: Calculateur PP ====================== */
 function renderPP(){
   const s = loadPPState();
   const { mult, final } = ppFinalDrop(s);
-
   pagePill.textContent = "Calculateur PP";
 
   app.innerHTML = `
@@ -1055,7 +1750,7 @@ function renderPP(){
 
         <div class="calcRightBig">
           <div class="t">% TAUX DE DROP FINAL</div>
-          <div class="v">${f2(final)}</div>
+          <div class="v" style="cursor:default">${f2(final)}</div>
           <div class="calcNote" style="text-align:center">
             Résultat = Base × Mult × (1+Chall) × (1+Ano) × (1+Shield) × (1+Almanax)
           </div>
@@ -1083,22 +1778,20 @@ function ppPctRow(icon, label, field, val){
 }
 window.setPPFieldLive = function(field, value){
   const s = loadPPState();
-  if(field === "prospection") s.prospection = clampNonNeg(value);
-  else s[field] = clampPct(value);
+  s[field] = clampPct(value);
   savePPState(s);
   renderPP();
 };
 window.resetPP = function(){
   if(!confirm("Reset le calculateur PP ?")) return;
   localStorage.removeItem(kPP);
+  scheduleCloudSave();
   render();
 };
 
-/* ====================== Page: Calculateur XP Oméga ====================== */
 function renderOmega(){
   const s = loadOmegaState();
   const xp = omegaXpRequired(s.cur, s.target);
-
   pagePill.textContent = "XP Oméga";
 
   app.innerHTML = `
@@ -1135,7 +1828,7 @@ function renderOmega(){
 
         <div class="calcRightBig">
           <div class="t">POINTS D’EXPÉRIENCE REQUIS</div>
-          <div class="v">${fmt.format(xp)} xp</div>
+          <div class="v" style="cursor:default">${fmt.format(xp)} xp</div>
           <div class="calcNote" style="text-align:center">
             Modèle : <span class="mono">xpNext(i) = round(50 000 000 × 1.01^i)</span>
           </div>
@@ -1151,413 +1844,10 @@ function renderOmega(){
 window.resetOmega = function(){
   if(!confirm("Reset le calculateur XP Oméga ?")) return;
   localStorage.removeItem(kOmega);
+  scheduleCloudSave();
   render();
 };
 
-/* ====================== Page: Songes (modifs visuelles demandées) ====================== */
-const kSonges = `${LS_PREFIX}songes`;
-const SONGES_IMG_DIR = "Songes/";
-
-// (optionnel) si tu ajoutes un fichier Bribes.png dans Songes/ il s'affichera
-const SONGES_BRIBES_ICON_FILE = "Bribes.png";
-
-const SONGE_INTENSITIES = [
-  { id:"reve1",     label:"Rêve 1",     group:"Rêve",     img:"Reve 1.png" },
-  { id:"reve2",     label:"Rêve 2",     group:"Rêve",     img:"Reve 2.png" },
-  { id:"reve3",     label:"Rêve 3",     group:"Rêve",     img:"Reve 3.png" },
-
-  { id:"paradoxe1", label:"Paradoxe 1", group:"Paradoxe", img:"Paradox 1.png" },
-  { id:"paradoxe2", label:"Paradoxe 2", group:"Paradoxe", img:"Paradox 2.png" },
-  { id:"paradoxe3", label:"Paradoxe 3", group:"Paradoxe", img:"Paradox 3.png" },
-  { id:"paradoxe4", label:"Paradoxe 4", group:"Paradoxe", img:"Paradox 4.png" },
-
-  { id:"cauchemar1",label:"Cauchemar 1",group:"Cauchemar",img:"Cauchemar 1.png" },
-  { id:"cauchemar2",label:"Cauchemar 2",group:"Cauchemar",img:"Cauchemar 2.png" },
-  { id:"cauchemar3",label:"Cauchemar 3",group:"Cauchemar",img:"Cauchemar 3.png" },
-];
-
-// Ordre EXACT demandé (puis le reste jusqu’à 26, puis animaux dans l’ordre)
-const SONGE_LEGENDS = [
-  { key:"Oto Mustam",      img:"Légende d'Oto Mustam.png",            imgDir: SONGES_IMG_DIR },
-  { key:"Menalt",         img:"Légende de Menalt.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Mériana",        img:"Légende de Mériana.png",               imgDir: SONGES_IMG_DIR },
-  { key:"Jahash",         img:"Légende de Jahash Jurgen.png",         imgDir: SONGES_IMG_DIR },
-  { key:"Amayiro",        img:"Légende d'Amayiro.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Dame Jhessica",  img:"Légende de Dame Jhessica.png",         imgDir: SONGES_IMG_DIR },
-  { key:"Thanatena",      img:"Légende de Thanatena.png",             imgDir: SONGES_IMG_DIR },
-
-  // autres (jusqu’à 26)
-  { key:"Helséphine",     img:"Légende d'Helséphine.png",             imgDir: SONGES_IMG_DIR },
-  { key:"Henual",         img:"Légende d'Henual.png",                 imgDir: SONGES_IMG_DIR },
-  { key:"Servitude",      img:"Légende de Servitude.png",             imgDir: SONGES_IMG_DIR },
-  { key:"Guerre",         img:"Légende de Guerre.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Misère",         img:"Légende de Misère.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Corruption",     img:"Légende de Corruption.png",            imgDir: SONGES_IMG_DIR },
-  { key:"Mille Lieues",   img:"Légende de Mille Lieues.png",          imgDir: SONGES_IMG_DIR },
-  { key:"Rykke Errel",    img:"Légende de Rykke Errel.png",           imgDir: SONGES_IMG_DIR },
-  { key:"Ganymède",       img:"Légende de Ganymède.png",              imgDir: SONGES_IMG_DIR },
-  { key:"Fallanster",     img:"Légende de Fallanster.png",            imgDir: SONGES_IMG_DIR },
-  { key:"Crocobur",       img:"Légende de Crocobur.png",              imgDir: SONGES_IMG_DIR },
-  { key:"Dodge",          img:"Légende de Dodge.png",                 imgDir: SONGES_IMG_DIR },
-  { key:"Brâm Barbe-Monde",img:"Légende de Brâm Barbe-Monde.png",     imgDir: SONGES_IMG_DIR },
-  { key:"Brumaire",       img:"Légende de Brumaire.png",              imgDir: SONGES_IMG_DIR },
-  { key:"Buhorado",       img:"Légende de Buhorado.png",              imgDir: SONGES_IMG_DIR },
-  { key:"Cul Botté",      img:"Légende du Cul Botté.png",             imgDir: SONGES_IMG_DIR },
-  { key:"Destin",         img:"Légende du Destin.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Miroir",         img:"Légende du Miroir.png",                imgDir: SONGES_IMG_DIR },
-  { key:"Trompe-la-Mort", img:"Légende du Trompe-la-Mort.png",        imgDir: SONGES_IMG_DIR },
-
-  // animaux (ordre demandé)
-  { key:"Kwakarticho",    img:"Légende animale de Kwakarticho.png",   imgDir: SONGES_IMG_DIR },
-  { key:"Poukachi",       img:"Légende animale de Poukachi.png",      imgDir: SONGES_IMG_DIR },
-  { key:"Bakushana",      img:"Légende animale de Bakushana.png",     imgDir: SONGES_IMG_DIR },
-  { key:"Magicrabe",      img:"Légende animale de Magicrabe.png",     imgDir: SONGES_IMG_DIR },
-];
-
-function loadSongesState(){
-  try{
-    const raw = localStorage.getItem(kSonges);
-    if(!raw){
-      const init = {
-        ui: { tab:"runs", search:"" },
-        bribesTotal: 0,
-        runs: {},
-        lastBribes: {},
-        legends: {},
-      };
-      SONGE_INTENSITIES.forEach(x=>init.runs[x.id]=0);
-      SONGE_LEGENDS.forEach(x=>init.legends[x.key]=0);
-      return init;
-    }
-    const p = JSON.parse(raw);
-    const out = {
-      ui: p.ui || { tab:"runs", search:"" },
-      bribesTotal: clampNonNeg(p.bribesTotal ?? 0),
-      runs: p.runs || {},
-      lastBribes: p.lastBribes || {},
-      legends: p.legends || {},
-    };
-    SONGE_INTENSITIES.forEach(x=>{
-      out.runs[x.id] = clampNonNeg(out.runs[x.id] ?? 0);
-      out.lastBribes[x.id] = clampNonNeg(out.lastBribes[x.id] ?? 0);
-    });
-    SONGE_LEGENDS.forEach(x=>{
-      out.legends[x.key] = clampNonNeg(out.legends[x.key] ?? 0);
-    });
-    if(!out.ui || !out.ui.tab) out.ui = { tab:"runs", search:"" };
-    return out;
-  }catch(e){
-    const init = { ui:{tab:"runs",search:""}, bribesTotal:0, runs:{}, lastBribes:{}, legends:{} };
-    SONGE_INTENSITIES.forEach(x=>init.runs[x.id]=0);
-    SONGE_LEGENDS.forEach(x=>init.legends[x.key]=0);
-    return init;
-  }
-}
-function saveSongesState(s){ localStorage.setItem(kSonges, JSON.stringify(s)); }
-
-window.resetSonges = function(){
-  if(!confirm("Reset Songes (runs + bribes + légendes) ?")) return;
-  localStorage.removeItem(kSonges);
-  render();
-};
-
-function setSongesTab(tab){
-  const s = loadSongesState();
-  s.ui.tab = tab;
-  saveSongesState(s);
-  renderSonges();
-}
-function setSongesSearch(value){
-  const s = loadSongesState();
-  s.ui.search = String(value||"");
-  saveSongesState(s);
-  renderSonges();
-}
-
-window.openSongesBribesPad = function(){
-  const s = loadSongesState();
-  openKeypad("Bribes (global)", clampNonNeg(s.bribesTotal), (v)=>{
-    const st = loadSongesState();
-    st.bribesTotal = clampNonNeg(v);
-    saveSongesState(st);
-    renderSonges();
-  });
-};
-
-window.openSongesRunPad = function(intensityId, label){
-  const s = loadSongesState();
-  openKeypad(`Runs • ${label}`, clampNonNeg(s.runs[intensityId] ?? 0), (v)=>{
-    const st = loadSongesState();
-    st.runs[intensityId] = clampNonNeg(v);
-    saveSongesState(st);
-    renderSonges();
-  });
-};
-
-window.songeIncRun = function(intensityId){
-  const st = loadSongesState();
-  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) + 1);
-  saveSongesState(st);
-
-  const intensity = SONGE_INTENSITIES.find(x=>x.id===intensityId);
-  const label = intensity ? intensity.label : intensityId;
-  const preset = clampNonNeg(st.lastBribes[intensityId] ?? 0);
-
-  openKeypad(`Bribes gagnées • ${label}`, preset, (v)=>{
-    const s2 = loadSongesState();
-    const add = clampNonNeg(v);
-    s2.lastBribes[intensityId] = add;
-    s2.bribesTotal = clampNonNeg((s2.bribesTotal ?? 0) + add);
-    saveSongesState(s2);
-    renderSonges();
-  });
-};
-
-window.songeDecRun = function(intensityId){
-  const st = loadSongesState();
-  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) - 1);
-  saveSongesState(st);
-  renderSonges();
-};
-
-window.songeAddBribes = function(){
-  openKeypad("Ajouter des bribes (global)", 0, (v)=>{
-    const st = loadSongesState();
-    st.bribesTotal = clampNonNeg((st.bribesTotal ?? 0) + clampNonNeg(v));
-    saveSongesState(st);
-    renderSonges();
-  });
-};
-
-window.songeSubBribes = function(){
-  openKeypad("Retirer des bribes (global)", 0, (v)=>{
-    const st = loadSongesState();
-    st.bribesTotal = clampNonNeg((st.bribesTotal ?? 0) - clampNonNeg(v));
-    saveSongesState(st);
-    renderSonges();
-  });
-};
-
-window.songeIncLegend = function(key){
-  const st = loadSongesState();
-  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) + 1);
-  saveSongesState(st);
-  renderSonges();
-};
-window.songeDecLegend = function(key){
-  const st = loadSongesState();
-  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) - 1);
-  saveSongesState(st);
-  renderSonges();
-};
-window.openLegendPad = function(key){
-  const s = loadSongesState();
-  openKeypad(`Légende • ${key}`, clampNonNeg(s.legends[key] ?? 0), (v)=>{
-    const st = loadSongesState();
-    st.legends[key] = clampNonNeg(v);
-    saveSongesState(st);
-    renderSonges();
-  });
-};
-
-function renderSonges(){
-  const s = loadSongesState();
-  pagePill.textContent = "Songes";
-
-  const tab = s.ui?.tab || "runs";
-
-  const totalRuns = Object.values(s.runs||{}).reduce((a,b)=>a+n(b),0);
-  const bribesTotal = clampNonNeg(s.bribesTotal ?? 0);
-
-  const header = `
-    <div class="topline">
-      <div class="title">
-        <div class="logo" style="width:42px;height:42px;border-radius:16px">🌙</div>
-        <div>
-          <h2>Songes</h2>
-          <p class="sub">Runs par intensité • Bribes globales • Légendes droppées (compteurs).</p>
-        </div>
-      </div>
-      <div class="nav">
-        <button class="btn gold" onclick="songeAddBribes()">➕ Ajouter bribes</button>
-        <button class="btn" onclick="songeSubBribes()">➖ Retirer bribes</button>
-        <button class="btn bad" onclick="resetSonges()">🧹 Reset Songes</button>
-      </div>
-    </div>
-  `;
-
-  const tabs = `
-    <div class="seg" style="margin-bottom:12px">
-      <button class="btn small ${tab==='runs'?'active':''}" onclick="setSongesTab('runs')">📊 Runs & Bribes</button>
-      <button class="btn small ${tab==='legends'?'active':''}" onclick="setSongesTab('legends')">🏷️ Légendes</button>
-    </div>
-  `;
-
-  const bribesKpiIcon = `
-    <span class="kico">
-      <img data-file="${escapeHtml(SONGES_BRIBES_ICON_FILE)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt="">
-    </span>
-  `;
-
-  const topKpis = `
-    <div class="summary" style="margin-top:0">
-      <div class="kpi">
-        <div class="k">Bribes (global) ${bribesKpiIcon}</div>
-        <div class="v mono gold" style="cursor:pointer" onclick="openSongesBribesPad()">${fmt.format(bribesTotal)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Runs (total)</div>
-        <div class="v mono">${fmt.format(totalRuns)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Outil</div>
-        <div class="v mono">3.5 ready</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Astuce</div>
-        <div class="v mono">+1 run → saisie bribes</div>
-      </div>
-    </div>
-  `;
-
-  let body = "";
-
-  if(tab === "runs"){
-    const byGroup = (group) => SONGE_INTENSITIES.filter(x=>x.group===group);
-
-    const groupBlock = (groupName) => {
-      const rows = byGroup(groupName).map(it=>{
-        const count = clampNonNeg(s.runs[it.id] ?? 0);
-        const last = clampNonNeg(s.lastBribes[it.id] ?? 0);
-
-        return `
-          <div class="item">
-            <div class="ico">
-              <img data-file="${escapeHtml(it.img)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt="">
-            </div>
-            <div class="name">
-              <p class="n">${escapeHtml(it.label)}</p>
-              <p class="m">Dernières bribes saisies: <b class="mono">${fmt.format(last)}</b></p>
-            </div>
-            <div class="ctrls">
-              <button class="btn small" onclick="songeDecRun('${it.id}')">−</button>
-              <div class="num" onclick="openSongesRunPad('${it.id}','${jsEscape(it.label)}')">${fmt.format(count)}</div>
-              <button class="btn small gold" onclick="songeIncRun('${it.id}')">+ Run</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      return `
-        <div class="calcBox" style="margin-bottom:14px">
-          <div class="calcHead">${escapeHtml(groupName.toUpperCase())}</div>
-          <div class="calcBody">
-            <div class="list">${rows}</div>
-          </div>
-        </div>
-      `;
-    };
-
-    body = `
-      <div class="row">
-        <div>
-          ${groupBlock("Rêve")}
-          ${groupBlock("Paradoxe")}
-          ${groupBlock("Cauchemar")}
-        </div>
-
-        <div>
-          <div class="calcRightBig">
-            <div class="t">BRIBES (GLOBAL)</div>
-            <div class="v" onclick="openSongesBribesPad()" style="cursor:pointer">${fmt.format(bribesTotal)}</div>
-            <div class="calcNote" style="text-align:center">
-              Clique sur la valeur pour définir le total.<br>
-              Ou utilise <b>+ Run</b> (ça te demande les bribes gagnées).
-            </div>
-          </div>
-
-          <div style="height:14px"></div>
-
-          <div class="section">
-            <div class="topline" style="margin-bottom:8px">
-              <div class="pill">Notes (3.5)</div>
-              <div class="pill">Bribes liées aux vagues</div>
-            </div>
-            <div class="hint" style="margin-top:0">
-              Après la 3.5, les bribes dépendent du nombre de vagues vaincues (combat final).<br>
-              Ici on reste flexible : tu saisis <b>les bribes réelles</b> de ta run → ça cumule au global.
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  if(tab === "legends"){
-    const q = (s.ui?.search || "").toLowerCase().trim();
-
-    const tiles = SONGE_LEGENDS
-      .filter(l => !q || l.key.toLowerCase().includes(q))
-      .map(l=>{
-        const val = clampNonNeg(s.legends[l.key] ?? 0);
-        return `
-          <div class="item legendItem">
-            <div class="ico">
-              <img data-file="${escapeHtml(l.img)}" data-dir="${escapeHtml(l.imgDir || SONGES_IMG_DIR)}" alt="">
-            </div>
-            <div class="name">
-              <p class="n">${escapeHtml(l.key)}</p>
-              <p class="m">Compteur de drop légendaire</p>
-            </div>
-            <div class="ctrls">
-              <button class="btn small" onclick="songeDecLegend('${jsEscape(l.key)}')">−</button>
-              <div class="num" onclick="openLegendPad('${jsEscape(l.key)}')">${fmt.format(val)}</div>
-              <button class="btn small" onclick="songeIncLegend('${jsEscape(l.key)}')">+</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-    const doneCount = SONGE_LEGENDS.reduce((acc,l)=> acc + (clampNonNeg(s.legends[l.key] ?? 0) > 0 ? 1 : 0), 0);
-
-    body = `
-      <div class="section">
-        <div class="topline">
-          <div class="title">
-            <div class="pill">📚 Classement</div>
-            <div class="pill">Déjà drop: <b class="mono">${fmt.format(doneCount)}</b> / <b class="mono">${fmt.format(SONGE_LEGENDS.length)}</b></div>
-          </div>
-          <div class="searchRow">
-            <input placeholder="Rechercher une légende…" value="${escapeHtml(s.ui?.search||"")}"
-              oninput="setSongesSearch(this.value)">
-            <button class="btn small" onclick="setSongesSearch('')">✖</button>
-          </div>
-        </div>
-
-        <!-- 2 compteurs par ligne -->
-        <div class="legendGrid">
-          ${tiles || ``}
-        </div>
-
-        ${tiles ? "" : `<div class="hint">Aucune légende trouvée.</div>`}
-      </div>
-    `;
-  }
-
-  app.innerHTML = `
-    <div class="section">
-      ${header}
-      ${tabs}
-      ${topKpis}
-      <div style="height:14px"></div>
-      ${body}
-    </div>
-  `;
-
-  activateFallbackIn(app, "");
-}
-
-/* ====================== Render: Dungeon ====================== */
 function renderDungeon(d){
   pagePill.textContent = d.name;
   const state = loadDungeonState(d.id);
@@ -1655,11 +1945,6 @@ function renderDungeon(d){
         <div class="kpi"><div class="k">Valeur estimée</div><div class="v mono gold">${fmt.format(kamaTotal)}</div></div>
         <div class="kpi"><div class="k">Dossier images</div><div class="v mono">${escapeHtml(d.imgDir)}</div></div>
       </div>
-
-      <div class="hint">
-        Si une image ne s’affiche pas : le fallback teste plein de chemins automatiquement.
-        Vérifie juste que le fichier existe bien dans <b>${escapeHtml(d.imgDir)}</b> et que le nom est EXACT.
-      </div>
     </div>
   `;
 
@@ -1686,10 +1971,13 @@ function renderCounterRow({dungeonId,title,subtitle,imgFile,imgDir,value}){
   `;
 }
 
-/* ====================== Actions exposed ====================== */
+/* =========================================================
+   ACTIONS EXPOSED (donjons)
+   ========================================================= */
 window.resetDungeon = function(id){
   if(!confirm(`Reset les données du donjon "${id}" ?`)) return;
   localStorage.removeItem(kDungeon(id));
+  scheduleCloudSave();
   render();
 }
 window.exportDungeon = function(id){
@@ -1766,7 +2054,9 @@ window.setPrice = function(id, key, val){
   saveDungeonState(id,state); render();
 }
 
-/* ====================== Render root ====================== */
+/* =========================================================
+   RENDER ROOT
+   ========================================================= */
 function render(){
   const r = getRoute();
 
@@ -1785,9 +2075,10 @@ function render(){
 
   renderHomePage();
 }
-render();
 
-/* ====================== Helpers ====================== */
+/* =========================================================
+   HELPERS
+   ========================================================= */
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c=>(
     c==="&"?"&amp;":c==="<"?"&lt;":c===">"?"&gt;":c==='"'?"&quot;":"&#39;"
@@ -1796,6 +2087,19 @@ function escapeHtml(s){
 function jsEscape(s){
   return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 }
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+(async function boot(){
+  // images fallback in header too (navbar icons)
+  activateFallbackIn(document.getElementById("topHeader"), "");
+  updateAuthUI();
+  await initAuth();
+  render();
+  // fallback in first render
+  activateFallbackIn(app, "");
+})();
 </script>
 </body>
 </html>
