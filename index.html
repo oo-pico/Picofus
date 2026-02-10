@@ -2115,6 +2115,7 @@ function render(){
   if(r.page === "omega") return renderOmega();
   return renderHome();
 }
+
 async function handleAuthCallback(){
   if(!sb) return;
 
@@ -2135,24 +2136,21 @@ async function handleAuthCallback(){
   window.history.replaceState({}, document.title, cleanUrl);
 }
 
-<script>
-/* ... tout ton code au-dessus inchangé ... */
-
 /* =========================================================
-   INIT (anti écran noir)
+   INIT FINAL (anti écran noir)
    ========================================================= */
 function showFatal(err){
   console.error(err);
-  const app = document.getElementById("app");
-  if(app){
-    app.innerHTML = `
+  const appEl = document.getElementById("app");
+  if(appEl){
+    appEl.innerHTML = `
       <div class="section">
         <div class="topline">
           <div class="title">
             <div class="logo" style="width:42px;height:42px;border-radius:16px">⚠️</div>
             <div>
               <h2>Erreur JS détectée</h2>
-              <p class="sub">Ouvre la console (F12 → Console) et envoie-moi la première erreur rouge.</p>
+              <p class="sub">Ouvre la console (F12 → Console) et copie la première erreur rouge.</p>
             </div>
           </div>
         </div>
