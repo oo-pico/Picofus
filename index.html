@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Picofus – Tracker</title>
+  <style>
+    :root{
+      --bg:#0e0e0f; --panel:#151517; --panel-soft:#1b1b1e; --stroke:#26262a;
+      --text:#e6e6e6; --muted:#9a9a9a; --gold:#d6b36a; --gold-soft:#b89a55;
+      --bad:#ff4d4d; --good:#45d07a; --shadow:0 12px 30px rgba(0,0,0,.35);
+      --r:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      background:radial-gradient(1200px 600px at 30% -10%, rgba(214,179,106,.08), transparent 60%),
+                 radial-gradient(900px 500px at 110% 10%, rgba(214,179,106,.06), transparent 55%),
+                 var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit}
+    .wrap{max-width:1150px;margin:0 auto;padding:22px}
+    header{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:14px 16px;border:1px solid var(--stroke);border-radius:var(--r);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      box-shadow:var(--shadow);
+      position:sticky;top:10px;z-index:20;backdrop-filter:blur(10px);
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:38px;height:38px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(214,179,106,.35), rgba(214,179,106,.05));
+      border:1px solid rgba(214,179,106,.35);
+      display:grid;place-items:center;
+      font-weight:800;color:var(--gold);
+    }
+    .brand h1{font-size:16px;margin:0;line-height:1}
+    .brand p{margin:0;color:var(--muted);font-size:12px}
+    .nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .btn{
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      border-radius:14px;
+      padding:10px 12px;
+      cursor:pointer;
+      display:inline-flex;align-items:center;gap:8px;
+      transition:transform .08s ease, border-color .15s ease, background .15s ease;
+      user-select:none;
+    }
+    .btn:hover{border-color:rgba(214,179,106,.45);background:rgba(214,179,106,.07)}
+    .btn:active{transform:translateY(1px)}
+    .btn.gold{border-color:rgba(214,179,106,.55);background:rgba(214,179,106,.08)}
+    .btn.bad{border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.08)}
+    .btn.small{padding:8px 10px;border-radius:12px;font-size:13px}
+    .pill{
+      font-size:12px;color:var(--muted);
+      border:1px solid var(--stroke);background:rgba(255,255,255,.02);
+      padding:7px 10px;border-radius:999px;
+    }
+
+    main{padding-top:18px}
+
+    .grid{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:14px;}
+    @media (max-width: 980px){ .grid{grid-template-columns:repeat(2, minmax(0, 1fr))} }
+    @media (max-width: 620px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      border:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      padding:14px;
+      display:flex;gap:14px;align-items:center;justify-content:space-between;
+    }
+    .card-left{display:flex;gap:12px;align-items:center;min-width:0}
+    .thumb{
+      width:54px;height:54px;border-radius:16px;
+      border:1px solid rgba(214,179,106,.25);
+      background:rgba(214,179,106,.06);
+      display:grid;place-items:center;overflow:hidden;
+    }
+    .thumb img{width:100%;height:100%;object-fit:contain;image-rendering:auto}
+    .card h3{margin:0;font-size:15px}
+    .card p{margin:3px 0 0;color:var(--muted);font-size:12px}
+    .card-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
+
+    .section{
+      border:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      padding:14px;
+    }
+    .topline{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px;}
+    .title{display:flex;gap:12px;align-items:center;min-width:0;}
+    .title h2{margin:0;font-size:18px}
+    .title .sub{margin:0;color:var(--muted);font-size:12px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    @media (max-width: 980px){ .row{grid-template-columns:1fr} }
+
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{
+      display:grid;
+      grid-template-columns:42px 1fr auto;
+      gap:10px;align-items:center;
+      padding:10px;
+      border:1px solid var(--stroke);
+      border-radius:16px;
+      background:rgba(255,255,255,.02);
+    }
+    .ico{
+      width:42px;height:42px;border-radius:14px;
+      border:1px solid rgba(214,179,106,.18);
+      background:rgba(214,179,106,.05);
+      display:grid;place-items:center;overflow:hidden;
+    }
+    .ico img{width:100%;height:100%;object-fit:contain}
+    .name{min-width:0}
+    .name .n{font-size:14px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .name .m{font-size:12px;margin:2px 0 0;color:var(--muted)}
+    .ctrls{display:flex;gap:8px;align-items:center}
+    .num{
+      min-width:64px;text-align:right;
+      font-variant-numeric:tabular-nums;
+      font-weight:700;
+      padding:8px 10px;border-radius:12px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.18);
+      cursor:pointer;
+    }
+    .field{
+      width:110px;
+      padding:8px 10px;border-radius:12px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      outline:none;
+      font-variant-numeric:tabular-nums;
+    }
+    .field:focus{border-color:rgba(214,179,106,.55)}
+    .mini{width:92px}
+
+    .summary{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:10px;margin-top:12px;}
+    @media (max-width: 980px){ .summary{grid-template-columns:repeat(2, minmax(0, 1fr))} }
+    .kpi{border:1px solid var(--stroke);border-radius:16px;background:rgba(255,255,255,.02);padding:10px;}
+    .kpi .k{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center}
+    .kpi .k .kico{width:16px;height:16px;display:inline-grid;place-items:center}
+    .kpi .k .kico img{width:16px;height:16px;object-fit:contain}
+    .kpi .v{margin-top:6px;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+    .kpi .v.gold{color:var(--gold)}
+    .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.35}
+
+    /* ====== MODAL / KEYPAD (non transparent) ====== */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:99;}
+    .modal.open{display:flex}
+    .kbd{
+      width:min(420px, 100%);
+      border:1px solid var(--stroke);
+      border-radius:22px;
+      background:linear-gradient(180deg, #1b1b1e, #121214); /* OPAQUE */
+      box-shadow:0 25px 60px rgba(0,0,0,.75);
+      padding:14px;
+    }
+    .kbd-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .kbd-top .label{color:var(--muted);font-size:12px}
+    .kbd-top .target{font-weight:800}
+    .kbd-display{
+      border:1px solid var(--stroke);
+      background:#0b0b0c; /* OPAQUE */
+      border-radius:18px;
+      padding:12px 12px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      margin-bottom:12px;
+    }
+    .kbd-display .val{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}
+    .kbd-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;}
+    .kbd-key{
+      border:1px solid var(--stroke);
+      background:#18181a; /* OPAQUE */
+      color:var(--text);
+      border-radius:16px;
+      padding:14px 10px;
+      font-size:16px;
+      cursor:pointer;
+    }
+    .kbd-key:hover{border-color:rgba(214,179,106,.45);background:#1f1f22}
+    .kbd-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+    .kbd-actions .btn{flex:1}
+    .kbd-actions .btn.small{flex:0 0 auto}
+    .hide{display:none!important}
+    .mono{font-variant-numeric:tabular-nums}
+
+    /* ====== mini layout calculators ====== */
+    .calc3{display:grid;grid-template-columns:1.05fr 1.25fr .9fr;gap:14px;align-items:start}
+    @media (max-width: 980px){ .calc3{grid-template-columns:1fr} }
+    .calcBox{
+      border:1px solid var(--stroke);
+      border-radius:var(--r);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .calcHead{
+      padding:10px 12px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border-bottom:1px solid var(--stroke);
+      font-size:12px;color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+    .calcBody{padding:12px}
+    .calcValue{
+      display:flex;align-items:center;justify-content:center;
+      font-size:22px;font-weight:900;
+      font-variant-numeric:tabular-nums;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.18);
+      border-radius:16px;
+      padding:12px 10px;
+      cursor:pointer;
+    }
+    .calcValue.static{cursor:default}
+    .calcStack{display:flex;flex-direction:column;gap:10px}
+    .calcRow{
+      display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.12);
+      border-radius:16px;
+      padding:10px;
+    }
+    .calcRow .lab{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+    .calcRow .sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .calcRightBig{
+      border:1px solid rgba(214,179,106,.45);
+      background:linear-gradient(180deg, rgba(214,179,106,.14), rgba(214,179,106,.06));
+      border-radius:var(--r);
+      padding:12px;
+    }
+    .calcRightBig .t{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .calcRightBig .v{
+      margin-top:8px;
+      font-size:30px;font-weight:950;color:var(--gold);
+      font-variant-numeric:tabular-nums;
+      display:flex;justify-content:center;
+      padding:14px 10px;border-radius:16px;
+      border:1px solid rgba(214,179,106,.35);
+      background:rgba(0,0,0,.18);
+    }
+    .calcNote{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.35}
+    .fieldPct{width:120px}
+
+    /* ====== Songes helpers ====== */
+    .seg{display:flex;gap:8px;flex-wrap:wrap}
+    .seg .btn{padding:8px 10px;border-radius:999px}
+    .seg .btn.active{border-color:rgba(214,179,106,.65);background:rgba(214,179,106,.10)}
+    .searchRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .searchRow input{
+      flex:1;min-width:180px;
+      padding:10px 12px;border-radius:14px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      outline:none;
+    }
+    .searchRow input:focus{border-color:rgba(214,179,106,.55)}
+
+    /* ====== Legends: 2 par ligne ====== */
+    .legendGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 980px){ .legendGrid{grid-template-columns:1fr} }
+    .legendItem .name .n{max-width:100%}
+    .legendItem .ctrls .btn.small{padding:8px 9px}
+    .legendItem .num{min-width:72px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">P</div>
+        <div>
+          <h1>Picofus – Tracker</h1>
+          <p>Compteurs donjons / mobs / ressources + saisie pavé numérique</p>
+        </div>
+      </div>
+
+      <div class="nav">
+        <span class="pill" id="pagePill">Accueil</span>
+
+        <button class="btn small" id="btnTabHome">🏠 Home</button>
+        <button class="btn small" id="btnTabDonjons">⚔️ Donjons</button>
+        <button class="btn small" id="btnTabSonges">🌙 Songes</button>
+        <button class="btn small" id="btnTabAnomalies">🌀 Anomalies</button>
+        <button class="btn small" id="btnTabPP">📌 Calculateur PP</button>
+        <button class="btn small" id="btnTabOmega">📈 XP Oméga</button>
+
+        <button class="btn small bad" id="btnResetAll">🧹 Reset tout</button>
+      </div>
+    </header>
+
+    <main id="app"></main>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="kbd" role="dialog" aria-modal="true">
+      <div class="kbd-top">
+        <div>
+          <div class="label">Saisie pavé numérique</div>
+          <div class="target" id="kbdTarget">—</div>
+        </div>
+        <button class="btn small" id="kbdClose">✖</button>
+      </div>
+
+      <div class="kbd-display">
+        <div class="label">Valeur</div>
+        <div class="val mono" id="kbdValue">0</div>
+      </div>
+
+      <div class="kbd-grid" id="kbdGrid"></div>
+
+      <div class="kbd-actions">
+        <button class="btn bad" id="kbdClear">C</button>
+        <button class="btn" id="kbdBack">⌫</button>
+        <button class="btn gold" id="kbdOk">Valider</button>
+      </div>
+
+      <div class="hint">
+        Clique sur un nombre pour saisir. <b>Valider</b> applique la valeur. <b>C</b> remet à 0.
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================================================
+   IMPORTANT :
+   Ton .html est dans: ...\\DofusTracker\\
+   Et tes images sont dans des dossiers au même niveau.
+   Songes : dossier "Songes/" dans DofusTracker.
+   ========================================================= */
+
+const DUNGEONS = [
+  {
+    id: "dechireuse",
+    name: "Déchireuse",
+    thumb: "Déchireuse.png",
+    imgDir: "Déchireuse/",
+    totalButtonLabel: "Total donjon (+1 run)",
+    totalIncrements: { "Déchireuse": 1, "Domptueuse": 13, "Ébourifauve": 13, "Voracle": 13 },
+    mobs: [
+      { key:"Déchireuse", img:"Déchireuse.png" },
+      { key:"Domptueuse", img:"Domptueuse.png" },
+      { key:"Ébourifauve", img:"Ébourifauve.png" },
+      { key:"Voracle", img:"Voracle.png" },
+    ],
+    resources: [
+      { key:"Toison de la Déchireuse", img:"Toison de la Déchireuse.png" },
+      { key:"Griffe de la Déchireuse", img:"Griffe de la Déchireuse.png" },
+      { key:"Tresse de Domptueuse", img:"Tresse de Domptueuse.png" },
+      { key:"Frange d'Ébourifauve", img:"Frange d'Ébourifauve.png" },
+      { key:"Mise en plis de Voracle", img:"Mise en plis de Voracle.png" },
+      { key:"Daguosseuse de Domptueuse", img:"Daguosseuse de Domptueuse.png" },
+      { key:"Bandeau d'Ébourifauve", img:"Bandeau d'Ébourifauve.png" },
+      { key:"Os Divinatoire de Voracle", img:"Os Divinatoire de Voracle.png" },
+      { key:"Squame du Graogarm", img:"Squame du Graogarm.png" },
+      { key:"Peigne de Rhoarim", img:"Peigne de Rhoarim.png" },
+      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
+      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
+      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
+      { key:"Uniforme de chasseur-mangeur", img:"Uniforme de chasseur-mangeur.png" },
+    ],
+  },
+  {
+    id: "tempetes",
+    name: "Tempêtes Éliocalypse",
+    thumb: "servitude.png",
+    imgDir: "4 cavaliers/",
+    totalButtonLabel: "Total donjon (+1 run)",
+    totalIncrements: {
+      "Servitude": 1, "Guerre": 1, "Corruption": 1, "Misère": 1,
+      "Armécréante": 1, "Olgoth": 1, "Pistilangue": 1, "Ferailleur": 1
+    },
+    mobs: [
+      { key:"Servitude", img:"servitude.png" },
+      { key:"Guerre", img:"guerre.png" },
+      { key:"Corruption", img:"Corruption.png" },
+      { key:"Misère", img:"Misère.png" },
+      { key:"Armécréante", img:"Armécréante.png" },
+      { key:"Olgoth", img:"Olgoth.png" },
+      { key:"Pistilangue", img:"Langue de Pistilangue.png" },
+      { key:"Ferailleur", img:"ferrailleur.png" },
+    ],
+    resources: [
+      { key:"Verrou de Servitude", img:"Verrou de Servitude.png" },
+      { key:"Bonnet de Guerre", img:"Bonnet de Guerre.png" },
+      { key:"Corne de Corruption", img:"Corne de Corruption.png" },
+      { key:"Plume de Misère", img:"Plume de Misère.png" },
+      { key:"Capuche d'Armécréante", img:"Capuche d'Armécréante.png" },
+      { key:"Fragment d'armure", img:"Fragment d'armure.png" },
+      { key:"Langue de Pistilangue", img:"Langue de Pistilangue.png" },
+      { key:"Épaulière de Ferrailleur", img:"Épaulière de Ferrailleur.png" },
+      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
+      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
+      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
+    ],
+  },
+  {
+    id: "bethel",
+    name: "Bethel Akarna",
+    thumb: "Bethel Akarna.png",
+    imgDir: "Bethel/",
+    totalButtonLabel: "Total donjon (+1 run)",
+    totalIncrements: {
+      "Bethel": 1, "Crânonier": 7, "Funespadon": 7, "Macrab": 11, "Tournoyé": 7, "Zombruth": 7
+    },
+    mobs: [
+      { key:"Bethel", img:"Bethel Akarna.png" },
+      { key:"Crânonier", img:"Crânonier.png" },
+      { key:"Funespadon", img:"Funespadon.png" },
+      { key:"Macrab", img:"Macrab.png" },
+      { key:"Tournoyé", img:"Tournoyé.png" },
+      { key:"Zombruth", img:"Zombruth.png" },
+    ],
+    resources: [
+      { key:"Queue de Bethel Akarna", img:"Queue de Bethel Akarna.png" },
+      { key:"Coquille de Submergé", img:"Coquille de Submergé.png" },
+      { key:"Aquarakne de Crânonier", img:"Aquarakne de Crânonier.png" },
+      { key:"Protection de Funespadon", img:"Protection de Funespadon.png" },
+      { key:"Bout d'Armure de Macrab", img:"Bout d'Armure de Macrab.png" },
+      { key:"Pointe de Lance de Tournoyé", img:"Pointe de Lance de Tournoyé.png" },
+      { key:"Chair de Zombruth", img:"Chair de Zombruth.png" },
+      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
+      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
+      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
+    ],
+  },
+  {
+    id: "eternel",
+    name: "Éternel Conflit",
+    thumb: "L'Éternel Conflit.png",
+    imgDir: "Eternel conflit/",
+    totalButtonLabel: "Total donjon (+1 run)",
+    totalIncrements: {
+      "Éternel Conflit": 1, "Brutasmodan": 8, "Démoloch": 8, "Diabélial": 8, "Maléphisto": 8, "Typhomet": 7
+    },
+    mobs: [
+      { key:"Éternel Conflit", img:"L'Éternel Conflit.png" },
+      { key:"Brutasmodan", img:"Brutasmodan.png" },
+      { key:"Démoloch", img:"Démoloch.png" },
+      { key:"Diabélial", img:"Diabélial.png" },
+      { key:"Maléphisto", img:"Maléphisto.png" },
+      { key:"Typhomet", img:"Typhomet.png" },
+    ],
+    resources: [
+      { key:"Masque cauchemardesque de l'Éternel Conflit", img:"Masque cauchemardesque de l'Éternel Conflit.png" },
+      { key:"Pic de Ravageur", img:"Pic de Ravageur.png" },
+      { key:"Mâchoire de Brutasmodan", img:"Mâchoire de Brutasmodan.png" },
+      { key:"Tentacule de Démoloch", img:"Tentacule de Démoloch.png" },
+      { key:"Langue de Diabélial", img:"Langue de Diabélial.png" },
+      { key:"Épaule de Maléphisto", img:"Épaule de Maléphisto.png" },
+      { key:"Corne de Typhomet", img:"Corne de Typhomet.png" },
+      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
+      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
+      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
+      { key:"Shuclier", img:"Shuclier.png" },
+    ],
+  },
+  {
+    id: "torke",
+    name: "Torkélonia",
+    thumb: "Torkélonia.png",
+    imgDir: "Torkélonia/",
+    totalButtonLabel: "Total donjon (+1 run)",
+    totalIncrements: { "Torkélonia": 1, "Alashasss": 7, "Cronnibal": 8, "Caïguille": 9, "Voapah": 7, "Kashkaille": 8 },
+    mobs: [
+      { key:"Torkélonia", img:"Torkélonia.png" },
+      { key:"Alashasss", img:"Alashasss.png" },
+      { key:"Cronnibal", img:"Cronnibal.png" },
+      { key:"Caïguille", img:"Caïguille.png" },
+      { key:"Voapah", img:"Voapah.png" },
+      { key:"Kashkaille", img:"Kashkaille.png" },
+    ],
+    resources: [
+      { key:"Écaille de Torkélonia", img:"Écaille de Torkélonia.png" },
+      { key:"Œil de Crocodaille albinos", img:"Œil de Crocodaille albinos.png" },
+      { key:"Pagne d'Alashasss", img:"Pagne d'Alashasss.png" },
+      { key:"Canine de Cronnibal", img:"Canine de Cronnibal.png" },
+      { key:"Poupée de Caïguille", img:"Poupée de Caïguille.png" },
+      { key:"Bandeau de Voapah", img:"Bandeau de Voapah.png" },
+      { key:"Langue de Kashkaille", img:"Langue de Kashkaille.png" },
+      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
+      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
+      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
+      { key:"Torvil", img:"Torvil.png" },
+    ],
+  },
+  {
+    id: "venerable",
+    name: "Vénérable Endormi",
+    thumb: "Vénérable Endormi.png",
+    imgDir: "Vénérable endormi/",
+    totalButtonLabel: "Total donjon (+1 run)",
+    totalIncrements: { "Vénérable Endormi": 1, "Brutapir": 8, "Lapilope": 8, "Gyrafor": 10, "Gropotam": 7, "Amphibouc": 6 },
+    mobs: [
+      { key:"Vénérable Endormi", img:"Vénérable Endormi.png" },
+      { key:"Brutapir", img:"Brutapir.png" },
+      { key:"Lapilope", img:"Lapilope.png" },
+      { key:"Gyrafor", img:"Gyrafor.png" },
+      { key:"Gropotam", img:"Gropotam.png" },
+      { key:"Amphibouc", img:"Amphibouc.png" },
+    ],
+    resources: [
+      { key:"Corne du Vénérable Endormi", img:"Corne du Vénérable Endormi.png" },
+      { key:"Crinière du Vénérable Endormi", img:"Crinière du Vénérable Endormi.png" },
+      { key:"Défense de Brutapir", img:"Défense de Brutapir.png" },
+      { key:"Corne de Lapilope", img:"Corne de Lapilope.png" },
+      { key:"Corne de Gyrafor", img:"Corne de Gyrafor.png" },
+      { key:"Front osseux de Gropotam", img:"Front osseux de Gropotam.png" },
+      { key:"Corne d'Amphibouc", img:"Corne d'Amphibouc.png" },
+      { key:"Groin de Brutapir", img:"Groin de Brutapir.png" },
+      { key:"Oreille de Lapilope", img:"Oreille de Lapilope.png" },
+      { key:"Lampe de Gyrafor", img:"Lampe de Gyrafor.png" },
+      { key:"Mâchoire de Gropotam", img:"Mâchoire de Gropotam.png" },
+      { key:"Langue d'Amphibouc", img:"Langue d'Amphibouc.png" },
+      { key:"Squame du Graogarm", img:"Squame du Graogarm.png" },
+      { key:"Peau de zarbivore", img:"Peau de zarbivore.png" },
+      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
+      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
+      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
+      { key:"Uniforme de chasseur-mangeur", img:"Uniforme de chasseur-mangeur.png" },
+    ],
+  },
+  {
+    id: "comte",
+    name: "Comte Harebourg",
+    thumb: "comte.png",
+    imgDir: "Comte/",
+    totalButtonLabel: "Total donjon (+1 run)",
+    totalIncrements: { "Comte": 1, "Sinistrofu": 6, "Noctu": 9, "Cyclo": 9, "Granduk": 8, "Strigide": 7 },
+    mobs: [
+      { key:"Comte Harebourg", img:"comte.png" },
+      { key:"Granduk", img:"granduk.png" },
+      { key:"Strigide", img:"strigide.png" },
+      { key:"Sinistrofu", img:"sinistrofu.png" },
+      { key:"Noctu", img:"noctu.png" },
+      { key:"Cyclo", img:"cyclo.png" },
+    ],
+    resources: [
+      { key:"Bandelette de Comte", img:"bandelette comte.png" },
+      { key:"Scapula du Comte", img:"scapu comte.png" },
+      { key:"Pic de Noctu", img:"pic de noctu.png" },
+      { key:"Bec de Granduk", img:"bec de granduk.png" },
+      { key:"Bec de Strigide", img:"bec de strigide.png" },
+      { key:"Plume Cyclo", img:"plume cyclo.png" },
+      { key:"Aile de Noctu", img:"aille de noctu.png" },
+      { key:"Aile de Sinistrofu", img:"aille de sinistrofu.png" },
+      { key:"Queue de Sini", img:"queue de sini.png" },
+      { key:"Œil de Cyclo", img:"oeil de cyclo.png" },
+      { key:"Plume de Granduk", img:"plume de granduk.png" },
+      { key:"Griffe de Strigide", img:"griffe de strigide.png" },
+      { key:"Viande Goûtue", img:"viande goutue.png" },
+      { key:"Bidoche Goûtue", img:"bidoche goutue.png" },
+      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
+      { key:"Ceinture de Glourdorak", img:"ceinture glourdorak.png" },
+    ],
+  },
+];
+
+/* ====================== Storage helpers ====================== */
+const LS_PREFIX = "picofus:v3:";
+const kDungeon = (id) => `${LS_PREFIX}${id}`;
+function loadDungeonState(id){
+  try{
+    const raw = localStorage.getItem(kDungeon(id));
+    if(!raw) return { mobs:{}, resources:{}, prices:{} };
+    const p = JSON.parse(raw);
+    return { mobs:p.mobs||{}, resources:p.resources||{}, prices:p.prices||{} };
+  }catch(e){ return { mobs:{}, resources:{}, prices:{} }; }
+}
+function saveDungeonState(id, state){ localStorage.setItem(kDungeon(id), JSON.stringify(state)); }
+function resetAll(){
+  Object.keys(localStorage).forEach(k=>{ if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k); });
+}
+
+/* ====================== Utils ====================== */
+const fmt = new Intl.NumberFormat("fr-FR");
+function n(v){ return Number.isFinite(v) ? v : 0; }
+function clampNonNeg(x){ x = Math.trunc(Number(x)||0); return x < 0 ? 0 : x; }
+function f2(x){ return (Number(x)||0).toFixed(2); }
+function clampPct(x){
+  x = Number(String(x).replace(",", "."));
+  if(!Number.isFinite(x)) x = 0;
+  return x < 0 ? 0 : x;
+}
+
+/* ====================== Calculateur PP ====================== */
+const kPP = `${LS_PREFIX}pp`;
+function loadPPState(){
+  try{
+    const raw = localStorage.getItem(kPP);
+    if(!raw) return { prospection:500, base:12, challenges:60, anomalie:0, shield:5, almanax:0 };
+    const p = JSON.parse(raw);
+    return {
+      prospection: clampNonNeg(p.prospection ?? 500),
+      base: clampPct(p.base ?? 12),
+      challenges: clampPct(p.challenges ?? 60),
+      anomalie: clampPct(p.anomalie ?? 0),
+      shield: clampPct(p.shield ?? 5),
+      almanax: clampPct(p.almanax ?? 0),
+    };
+  }catch(e){
+    return { prospection:500, base:12, challenges:60, anomalie:0, shield:5, almanax:0 };
+  }
+}
+function savePPState(s){ localStorage.setItem(kPP, JSON.stringify(s)); }
+function ppMultiplier(prospection){
+  const pp = Number(prospection)||0;
+  const m = 0.74 + (1.755 / (1 + Math.exp((250 - pp) / 85)));
+  return Math.min(2.5, m);
+}
+function ppFinalDrop(s){
+  const mult = ppMultiplier(s.prospection);
+  const base = clampPct(s.base);
+  const final = base
+    * mult
+    * (1 + clampPct(s.challenges)/100)
+    * (1 + clampPct(s.anomalie)/100)
+    * (1 + clampPct(s.shield)/100)
+    * (1 + clampPct(s.almanax)/100);
+  return { mult, final };
+}
+function openPPPad(field, label){
+  const s = loadPPState();
+  const cur = field === "prospection" ? clampNonNeg(s.prospection) : clampNonNeg(s[field]);
+  openKeypad(label, cur, (v)=>{
+    const st = loadPPState();
+    if(field === "prospection") st.prospection = clampNonNeg(v);
+    else st[field] = clampPct(v);
+    savePPState(st);
+    render();
+  });
+}
+
+/* ====================== Calculateur XP Oméga ====================== */
+const kOmega = `${LS_PREFIX}omega`;
+function loadOmegaState(){
+  try{
+    const raw = localStorage.getItem(kOmega);
+    if(!raw) return { cur: 472, target: 482 };
+    const p = JSON.parse(raw);
+    return { cur: clampNonNeg(p.cur ?? 472), target: clampNonNeg(p.target ?? 482) };
+  }catch(e){
+    return { cur: 472, target: 482 };
+  }
+}
+function saveOmegaState(s){ localStorage.setItem(kOmega, JSON.stringify(s)); }
+function omegaXpToNext(i){ return Math.round(50000000 * Math.pow(1.01, i)); }
+function omegaXpRequired(cur, target){
+  cur = clampNonNeg(cur);
+  target = clampNonNeg(target);
+  if(target <= cur) return 0;
+  let sum = 0;
+  for(let i=cur; i<target; i++) sum += omegaXpToNext(i);
+  return sum;
+}
+function openOmegaPad(field, label){
+  const s = loadOmegaState();
+  openKeypad(label, clampNonNeg(s[field]), (v)=>{
+    const st = loadOmegaState();
+    st[field] = clampNonNeg(v);
+    saveOmegaState(st);
+    render();
+  });
+}
+
+/* =========================================================
+   IMAGE FALLBACK (ultra robuste)
+   ========================================================= */
+function uniq(arr){
+  const seen = new Set();
+  const out = [];
+  for(const x of arr){
+    if(!x) continue;
+    if(seen.has(x)) continue;
+    seen.add(x);
+    out.push(x);
+  }
+  return out;
+}
+function withDot(dir){ return dir.startsWith("./") ? dir : "./" + dir; }
+function stripDot(dir){ return dir.startsWith("./") ? dir.slice(2) : dir; }
+function encPath(p){ try { return encodeURI(p); } catch { return p; } }
+function makeCandidates(imgDir, file){
+  const d1 = stripDot(imgDir || "");
+  const d2 = withDot(imgDir || "");
+  const f1 = file || "";
+  return uniq([
+    d1 + f1,
+    d2 + f1,
+    encPath(d1 + f1),
+    encPath(d2 + f1),
+    f1,
+    "./" + f1,
+    encPath(f1),
+    encPath("./" + f1),
+    "img/" + f1,
+    "./img/" + f1,
+    "images/" + f1,
+    "./images/" + f1,
+    "assets/" + f1,
+    "./assets/" + f1,
+  ]);
+}
+function attachFallback(imgEl, imgDir, file){
+  const list = makeCandidates(imgDir, file);
+  imgEl.dataset.candidates = JSON.stringify(list);
+  imgEl.dataset.idx = "0";
+  imgEl.src = list[0];
+  imgEl.onerror = () => {
+    const candidates = JSON.parse(imgEl.dataset.candidates || "[]");
+    let idx = parseInt(imgEl.dataset.idx || "0", 10) + 1;
+    imgEl.dataset.idx = String(idx);
+    if(idx < candidates.length) imgEl.src = candidates[idx];
+    else imgEl.onerror = null;
+  };
+}
+function activateFallbackIn(containerEl, defaultDir){
+  containerEl.querySelectorAll("img").forEach(img=>{
+    const file = img.getAttribute("data-file") || (img.getAttribute("src")||"").split("/").pop();
+    const dir  = img.getAttribute("data-dir") || defaultDir || "";
+    if(file) attachFallback(img, dir, file);
+  });
+}
+
+/* ====================== Keypad ====================== */
+const modal = document.getElementById("modal");
+const kbdTarget = document.getElementById("kbdTarget");
+const kbdValue = document.getElementById("kbdValue");
+const kbdGrid = document.getElementById("kbdGrid");
+const btnClose = document.getElementById("kbdClose");
+const btnClear = document.getElementById("kbdClear");
+const btnBack = document.getElementById("kbdBack");
+const btnOk = document.getElementById("kbdOk");
+
+let keypad = { open:false, buffer:"0", onApply:null, title:"" };
+
+function openKeypad(title, currentValue, onApply){
+  keypad.open = true;
+  keypad.title = title;
+  keypad.buffer = String(clampNonNeg(currentValue));
+  keypad.onApply = onApply;
+  kbdTarget.textContent = title;
+  kbdValue.textContent = keypad.buffer;
+  modal.classList.add("open");
+}
+function closeKeypad(){ keypad.open = false; modal.classList.remove("open"); }
+function setBuffer(next){ keypad.buffer = next; kbdValue.textContent = keypad.buffer; }
+function pushDigit(d){ if(keypad.buffer === "0") setBuffer(String(d)); else setBuffer(keypad.buffer + String(d)); }
+function backspace(){ if(keypad.buffer.length <= 1) setBuffer("0"); else setBuffer(keypad.buffer.slice(0,-1)); }
+function clearBuf(){ setBuffer("0"); }
+function applyBuf(){
+  const val = clampNonNeg(parseInt(keypad.buffer,10));
+  if(typeof keypad.onApply === "function") keypad.onApply(val);
+  closeKeypad();
+}
+(function buildKeypad(){
+  kbdGrid.innerHTML = "";
+  for(let i=1;i<=9;i++){
+    const b = document.createElement("button");
+    b.className = "kbd-key";
+    b.textContent = String(i);
+    b.addEventListener("click", ()=>pushDigit(i));
+    kbdGrid.appendChild(b);
+  }
+  const blank1 = document.createElement("div");
+  const zero = document.createElement("button");
+  zero.className = "kbd-key";
+  zero.textContent = "0";
+  zero.addEventListener("click", ()=>pushDigit(0));
+  const blank2 = document.createElement("div");
+  kbdGrid.appendChild(blank1);
+  kbdGrid.appendChild(zero);
+  kbdGrid.appendChild(blank2);
+})();
+btnClose.addEventListener("click", closeKeypad);
+modal.addEventListener("click", (e)=>{ if(e.target === modal) closeKeypad(); });
+btnClear.addEventListener("click", clearBuf);
+btnBack.addEventListener("click", backspace);
+btnOk.addEventListener("click", applyBuf);
+window.addEventListener("keydown", (e)=>{
+  if(!keypad.open) return;
+  if(e.key >= "0" && e.key <= "9") pushDigit(e.key);
+  else if(e.key === "Backspace") backspace();
+  else if(e.key === "Escape") closeKeypad();
+  else if(e.key === "Enter") applyBuf();
+});
+
+/* ====================== Router ====================== */
+const app = document.getElementById("app");
+const pagePill = document.getElementById("pagePill");
+
+document.getElementById("btnTabHome").addEventListener("click", ()=>{ location.hash = "#/"; });
+document.getElementById("btnTabDonjons").addEventListener("click", ()=>{ location.hash = "#/donjons"; });
+document.getElementById("btnTabSonges").addEventListener("click", ()=>{ location.hash = "#/songes"; });
+document.getElementById("btnTabAnomalies").addEventListener("click", ()=>{ location.hash = "#/anomalies"; });
+document.getElementById("btnTabPP").addEventListener("click", ()=>{ location.hash = "#/pp"; });
+document.getElementById("btnTabOmega").addEventListener("click", ()=>{ location.hash = "#/omega"; });
+
+document.getElementById("btnResetAll").addEventListener("click", ()=>{
+  if(confirm("Reset TOUTES les données (tous les donjons + Songes + calculateurs) ?")){ resetAll(); render(); }
+});
+
+function getRoute(){
+  const h = location.hash.replace("#","").trim();
+  if(!h || h === "/") return { page:"home" };
+  if(h === "/donjons") return { page:"donjons" };
+  if(h === "/songes") return { page:"songes" };
+  if(h === "/anomalies") return { page:"anomalies" };
+  if(h === "/pp") return { page:"pp" };
+  if(h === "/omega") return { page:"omega" };
+  const m = h.match(/^\/d\/([^\/]+)$/);
+  if(m) return { page:"dungeon", id:m[1] };
+  return { page:"home" };
+}
+window.addEventListener("hashchange", render);
+
+/* ====================== Pages ====================== */
+function renderHomePage(){
+  pagePill.textContent = "Accueil";
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="logo" style="width:42px;height:42px;border-radius:16px">🏠</div>
+          <div>
+            <h2>Home</h2>
+            <p class="sub">Choisis une catégorie.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-left">
+            <div class="thumb"><span style="color:var(--gold);font-weight:900">⚔️</span></div>
+            <div style="min-width:0">
+              <h3>Donjons</h3>
+              <p>Liste Comte / Torké / Déchireuse…</p>
+            </div>
+          </div>
+          <div class="card-right">
+            <button class="btn small gold" onclick="location.hash='#/donjons'">Ouvrir</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-left">
+            <div class="thumb"><span style="color:var(--gold);font-weight:900">🌙</span></div>
+            <div style="min-width:0">
+              <h3>Songes</h3>
+              <p>Runs par intensité • Bribes globales • Légendes drop.</p>
+            </div>
+          </div>
+          <div class="card-right">
+            <button class="btn small gold" onclick="location.hash='#/songes'">Ouvrir</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-left">
+            <div class="thumb"><span style="color:var(--gold);font-weight:900">🌀</span></div>
+            <div style="min-width:0">
+              <h3>Anomalies</h3>
+              <p>À venir (suivi farm, stats, etc.).</p>
+            </div>
+          </div>
+          <div class="card-right">
+            <button class="btn small gold" onclick="location.hash='#/anomalies'">Ouvrir</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-left">
+            <div class="thumb"><span style="color:var(--gold);font-weight:900">📌</span></div>
+            <div style="min-width:0">
+              <h3>Calculateur PP</h3>
+              <p>Prospection → multiplicateur → taux final.</p>
+            </div>
+          </div>
+          <div class="card-right">
+            <button class="btn small gold" onclick="location.hash='#/pp'">Ouvrir</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-left">
+            <div class="thumb"><span style="color:var(--gold);font-weight:900">📈</span></div>
+            <div style="min-width:0">
+              <h3>Calculateur XP Oméga</h3>
+              <p>Omega actuel → objectif → XP totale.</p>
+            </div>
+          </div>
+          <div class="card-right">
+            <button class="btn small gold" onclick="location.hash='#/omega'">Ouvrir</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hint">
+        Navigue via les onglets en haut. Donjons + Songes sauvegarde auto + pavé numérique.
+      </div>
+    </div>
+  `;
+}
+
+function renderPlaceholder(title, desc){
+  pagePill.textContent = title;
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="logo" style="width:42px;height:42px;border-radius:16px">—</div>
+          <div>
+            <h2>${escapeHtml(title)}</h2>
+            <p class="sub">${escapeHtml(desc)}</p>
+          </div>
+        </div>
+      </div>
+      <div class="hint">Page placeholder.</div>
+    </div>
+  `;
+}
+
+/* ====================== Donjons list ====================== */
+function renderDonjonsList(){
+  pagePill.textContent = "Donjons";
+  const cards = DUNGEONS.map(d=>{
+    const state = loadDungeonState(d.id);
+    const mobsTotal = Object.values(state.mobs||{}).reduce((a,b)=>a+n(b),0);
+    const resTotal  = Object.values(state.resources||{}).reduce((a,b)=>a+n(b),0);
+
+    return `
+      <div class="card">
+        <div class="card-left">
+          <div class="thumb">
+            ${d.thumb
+              ? `<img data-file="${escapeHtml(d.thumb)}" data-dir="${escapeHtml(d.imgDir)}" alt="">`
+              : `<span style="color:var(--gold);font-weight:800">DJ</span>`}
+          </div>
+          <div style="min-width:0">
+            <h3>${escapeHtml(d.name)}</h3>
+            <p>Mobs: <b class="mono">${fmt.format(mobsTotal)}</b> • Ressources: <b class="mono">${fmt.format(resTotal)}</b></p>
+          </div>
+        </div>
+        <div class="card-right">
+          <button class="btn small gold" onclick="location.hash='#/d/${d.id}'">Ouvrir</button>
+          <button class="btn small bad" onclick="resetDungeon('${d.id}')">Reset</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="logo" style="width:42px;height:42px;border-radius:16px">⚔️</div>
+          <div>
+            <h2>Donjons</h2>
+            <p class="sub">Comte / Torké / Déchireuse…</p>
+          </div>
+        </div>
+        <div class="nav">
+          <span class="pill">Astuce: clique sur un nombre → pavé numérique</span>
+        </div>
+      </div>
+      <div class="grid">${cards}</div>
+      <div class="hint">
+        Ton .html doit rester dans <b>DofusTracker</b> (racine).<br>
+        Les images doivent être dans les dossiers <b>Déchireuse/</b>, <b>Torkélonia/</b>, etc.
+      </div>
+    </div>
+  `;
+
+  activateFallbackIn(app, "");
+}
+
+/* ====================== Page: Calculateur PP ====================== */
+function renderPP(){
+  const s = loadPPState();
+  const { mult, final } = ppFinalDrop(s);
+
+  pagePill.textContent = "Calculateur PP";
+
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="logo" style="width:42px;height:42px;border-radius:16px">📌</div>
+          <div>
+            <h2>Calculateur PP</h2>
+            <p class="sub">Modifiables : PP / Base / Challenges / Anomalie / Shield / Almanax • Le reste est calculé.</p>
+          </div>
+        </div>
+        <div class="nav">
+          <button class="btn bad" onclick="resetPP()">🧹 Reset</button>
+        </div>
+      </div>
+
+      <div class="calc3">
+        <div class="calcBox">
+          <div class="calcHead">PROSPECTION</div>
+          <div class="calcBody">
+            <div class="calcValue" onclick="openPPPad('prospection','Prospection')">${fmt.format(s.prospection)}</div>
+
+            <div style="height:10px"></div>
+
+            <div class="calcRow" style="grid-template-columns:1fr;gap:6px">
+              <div>
+                <div class="lab">MULTIPLICATEUR DROP</div>
+                <div class="sub">MAX = 2.5</div>
+              </div>
+              <div class="calcValue static" style="margin-top:8px">${f2(mult)}</div>
+            </div>
+
+            <div class="calcNote">
+              Formule : <span class="mono">0.74 + (1.755 / (1 + e^((250 - PP)/85)))</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="calcBox">
+          <div class="calcHead">% BONUS / TAUX</div>
+          <div class="calcBody">
+            <div class="calcStack">
+              ${ppPctRow("🧪","% TAUX DE DROP DE BASE", "base", s.base)}
+              ${ppPctRow("🧩","% CHALLENGES", "challenges", s.challenges)}
+              ${ppPctRow("🌀","% ANOMALIE", "anomalie", s.anomalie)}
+              ${ppPctRow("🛡️","% ANKAMA SHIELD", "shield", s.shield)}
+              ${ppPctRow("📅","% ALMANAX", "almanax", s.almanax)}
+            </div>
+
+            <div class="hint" style="margin-top:12px">
+              Astuce : tu peux taper au clavier dans les champs % (virgule OK). La PP se fait au pavé numérique.
+            </div>
+          </div>
+        </div>
+
+        <div class="calcRightBig">
+          <div class="t">% TAUX DE DROP FINAL</div>
+          <div class="v">${f2(final)}</div>
+          <div class="calcNote" style="text-align:center">
+            Résultat = Base × Mult × (1+Chall) × (1+Ano) × (1+Shield) × (1+Almanax)
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function ppPctRow(icon, label, field, val){
+  const v = (Number(val)||0);
+  const display = f2(v).replace(".", ",");
+  return `
+    <div class="calcRow">
+      <div><div class="lab">${escapeHtml(label)}</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="pill" style="border-color:rgba(214,179,106,.25);background:rgba(214,179,106,.06)">${escapeHtml(icon)}</span>
+        <input class="field fieldPct" inputmode="decimal"
+          value="${escapeHtml(display)}"
+          oninput="setPPFieldLive('${field}', this.value)"
+          onfocus="this.select()"
+          title="${escapeHtml(label)}">
+      </div>
+    </div>
+  `;
+}
+window.setPPFieldLive = function(field, value){
+  const s = loadPPState();
+  if(field === "prospection") s.prospection = clampNonNeg(value);
+  else s[field] = clampPct(value);
+  savePPState(s);
+  renderPP();
+};
+window.resetPP = function(){
+  if(!confirm("Reset le calculateur PP ?")) return;
+  localStorage.removeItem(kPP);
+  render();
+};
+
+/* ====================== Page: Calculateur XP Oméga ====================== */
+function renderOmega(){
+  const s = loadOmegaState();
+  const xp = omegaXpRequired(s.cur, s.target);
+
+  pagePill.textContent = "XP Oméga";
+
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="logo" style="width:42px;height:42px;border-radius:16px">📈</div>
+          <div>
+            <h2>Calculateur XP Oméga</h2>
+            <p class="sub">Modifiables : Oméga actuel + Oméga souhaité • Résultat : XP à faire.</p>
+          </div>
+        </div>
+        <div class="nav">
+          <button class="btn bad" onclick="resetOmega()">🧹 Reset</button>
+        </div>
+      </div>
+
+      <div class="calc3">
+        <div class="calcBox">
+          <div class="calcHead">OMEGA ACTUEL</div>
+          <div class="calcBody">
+            <div class="calcValue" onclick="openOmegaPad('cur','Omega actuel')">${fmt.format(s.cur)}</div>
+            <div class="calcNote">Clique pour saisir au pavé numérique.</div>
+          </div>
+        </div>
+
+        <div class="calcBox">
+          <div class="calcHead">OMEGA SOUHAITÉ</div>
+          <div class="calcBody">
+            <div class="calcValue" onclick="openOmegaPad('target','Omega souhaité')">${fmt.format(s.target)}</div>
+            <div class="calcNote">Si l’objectif ≤ actuel → 0 XP.</div>
+          </div>
+        </div>
+
+        <div class="calcRightBig">
+          <div class="t">POINTS D’EXPÉRIENCE REQUIS</div>
+          <div class="v">${fmt.format(xp)} xp</div>
+          <div class="calcNote" style="text-align:center">
+            Modèle : <span class="mono">xpNext(i) = round(50 000 000 × 1.01^i)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hint">
+        (Info) Oméga = niveaux après 200 (Ω1, Ω2, …). Ici on calcule l’XP à gagner entre deux omégas.
+      </div>
+    </div>
+  `;
+}
+window.resetOmega = function(){
+  if(!confirm("Reset le calculateur XP Oméga ?")) return;
+  localStorage.removeItem(kOmega);
+  render();
+};
+
+/* ====================== Page: Songes (modifs visuelles demandées) ====================== */
+const kSonges = `${LS_PREFIX}songes`;
+const SONGES_IMG_DIR = "Songes/";
+
+// (optionnel) si tu ajoutes un fichier Bribes.png dans Songes/ il s'affichera
+const SONGES_BRIBES_ICON_FILE = "Bribes.png";
+
+const SONGE_INTENSITIES = [
+  { id:"reve1",     label:"Rêve 1",     group:"Rêve",     img:"Reve 1.png" },
+  { id:"reve2",     label:"Rêve 2",     group:"Rêve",     img:"Reve 2.png" },
+  { id:"reve3",     label:"Rêve 3",     group:"Rêve",     img:"Reve 3.png" },
+
+  { id:"paradoxe1", label:"Paradoxe 1", group:"Paradoxe", img:"Paradox 1.png" },
+  { id:"paradoxe2", label:"Paradoxe 2", group:"Paradoxe", img:"Paradox 2.png" },
+  { id:"paradoxe3", label:"Paradoxe 3", group:"Paradoxe", img:"Paradox 3.png" },
+  { id:"paradoxe4", label:"Paradoxe 4", group:"Paradoxe", img:"Paradox 4.png" },
+
+  { id:"cauchemar1",label:"Cauchemar 1",group:"Cauchemar",img:"Cauchemar 1.png" },
+  { id:"cauchemar2",label:"Cauchemar 2",group:"Cauchemar",img:"Cauchemar 2.png" },
+  { id:"cauchemar3",label:"Cauchemar 3",group:"Cauchemar",img:"Cauchemar 3.png" },
+];
+
+// Ordre EXACT demandé (puis le reste jusqu’à 26, puis animaux dans l’ordre)
+const SONGE_LEGENDS = [
+  { key:"Oto Mustam",      img:"Légende d'Oto Mustam.png",            imgDir: SONGES_IMG_DIR },
+  { key:"Menalt",         img:"Légende de Menalt.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Mériana",        img:"Légende de Mériana.png",               imgDir: SONGES_IMG_DIR },
+  { key:"Jahash",         img:"Légende de Jahash Jurgen.png",         imgDir: SONGES_IMG_DIR },
+  { key:"Amayiro",        img:"Légende d'Amayiro.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Dame Jhessica",  img:"Légende de Dame Jhessica.png",         imgDir: SONGES_IMG_DIR },
+  { key:"Thanatena",      img:"Légende de Thanatena.png",             imgDir: SONGES_IMG_DIR },
+
+  // autres (jusqu’à 26)
+  { key:"Helséphine",     img:"Légende d'Helséphine.png",             imgDir: SONGES_IMG_DIR },
+  { key:"Henual",         img:"Légende d'Henual.png",                 imgDir: SONGES_IMG_DIR },
+  { key:"Servitude",      img:"Légende de Servitude.png",             imgDir: SONGES_IMG_DIR },
+  { key:"Guerre",         img:"Légende de Guerre.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Misère",         img:"Légende de Misère.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Corruption",     img:"Légende de Corruption.png",            imgDir: SONGES_IMG_DIR },
+  { key:"Mille Lieues",   img:"Légende de Mille Lieues.png",          imgDir: SONGES_IMG_DIR },
+  { key:"Rykke Errel",    img:"Légende de Rykke Errel.png",           imgDir: SONGES_IMG_DIR },
+  { key:"Ganymède",       img:"Légende de Ganymède.png",              imgDir: SONGES_IMG_DIR },
+  { key:"Fallanster",     img:"Légende de Fallanster.png",            imgDir: SONGES_IMG_DIR },
+  { key:"Crocobur",       img:"Légende de Crocobur.png",              imgDir: SONGES_IMG_DIR },
+  { key:"Dodge",          img:"Légende de Dodge.png",                 imgDir: SONGES_IMG_DIR },
+  { key:"Brâm Barbe-Monde",img:"Légende de Brâm Barbe-Monde.png",     imgDir: SONGES_IMG_DIR },
+  { key:"Brumaire",       img:"Légende de Brumaire.png",              imgDir: SONGES_IMG_DIR },
+  { key:"Buhorado",       img:"Légende de Buhorado.png",              imgDir: SONGES_IMG_DIR },
+  { key:"Cul Botté",      img:"Légende du Cul Botté.png",             imgDir: SONGES_IMG_DIR },
+  { key:"Destin",         img:"Légende du Destin.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Miroir",         img:"Légende du Miroir.png",                imgDir: SONGES_IMG_DIR },
+  { key:"Trompe-la-Mort", img:"Légende du Trompe-la-Mort.png",        imgDir: SONGES_IMG_DIR },
+
+  // animaux (ordre demandé)
+  { key:"Kwakarticho",    img:"Légende animale de Kwakarticho.png",   imgDir: SONGES_IMG_DIR },
+  { key:"Poukachi",       img:"Légende animale de Poukachi.png",      imgDir: SONGES_IMG_DIR },
+  { key:"Bakushana",      img:"Légende animale de Bakushana.png",     imgDir: SONGES_IMG_DIR },
+  { key:"Magicrabe",      img:"Légende animale de Magicrabe.png",     imgDir: SONGES_IMG_DIR },
+];
+
+function loadSongesState(){
+  try{
+    const raw = localStorage.getItem(kSonges);
+    if(!raw){
+      const init = {
+        ui: { tab:"runs", search:"" },
+        bribesTotal: 0,
+        runs: {},
+        lastBribes: {},
+        legends: {},
+      };
+      SONGE_INTENSITIES.forEach(x=>init.runs[x.id]=0);
+      SONGE_LEGENDS.forEach(x=>init.legends[x.key]=0);
+      return init;
+    }
+    const p = JSON.parse(raw);
+    const out = {
+      ui: p.ui || { tab:"runs", search:"" },
+      bribesTotal: clampNonNeg(p.bribesTotal ?? 0),
+      runs: p.runs || {},
+      lastBribes: p.lastBribes || {},
+      legends: p.legends || {},
+    };
+    SONGE_INTENSITIES.forEach(x=>{
+      out.runs[x.id] = clampNonNeg(out.runs[x.id] ?? 0);
+      out.lastBribes[x.id] = clampNonNeg(out.lastBribes[x.id] ?? 0);
+    });
+    SONGE_LEGENDS.forEach(x=>{
+      out.legends[x.key] = clampNonNeg(out.legends[x.key] ?? 0);
+    });
+    if(!out.ui || !out.ui.tab) out.ui = { tab:"runs", search:"" };
+    return out;
+  }catch(e){
+    const init = { ui:{tab:"runs",search:""}, bribesTotal:0, runs:{}, lastBribes:{}, legends:{} };
+    SONGE_INTENSITIES.forEach(x=>init.runs[x.id]=0);
+    SONGE_LEGENDS.forEach(x=>init.legends[x.key]=0);
+    return init;
+  }
+}
+function saveSongesState(s){ localStorage.setItem(kSonges, JSON.stringify(s)); }
+
+window.resetSonges = function(){
+  if(!confirm("Reset Songes (runs + bribes + légendes) ?")) return;
+  localStorage.removeItem(kSonges);
+  render();
+};
+
+function setSongesTab(tab){
+  const s = loadSongesState();
+  s.ui.tab = tab;
+  saveSongesState(s);
+  renderSonges();
+}
+function setSongesSearch(value){
+  const s = loadSongesState();
+  s.ui.search = String(value||"");
+  saveSongesState(s);
+  renderSonges();
+}
+
+window.openSongesBribesPad = function(){
+  const s = loadSongesState();
+  openKeypad("Bribes (global)", clampNonNeg(s.bribesTotal), (v)=>{
+    const st = loadSongesState();
+    st.bribesTotal = clampNonNeg(v);
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+window.openSongesRunPad = function(intensityId, label){
+  const s = loadSongesState();
+  openKeypad(`Runs • ${label}`, clampNonNeg(s.runs[intensityId] ?? 0), (v)=>{
+    const st = loadSongesState();
+    st.runs[intensityId] = clampNonNeg(v);
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+window.songeIncRun = function(intensityId){
+  const st = loadSongesState();
+  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) + 1);
+  saveSongesState(st);
+
+  const intensity = SONGE_INTENSITIES.find(x=>x.id===intensityId);
+  const label = intensity ? intensity.label : intensityId;
+  const preset = clampNonNeg(st.lastBribes[intensityId] ?? 0);
+
+  openKeypad(`Bribes gagnées • ${label}`, preset, (v)=>{
+    const s2 = loadSongesState();
+    const add = clampNonNeg(v);
+    s2.lastBribes[intensityId] = add;
+    s2.bribesTotal = clampNonNeg((s2.bribesTotal ?? 0) + add);
+    saveSongesState(s2);
+    renderSonges();
+  });
+};
+
+window.songeDecRun = function(intensityId){
+  const st = loadSongesState();
+  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) - 1);
+  saveSongesState(st);
+  renderSonges();
+};
+
+window.songeAddBribes = function(){
+  openKeypad("Ajouter des bribes (global)", 0, (v)=>{
+    const st = loadSongesState();
+    st.bribesTotal = clampNonNeg((st.bribesTotal ?? 0) + clampNonNeg(v));
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+window.songeSubBribes = function(){
+  openKeypad("Retirer des bribes (global)", 0, (v)=>{
+    const st = loadSongesState();
+    st.bribesTotal = clampNonNeg((st.bribesTotal ?? 0) - clampNonNeg(v));
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+window.songeIncLegend = function(key){
+  const st = loadSongesState();
+  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) + 1);
+  saveSongesState(st);
+  renderSonges();
+};
+window.songeDecLegend = function(key){
+  const st = loadSongesState();
+  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) - 1);
+  saveSongesState(st);
+  renderSonges();
+};
+window.openLegendPad = function(key){
+  const s = loadSongesState();
+  openKeypad(`Légende • ${key}`, clampNonNeg(s.legends[key] ?? 0), (v)=>{
+    const st = loadSongesState();
+    st.legends[key] = clampNonNeg(v);
+    saveSongesState(st);
+    renderSonges();
+  });
+};
+
+function renderSonges(){
+  const s = loadSongesState();
+  pagePill.textContent = "Songes";
+
+  const tab = s.ui?.tab || "runs";
+
+  const totalRuns = Object.values(s.runs||{}).reduce((a,b)=>a+n(b),0);
+  const bribesTotal = clampNonNeg(s.bribesTotal ?? 0);
+
+  const header = `
+    <div class="topline">
+      <div class="title">
+        <div class="logo" style="width:42px;height:42px;border-radius:16px">🌙</div>
+        <div>
+          <h2>Songes</h2>
+          <p class="sub">Runs par intensité • Bribes globales • Légendes droppées (compteurs).</p>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn gold" onclick="songeAddBribes()">➕ Ajouter bribes</button>
+        <button class="btn" onclick="songeSubBribes()">➖ Retirer bribes</button>
+        <button class="btn bad" onclick="resetSonges()">🧹 Reset Songes</button>
+      </div>
+    </div>
+  `;
+
+  const tabs = `
+    <div class="seg" style="margin-bottom:12px">
+      <button class="btn small ${tab==='runs'?'active':''}" onclick="setSongesTab('runs')">📊 Runs & Bribes</button>
+      <button class="btn small ${tab==='legends'?'active':''}" onclick="setSongesTab('legends')">🏷️ Légendes</button>
+    </div>
+  `;
+
+  const bribesKpiIcon = `
+    <span class="kico">
+      <img data-file="${escapeHtml(SONGES_BRIBES_ICON_FILE)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt="">
+    </span>
+  `;
+
+  const topKpis = `
+    <div class="summary" style="margin-top:0">
+      <div class="kpi">
+        <div class="k">Bribes (global) ${bribesKpiIcon}</div>
+        <div class="v mono gold" style="cursor:pointer" onclick="openSongesBribesPad()">${fmt.format(bribesTotal)}</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Runs (total)</div>
+        <div class="v mono">${fmt.format(totalRuns)}</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Outil</div>
+        <div class="v mono">3.5 ready</div>
+      </div>
+      <div class="kpi">
+        <div class="k">Astuce</div>
+        <div class="v mono">+1 run → saisie bribes</div>
+      </div>
+    </div>
+  `;
+
+  let body = "";
+
+  if(tab === "runs"){
+    const byGroup = (group) => SONGE_INTENSITIES.filter(x=>x.group===group);
+
+    const groupBlock = (groupName) => {
+      const rows = byGroup(groupName).map(it=>{
+        const count = clampNonNeg(s.runs[it.id] ?? 0);
+        const last = clampNonNeg(s.lastBribes[it.id] ?? 0);
+
+        return `
+          <div class="item">
+            <div class="ico">
+              <img data-file="${escapeHtml(it.img)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt="">
+            </div>
+            <div class="name">
+              <p class="n">${escapeHtml(it.label)}</p>
+              <p class="m">Dernières bribes saisies: <b class="mono">${fmt.format(last)}</b></p>
+            </div>
+            <div class="ctrls">
+              <button class="btn small" onclick="songeDecRun('${it.id}')">−</button>
+              <div class="num" onclick="openSongesRunPad('${it.id}','${jsEscape(it.label)}')">${fmt.format(count)}</div>
+              <button class="btn small gold" onclick="songeIncRun('${it.id}')">+ Run</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="calcBox" style="margin-bottom:14px">
+          <div class="calcHead">${escapeHtml(groupName.toUpperCase())}</div>
+          <div class="calcBody">
+            <div class="list">${rows}</div>
+          </div>
+        </div>
+      `;
+    };
+
+    body = `
+      <div class="row">
+        <div>
+          ${groupBlock("Rêve")}
+          ${groupBlock("Paradoxe")}
+          ${groupBlock("Cauchemar")}
+        </div>
+
+        <div>
+          <div class="calcRightBig">
+            <div class="t">BRIBES (GLOBAL)</div>
+            <div class="v" onclick="openSongesBribesPad()" style="cursor:pointer">${fmt.format(bribesTotal)}</div>
+            <div class="calcNote" style="text-align:center">
+              Clique sur la valeur pour définir le total.<br>
+              Ou utilise <b>+ Run</b> (ça te demande les bribes gagnées).
+            </div>
+          </div>
+
+          <div style="height:14px"></div>
+
+          <div class="section">
+            <div class="topline" style="margin-bottom:8px">
+              <div class="pill">Notes (3.5)</div>
+              <div class="pill">Bribes liées aux vagues</div>
+            </div>
+            <div class="hint" style="margin-top:0">
+              Après la 3.5, les bribes dépendent du nombre de vagues vaincues (combat final).<br>
+              Ici on reste flexible : tu saisis <b>les bribes réelles</b> de ta run → ça cumule au global.
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  if(tab === "legends"){
+    const q = (s.ui?.search || "").toLowerCase().trim();
+
+    const tiles = SONGE_LEGENDS
+      .filter(l => !q || l.key.toLowerCase().includes(q))
+      .map(l=>{
+        const val = clampNonNeg(s.legends[l.key] ?? 0);
+        return `
+          <div class="item legendItem">
+            <div class="ico">
+              <img data-file="${escapeHtml(l.img)}" data-dir="${escapeHtml(l.imgDir || SONGES_IMG_DIR)}" alt="">
+            </div>
+            <div class="name">
+              <p class="n">${escapeHtml(l.key)}</p>
+              <p class="m">Compteur de drop légendaire</p>
+            </div>
+            <div class="ctrls">
+              <button class="btn small" onclick="songeDecLegend('${jsEscape(l.key)}')">−</button>
+              <div class="num" onclick="openLegendPad('${jsEscape(l.key)}')">${fmt.format(val)}</div>
+              <button class="btn small" onclick="songeIncLegend('${jsEscape(l.key)}')">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+    const doneCount = SONGE_LEGENDS.reduce((acc,l)=> acc + (clampNonNeg(s.legends[l.key] ?? 0) > 0 ? 1 : 0), 0);
+
+    body = `
+      <div class="section">
+        <div class="topline">
+          <div class="title">
+            <div class="pill">📚 Classement</div>
+            <div class="pill">Déjà drop: <b class="mono">${fmt.format(doneCount)}</b> / <b class="mono">${fmt.format(SONGE_LEGENDS.length)}</b></div>
+          </div>
+          <div class="searchRow">
+            <input placeholder="Rechercher une légende…" value="${escapeHtml(s.ui?.search||"")}"
+              oninput="setSongesSearch(this.value)">
+            <button class="btn small" onclick="setSongesSearch('')">✖</button>
+          </div>
+        </div>
+
+        <!-- 2 compteurs par ligne -->
+        <div class="legendGrid">
+          ${tiles || ``}
+        </div>
+
+        ${tiles ? "" : `<div class="hint">Aucune légende trouvée.</div>`}
+      </div>
+    `;
+  }
+
+  app.innerHTML = `
+    <div class="section">
+      ${header}
+      ${tabs}
+      ${topKpis}
+      <div style="height:14px"></div>
+      ${body}
+    </div>
+  `;
+
+  activateFallbackIn(app, "");
+}
+
+/* ====================== Render: Dungeon ====================== */
+function renderDungeon(d){
+  pagePill.textContent = d.name;
+  const state = loadDungeonState(d.id);
+
+  const mobsHtml = (d.mobs||[]).map(m=>{
+    const val = clampNonNeg(state.mobs[m.key] ?? 0);
+    return renderCounterRow({
+      dungeonId:d.id,
+      title:m.key,
+      subtitle:"Monstre",
+      imgFile:m.img,
+      imgDir:d.imgDir,
+      value:val,
+    });
+  }).join("");
+
+  const resHtml = (d.resources||[]).map(r=>{
+    const count = clampNonNeg(state.resources[r.key] ?? 0);
+    const price = clampNonNeg(state.prices[r.key] ?? 0);
+    const subtotal = count * price;
+
+    return `
+      <div class="item">
+        <div class="ico">
+          ${r.img ? `<img data-file="${escapeHtml(r.img)}" data-dir="${escapeHtml(d.imgDir)}" alt="">` : ""}
+        </div>
+        <div class="name">
+          <p class="n">${escapeHtml(r.key)}</p>
+          <p class="m">Sous-total: <b class="mono">${fmt.format(subtotal)}</b></p>
+        </div>
+        <div class="ctrls">
+          <button class="btn small" onclick="decRes('${d.id}', '${jsEscape(r.key)}')">−</button>
+          <div class="num" onclick="openResPad('${d.id}', '${jsEscape(r.key)}')">${fmt.format(count)}</div>
+          <button class="btn small" onclick="incRes('${d.id}', '${jsEscape(r.key)}')">+</button>
+          <input class="field mini" inputmode="numeric" pattern="[0-9]*"
+                 value="${price}"
+                 title="Prix moyen"
+                 onchange="setPrice('${d.id}','${jsEscape(r.key)}', this.value)"
+                 onfocus="this.select()">
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  const mobsTotal = Object.values(state.mobs||{}).reduce((a,b)=>a+n(b),0);
+  const resTotal  = Object.values(state.resources||{}).reduce((a,b)=>a+n(b),0);
+  const kamaTotal = (d.resources||[]).reduce((sum,r)=>{
+    const c = clampNonNeg(state.resources[r.key] ?? 0);
+    const p = clampNonNeg(state.prices[r.key] ?? 0);
+    return sum + (c*p);
+  },0);
+
+  const hasTotalBtn = d.totalIncrements && Object.keys(d.totalIncrements).length > 0;
+
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb" style="width:48px;height:48px;border-radius:18px">
+            ${d.thumb ? `<img data-file="${escapeHtml(d.thumb)}" data-dir="${escapeHtml(d.imgDir)}" alt="">` : `<span style="color:var(--gold);font-weight:800">DJ</span>`}
+          </div>
+          <div style="min-width:0">
+            <h2>${escapeHtml(d.name)}</h2>
+            <p class="sub">Clique sur un nombre pour saisir au pavé numérique. Sauvegarde auto.</p>
+          </div>
+        </div>
+        <div class="nav">
+          ${hasTotalBtn ? `<button class="btn gold" onclick="applyTotalRun('${d.id}')">➕ ${escapeHtml(d.totalButtonLabel)}</button>` : ""}
+          <button class="btn" onclick="exportDungeon('${d.id}')">📤 Export JSON</button>
+          <button class="btn bad" onclick="resetDungeon('${d.id}')">🧹 Reset</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <div class="topline" style="margin-bottom:10px">
+            <div class="pill">Monstres</div>
+            <div class="pill">Total: <b class="mono">${fmt.format(mobsTotal)}</b></div>
+          </div>
+          <div class="list">${mobsHtml || `<div class="hint">Aucun monstre configuré ici.</div>`}</div>
+        </div>
+
+        <div>
+          <div class="topline" style="margin-bottom:10px">
+            <div class="pill">Ressources (compte + prix moyen)</div>
+            <div class="pill">Total: <b class="mono">${fmt.format(resTotal)}</b> • Kamas: <b class="mono" style="color:var(--gold)">${fmt.format(kamaTotal)}</b></div>
+          </div>
+          <div class="list">${resHtml || `<div class="hint">Aucune ressource configurée ici.</div>`}</div>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="kpi"><div class="k">Total mobs</div><div class="v mono">${fmt.format(mobsTotal)}</div></div>
+        <div class="kpi"><div class="k">Total ressources</div><div class="v mono">${fmt.format(resTotal)}</div></div>
+        <div class="kpi"><div class="k">Valeur estimée</div><div class="v mono gold">${fmt.format(kamaTotal)}</div></div>
+        <div class="kpi"><div class="k">Dossier images</div><div class="v mono">${escapeHtml(d.imgDir)}</div></div>
+      </div>
+
+      <div class="hint">
+        Si une image ne s’affiche pas : le fallback teste plein de chemins automatiquement.
+        Vérifie juste que le fichier existe bien dans <b>${escapeHtml(d.imgDir)}</b> et que le nom est EXACT.
+      </div>
+    </div>
+  `;
+
+  activateFallbackIn(app, d.imgDir);
+}
+
+function renderCounterRow({dungeonId,title,subtitle,imgFile,imgDir,value}){
+  const safeTitle = jsEscape(title);
+  return `
+    <div class="item">
+      <div class="ico">
+        ${imgFile ? `<img data-file="${escapeHtml(imgFile)}" data-dir="${escapeHtml(imgDir)}" alt="">` : ""}
+      </div>
+      <div class="name">
+        <p class="n">${escapeHtml(title)}</p>
+        <p class="m">${escapeHtml(subtitle)}</p>
+      </div>
+      <div class="ctrls">
+        <button class="btn small" onclick="decMob('${dungeonId}','${safeTitle}')">−</button>
+        <div class="num" onclick="openMobPad('${dungeonId}','${safeTitle}')">${fmt.format(value)}</div>
+        <button class="btn small" onclick="incMob('${dungeonId}','${safeTitle}')">+</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ====================== Actions exposed ====================== */
+window.resetDungeon = function(id){
+  if(!confirm(`Reset les données du donjon "${id}" ?`)) return;
+  localStorage.removeItem(kDungeon(id));
+  render();
+}
+window.exportDungeon = function(id){
+  const d = DUNGEONS.find(x=>x.id===id);
+  const state = loadDungeonState(id);
+  const payload = { id, name:d?.name, state, exportedAt:new Date().toISOString() };
+  navigator.clipboard?.writeText(JSON.stringify(payload, null, 2)).catch(()=>{});
+  alert("Export copié dans le presse-papiers (JSON) ✅");
+}
+window.applyTotalRun = function(id){
+  const d = DUNGEONS.find(x=>x.id===id);
+  if(!d || !d.totalIncrements) return;
+  const state = loadDungeonState(id);
+  state.mobs ||= {};
+  Object.entries(d.totalIncrements).forEach(([mob, inc])=>{
+    const cur = clampNonNeg(state.mobs[mob] ?? 0);
+    state.mobs[mob] = clampNonNeg(cur + inc);
+  });
+  saveDungeonState(id, state);
+  render();
+}
+
+window.incMob = function(id, key){
+  const state = loadDungeonState(id);
+  state.mobs ||= {};
+  state.mobs[key] = clampNonNeg((state.mobs[key] ?? 0) + 1);
+  saveDungeonState(id,state); render();
+}
+window.decMob = function(id, key){
+  const state = loadDungeonState(id);
+  state.mobs ||= {};
+  state.mobs[key] = clampNonNeg((state.mobs[key] ?? 0) - 1);
+  saveDungeonState(id,state); render();
+}
+window.openMobPad = function(id, key){
+  const state = loadDungeonState(id);
+  const cur = clampNonNeg(state.mobs?.[key] ?? 0);
+  openKeypad(`Monstre • ${key}`, cur, (v)=>{
+    const st = loadDungeonState(id);
+    st.mobs ||= {};
+    st.mobs[key] = v;
+    saveDungeonState(id, st);
+    render();
+  });
+}
+
+window.incRes = function(id, key){
+  const state = loadDungeonState(id);
+  state.resources ||= {};
+  state.resources[key] = clampNonNeg((state.resources[key] ?? 0) + 1);
+  saveDungeonState(id,state); render();
+}
+window.decRes = function(id, key){
+  const state = loadDungeonState(id);
+  state.resources ||= {};
+  state.resources[key] = clampNonNeg((state.resources[key] ?? 0) - 1);
+  saveDungeonState(id,state); render();
+}
+window.openResPad = function(id, key){
+  const state = loadDungeonState(id);
+  const cur = clampNonNeg(state.resources?.[key] ?? 0);
+  openKeypad(`Ressource • ${key}`, cur, (v)=>{
+    const st = loadDungeonState(id);
+    st.resources ||= {};
+    st.resources[key] = v;
+    saveDungeonState(id, st);
+    render();
+  });
+}
+window.setPrice = function(id, key, val){
+  const state = loadDungeonState(id);
+  state.prices ||= {};
+  state.prices[key] = clampNonNeg(val);
+  saveDungeonState(id,state); render();
+}
+
+/* ====================== Render root ====================== */
+function render(){
+  const r = getRoute();
+
+  if(r.page === "home") return renderHomePage();
+  if(r.page === "donjons") return renderDonjonsList();
+  if(r.page === "songes") return renderSonges();
+  if(r.page === "anomalies") return renderPlaceholder("Anomalies", "Espace Anomalies (à venir).");
+  if(r.page === "pp") return renderPP();
+  if(r.page === "omega") return renderOmega();
+
+  if(r.page === "dungeon"){
+    const d = DUNGEONS.find(x=>x.id===r.id);
+    if(!d) { location.hash="#/"; return; }
+    return renderDungeon(d);
+  }
+
+  renderHomePage();
+}
+render();
+
+/* ====================== Helpers ====================== */
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>(
+    c==="&"?"&amp;":c==="<"?"&lt;":c===">"?"&gt;":c==='"'?"&quot;":"&#39;"
+  ));
+}
+function jsEscape(s){
+  return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+}
+</script>
+</body>
+</html>
