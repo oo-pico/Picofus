@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Picofus – Tracker</title>
+  <title>Picofus – Donjons</title>
 
-  <!-- Favicon simple "P" -->
   <link rel="icon" type="image/svg+xml"
     href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="%23d6b36a" stop-opacity=".9"/><stop stop-color="%23d6b36a" stop-opacity=".15"/></linearGradient></defs><rect x="6" y="6" width="52" height="52" rx="16" fill="url(%23g)" stroke="%23d6b36a" stroke-opacity=".55"/><text x="32" y="41" font-size="30" text-anchor="middle" font-family="system-ui" font-weight="800" fill="%23d6b36a">P</text></svg>'>
 
@@ -72,15 +71,8 @@
     .btn:active{transform:translateY(1px)}
     .btn.small{padding:8px 10px;border-radius:12px;font-size:13px}
     .btn.gold{border-color:rgba(214,179,106,.55);background:rgba(214,179,106,.08)}
-    .btn.good{border-color:rgba(69,208,122,.5);background:rgba(69,208,122,.08)}
     .btn.bad{border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.08)}
     .btn.active{border-color:rgba(214,179,106,.75);background:rgba(214,179,106,.15);font-weight:700}
-
-    .navIcon{width:18px;height:18px;object-fit:contain;display:block}
-    .ppIcon{width:22px;height:22px;object-fit:contain;display:block}
-
-    .kamasIcon{width:14px;height:14px;object-fit:contain;display:block;opacity:.95}
-    .kamasInline{display:inline-flex;gap:6px;align-items:center;vertical-align:middle}
 
     main{padding-top:16px}
 
@@ -125,12 +117,7 @@
     @media (max-width: 980px){ .row{grid-template-columns:1fr} }
 
     .list{display:flex;flex-direction:column;gap:10px}
-
-    .equipGrid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
+    .equipGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
     @media (max-width: 980px){ .equipGrid{grid-template-columns:1fr} }
 
     .item{
@@ -182,8 +169,6 @@
     .kpi .k{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center}
     .kpi .v{margin-top:6px;font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
     .kpi .v.gold{color:var(--gold)}
-    .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.35}
-
     .butinSelector{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
     .butinLabel{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
 
@@ -224,109 +209,7 @@
     .kbd-key:active{transform:scale(0.97)}
     .kbd-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
     .kbd-actions .btn{flex:1}
-
-    .intGrid{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:10px;
-      margin-top:10px;
-    }
-    @media (max-width: 420px){ .intGrid{grid-template-columns:repeat(2, 1fr)} }
-    .intBtn{
-      border:1px solid var(--stroke);
-      background:#18181a;
-      color:var(--text);
-      border-radius:16px;
-      padding:10px;
-      cursor:pointer;
-      display:flex;align-items:center;gap:10px;
-      transition:transform .08s ease, border-color .15s ease, background .15s ease;
-    }
-    .intBtn:hover{border-color:rgba(214,179,106,.45);background:#1f1f22}
-    .intBtn:active{transform:scale(.985)}
-    .intBtn .i{width:34px;height:34px;border-radius:12px;border:1px solid rgba(214,179,106,.18);background:rgba(214,179,106,.05);display:grid;place-items:center;overflow:hidden;flex:0 0 auto}
-    .intBtn .i img{width:100%;height:100%;object-fit:contain}
-    .intBtn .t{min-width:0}
-    .intBtn .t .n{margin:0;font-size:13px;font-weight:900}
-    .intBtn .t .s{margin:2px 0 0;color:var(--muted);font-size:12px}
-
-    .miniLegendGrid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));
-      gap:8px;
-    }
-    .miniLegend{
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.02);
-      border-radius:14px;
-      padding:8px;
-      display:flex;align-items:center;justify-content:space-between;gap:8px;
-    }
-    .miniLegend .left{display:flex;align-items:center;gap:8px;min-width:0}
-    .miniLegend .ico{
-      width:34px;height:34px;border-radius:12px;
-      flex:0 0 auto;
-    }
-    .miniLegend .lab{
-      min-width:0;
-      font-size:12px;
-      color:var(--muted);
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-      max-width:120px;
-    }
-    .miniLegend .ctrls{gap:6px}
-    .miniLegend .num{min-width:54px;padding:7px 8px;border-radius:10px}
-
-    .statGrid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
-      gap:10px;
-    }
-    .statItem{
-      border:1px solid var(--stroke);
-      border-radius:14px;
-      background:rgba(255,255,255,.02);
-      padding:10px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .statItem .ico{width:36px;height:36px;border-radius:12px;flex-shrink:0}
-    .statItem .info{min-width:0;flex:1}
-    .statItem .info .n{font-size:13px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .statItem .info .v{font-size:14px;font-weight:900;margin:2px 0 0;font-variant-numeric:tabular-nums;color:var(--gold)}
-    .statItem .right{font-variant-numeric:tabular-nums;font-weight:900}
-
-    /* TOP RESSOURCES (prix moyen) */
-    .topResWrap{display:flex;flex-direction:column;gap:10px}
-    .topResHero{
-      border:1px solid rgba(214,179,106,.35);
-      background:linear-gradient(180deg, rgba(214,179,106,.12), rgba(255,255,255,.015));
-      border-radius:18px;
-      padding:12px;
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-    }
-    .topResHero .L{display:flex;align-items:center;gap:12px;min-width:0}
-    .topResHero .ico{width:48px;height:48px;border-radius:16px}
-    .topResHero .name{min-width:0}
-    .topResHero .name .n{margin:0;font-size:14px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .topResHero .name .m{margin:2px 0 0;color:var(--muted);font-size:12px}
-    .topResHero .price{font-weight:950}
-    .topResRow{
-      display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
-      gap:10px;
-    }
-    .topResMini{
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.02);
-      border-radius:16px;
-      padding:10px;
-      display:flex;flex-direction:column;gap:8px;
-      align-items:flex-start;
-    }
-    .topResMini .ico{width:40px;height:40px;border-radius:14px}
-    .topResMini .p{font-weight:950}
+    .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.35}
   </style>
 </head>
 
@@ -336,34 +219,14 @@
       <div class="brand">
         <div class="logo">P</div>
         <div style="min-width:0">
-          <h1>Picofus – Tracker</h1>
-          <p>Donjons • Songes • Stats • PP • Oméga</p>
+          <h1>Picofus – Donjons</h1>
+          <p>Mobs • Ressources • Équipements • Runs</p>
         </div>
       </div>
 
       <div class="nav">
-        <span class="pill" id="pagePill">Accueil</span>
-
-        <button class="btn small" id="btnHome" title="Accueil">🏠</button>
-
-        <!-- ✅ Donjons picto -->
-        <button class="btn small" id="btnDonjons" title="Donjons">
-          <img class="navIcon" src="./Ic%C3%B4ne%20Dj.png" alt="Donjons">
-        </button>
-
-        <!-- ✅ Songes picto -->
-        <button class="btn small" id="btnSonges" title="Songes">
-          <img class="navIcon" src="./Baguette%20Range.png" alt="Songes">
-        </button>
-
-        <button class="btn small" id="btnStats" title="Stats">📊</button>
-
-        <button class="btn small" id="btnPP" title="Calcul PP">
-          <img class="navIcon" src="./Ic%C3%B4ne%20Calculateur%20PP.png" alt="PP">
-        </button>
-
-        <button class="btn small" id="btnOmega" title="Oméga">📈</button>
-
+        <span class="pill" id="pagePill">Donjons</span>
+        <button class="btn small" id="btnDonjons" title="Donjons">🗝️</button>
         <button class="btn small bad" id="btnResetAll" title="Reset tout">🧹 Reset</button>
       </div>
     </header>
@@ -396,147 +259,54 @@
       </div>
 
       <div class="hint">
-        Clavier : chiffres 0-9 • C ou Suppr/Delete = effacer • Backspace = retour • Entrée = valider • Échap = fermer
-      </div>
-    </div>
-  </div>
-
-  <!-- ✅ Intensity modal (Bribes) -->
-  <div class="modal" id="modalIntensity">
-    <div class="kbd" role="dialog" aria-modal="true">
-      <div class="kbd-top">
-        <div>
-          <div class="label">Bribes</div>
-          <div class="target" id="intTitle">Choisir l’intensité</div>
-        </div>
-        <button class="btn small" id="intClose">✖</button>
-      </div>
-
-      <div class="kbd-display">
-        <div class="label">Quantité</div>
-        <div class="val mono" id="intQty">0</div>
-      </div>
-
-      <div class="intGrid" id="intGrid"></div>
-
-      <div class="kbd-actions">
-        <button class="btn bad" id="intCancel">Annuler</button>
-      </div>
-
-      <div class="hint">
-        Tu valides la quantité → tu choisis l’intensité → ça s’ajoute au bon compteur.
+        Clavier : chiffres 0-9 • C/Suppr/Delete • Backspace • Entrée • Échap
       </div>
     </div>
   </div>
 
 <script>
-/* =========================================================
-   Utils
-   ========================================================= */
+/* ===================== Utils ===================== */
 const fmt = new Intl.NumberFormat("fr-FR");
-const LS_PREFIX = "picofus:v5:";
+const LS_PREFIX = "picofus:donjons:";
 
 const $ = (q, el=document)=>el.querySelector(q);
-
 function clampInt(x){ x = Math.trunc(Number(x)||0); return x<0?0:x; }
 function toNum(x){ const n = Number(String(x).replace(",", ".")); return Number.isFinite(n)?n:0; }
 function money(x){ return fmt.format(Math.round(toNum(x))); }
 function escapeHtml(s){
   return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
 }
 
-/* =========================================================
-   Global icons (from your mapping)
-   ========================================================= */
-const ICONS = {
-  donjons: "Icône Dj.png",
-  mobs: "monster.png",
-  ressources: "Ressource.png",
-  equips: "inventory_equipment.png",
-
-  songes: "Baguette Range.png",
-  runs: "Narkoffret Infini.png",
-  bribesLeg: "breach.png",
-
-  kamas: "Kamas.png",
-
-  omegaLevels: "lv200.png",
-  omegaCur: "tx_illu_OmegaUnlocked.jpg",
-  omegaTar: "tx_illu_OmegaUnlocked.jpg",
-  omegaXp: "ornement omega.png",
-
-  ppBase: "icon_bonus_reward.png",
-  ppChallenges: "Blitzkrieg.png",
-  ppAnomaly: "icon_anomaly.png",
-  ppShield: "Shield.png",
-  ppAlmanax: "Page de Calendrier.png",
-};
-
-/* =========================================================
-   Kamas inline html
-   ========================================================= */
-function kamasInlineHtml(text){
-  return `<span class="kamasInline"><b class="mono">${text}</b><img class="kamasIcon" src="${encodeURI("./"+ICONS.kamas)}" alt="k"></span>`;
-}
-
-/* =========================================================
-   Images: fallback (essaie plusieurs chemins + variantes)
-   - FIX: gère œ -> oe
-   - FIX: gère variantes "Goûtue" / "goutue" / "goutteue" / "goutte"
-   ========================================================= */
+/* ===================== Images fallback (identique à ton code) ===================== */
 const DIR_ALIASES = {
   "Vénérable endormi/": ["véné/", "Véné/", "Vene/", "vene/"],
   "4 cavaliers/": ["4 cavalier/", "4 Cavalier/", "4cavalier/", "4-cavalier/"],
   "Eternel conflit/": ["Eternel conflit/", "Eternel Conflit/", "eternel conflit/", "eternel Conflit/"],
 };
-
-function uniq(arr){
-  const s = new Set();
-  return arr.filter(x => x && !s.has(x) && (s.add(x), true));
-}
-function normDir(d){
-  if(!d) return "";
-  d = String(d).trim();
-  return d.endsWith("/") ? d : (d + "/");
-}
-function stripAccents(str){
-  try{
-    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  }catch{
-    return str;
-  }
-}
+function uniq(arr){ const s=new Set(); return arr.filter(x=>x && !s.has(x) && (s.add(x), true)); }
+function normDir(d){ if(!d) return ""; d=String(d).trim(); return d.endsWith("/")?d:(d+"/"); }
+function stripAccents(str){ try{ return str.normalize("NFD").replace(/[\u0300-\u036f]/g,""); }catch{ return str; } }
 function fileVariants(file){
   file = String(file || "").trim();
   if(!file) return [];
   const base = file;
-
   const lower = base.toLowerCase();
   const noAcc = stripAccents(base);
   const noAccLower = stripAccents(lower);
-
   const unders = base.replaceAll(" ", "_");
   const undersLower = unders.toLowerCase();
+  const apos1 = base.replaceAll("’","'");
+  const apos2 = base.replaceAll("'","’");
+  const lig1 = base.replaceAll("œ","oe").replaceAll("Œ","OE");
+  const lig2 = lower.replaceAll("œ","oe");
+  const lig3 = noAcc.replaceAll("œ","oe").replaceAll("Œ","OE");
+  const lig4 = noAccLower.replaceAll("œ","oe");
 
-  const apos1 = base.replaceAll("’", "'");
-  const apos2 = base.replaceAll("'", "’");
-
-  // ✅ ligatures: œ / Œ -> oe / OE
-  const lig1 = base.replaceAll("œ", "oe").replaceAll("Œ", "OE");
-  const lig2 = lower.replaceAll("œ", "oe");
-  const lig3 = noAcc.replaceAll("œ", "oe").replaceAll("Œ", "OE");
-  const lig4 = noAccLower.replaceAll("œ", "oe");
-
-  // ✅ variantes goûtue / goutue / goutteue / goutte
   const goutFix = (s)=>{
-    const t = stripAccents(s); // Goûtue -> Goutue
+    const t = stripAccents(s);
     const out = [s, t];
-
     if(t.toLowerCase().includes("goutue")){
       out.push(
         s.replaceAll("Goûtue","Goutteue").replaceAll("goûtue","goutteue").replaceAll("Goutue","Goutteue").replaceAll("goutue","goutteue"),
@@ -551,14 +321,7 @@ function fileVariants(file){
   };
   const gout = uniq(goutFix(base).flatMap(x => [x, x.toLowerCase()]));
 
-  return uniq([
-    base, lower,
-    noAcc, noAccLower,
-    unders, undersLower,
-    apos1, apos2,
-    lig1, lig2, lig3, lig4,
-    ...gout
-  ]);
+  return uniq([base, lower, noAcc, noAccLower, unders, undersLower, apos1, apos2, lig1, lig2, lig3, lig4, ...gout]);
 }
 function dirVariants(dir){
   dir = normDir(dir);
@@ -568,14 +331,11 @@ function dirVariants(dir){
   vars.push(normDir(dir.replace(/\/+$/,"")));
   return uniq(vars);
 }
-
 function makeCandidates(dir, file){
   const enc = (p)=>{ try { return encodeURI(p); } catch { return p; } };
-
   const dirs = dirVariants(dir);
   const files = fileVariants(file);
   const out = [];
-
   for(const d of dirs){
     for(const f of files){
       out.push(d+f, "./"+d+f, enc(d+f), enc("./"+d+f));
@@ -583,39 +343,29 @@ function makeCandidates(dir, file){
       out.push(enc("img/"+d+f), enc("./img/"+d+f), enc("images/"+d+f), enc("./images/"+d+f), enc("assets/"+d+f), enc("./assets/"+d+f));
     }
   }
-
-  for(const f of files){
-    out.push(f, "./"+f, enc(f), enc("./"+f));
-  }
-
+  for(const f of files) out.push(f, "./"+f, enc(f), enc("./"+f));
   return uniq(out);
 }
-
 function setImgWithFallback(imgEl, dir, file){
   const list = makeCandidates(dir, file);
   imgEl.dataset.cands = JSON.stringify(list);
   imgEl.dataset.idx = "0";
   imgEl.src = list[0] || "";
-
   imgEl.onerror = ()=>{
     const cands = JSON.parse(imgEl.dataset.cands || "[]");
-    let i = parseInt(imgEl.dataset.idx || "0", 10) + 1;
+    let i = parseInt(imgEl.dataset.idx || "0",10)+1;
     imgEl.dataset.idx = String(i);
-
     if(i < cands.length) imgEl.src = cands[i];
     else imgEl.onerror = null;
   };
 }
-
 function activateImages(container, defaultDir){
   container.querySelectorAll("img[data-file]").forEach(img=>{
     setImgWithFallback(img, img.dataset.dir || defaultDir || "", img.dataset.file || "");
   });
 }
 
-/* =========================================================
-   Keypad
-   ========================================================= */
+/* ===================== Keypad (identique logique) ===================== */
 const modal = $("#modal");
 const kbdTarget = $("#kbdTarget");
 const kbdValue = $("#kbdValue");
@@ -635,14 +385,6 @@ function openKeypad(title, currentValue, onApply){
   kbdTarget.textContent = title;
   kbdValue.textContent = keypad.buffer;
   modal.classList.add("open");
-
-  setTimeout(()=>{
-    const sel = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(kbdValue);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }, 30);
 }
 function closeKeypad(){ keypad.open = false; modal.classList.remove("open"); }
 function setBuffer(v){ keypad.buffer = v; kbdValue.textContent = keypad.buffer; }
@@ -654,7 +396,6 @@ function applyBuf(){
   if(typeof keypad.onApply === "function") keypad.onApply(v);
   closeKeypad();
 }
-
 (function buildKeypad(){
   kbdGrid.innerHTML = "";
   for(let i=1;i<=9;i++){
@@ -670,16 +411,13 @@ function applyBuf(){
   const blank2 = document.createElement("div");
   kbdGrid.append(blank1, zero, blank2);
 })();
-
 btnClose.onclick = closeKeypad;
 btnClear.onclick = clearBuf;
 btnBack.onclick = backspace;
 btnOk.onclick = applyBuf;
 modal.addEventListener("click", (e)=>{ if(e.target === modal) closeKeypad(); });
-
 window.addEventListener("keydown", (e)=>{
   if(!keypad.open) return;
-
   if(e.key>="0" && e.key<="9"){ e.preventDefault(); pushDigit(e.key); return; }
   if(e.key==="Backspace"){ e.preventDefault(); backspace(); return; }
   if(e.key==="Delete"){ e.preventDefault(); clearBuf(); return; }
@@ -688,19 +426,13 @@ window.addEventListener("keydown", (e)=>{
   if(e.key==="Enter"){ e.preventDefault(); applyBuf(); return; }
 });
 
-/* =========================================================
-   Data: Donjons  (UNCHANGED)
-   ========================================================= */
-const DUNGEONS = [/* ... (UNCHANGED DATA YOU SENT) ... */];
-/* IMPORTANT:
-   Pour éviter de re-coller 2000 lignes ici, ton bloc DUNGEONS
-   doit rester EXACTEMENT comme dans ton fichier actuel.
-   ⚠️ Donc : remplace uniquement ce commentaire par TON tableau DUNGEONS complet.
-*/
+/* ===================== Donjons DATA ===================== */
+/* ✅ Tu peux coller ICI ton array DUNGEONS complet (tel quel) */
+const DUNGEONS = [
+  /* ... COLLE TES DONJONS ICI (Déchireuse, Comte, Tempêtes, Bethel, etc.) ... */
+];
 
-/* =========================================================
-   Storage per dungeon
-   ========================================================= */
+/* ===================== Storage ===================== */
 const kDungeon = (id)=>`${LS_PREFIX}d:${id}`;
 const kButin = (id)=>`${LS_PREFIX}butin:${id}`;
 
@@ -710,11 +442,8 @@ function loadDungeon(id){
     if(!raw) return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0 };
     const p = JSON.parse(raw);
     return {
-      mobs: p.mobs||{},
-      res: p.res||{},
-      resP: p.resP||{},
-      eq: p.eq||{},
-      eqP: p.eqP||{},
+      mobs: p.mobs||{}, res: p.res||{}, resP: p.resP||{},
+      eq: p.eq||{}, eqP: p.eqP||{},
       runs: clampInt(p.runs ?? 0),
     };
   }catch{
@@ -736,211 +465,7 @@ function ensureDungeonShape(d, st){
 function loadButin(id){ return localStorage.getItem(kButin(id)) || "b8"; }
 function saveButin(id, b){ localStorage.setItem(kButin(id), b); }
 
-/* =========================================================
-   Songes (UPDATED: no hiding + bribes by intensity + 30 mini counters)
-   ========================================================= */
-const kSonges = `${LS_PREFIX}songes`;
-
-const SONGES = {
-  intensities: [
-    { id:"r1", label:"Rêve 1", img:"Reve 1.png", dir:"Songes/" },
-    { id:"r2", label:"Rêve 2", img:"Reve 2.png", dir:"Songes/" },
-    { id:"r3", label:"Rêve 3", img:"Reve 3.png", dir:"Songes/" },
-    { id:"p1", label:"Paradoxe 1", img:"Paradox 1.png", dir:"Songes/" },
-    { id:"p2", label:"Paradoxe 2", img:"Paradox 2.png", dir:"Songes/" },
-    { id:"p3", label:"Paradoxe 3", img:"Paradox 3.png", dir:"Songes/" },
-    { id:"p4", label:"Paradoxe 4", img:"Paradox 4.png", dir:"Songes/" },
-    { id:"c1", label:"Cauchemar 1", img:"Cauchemar 1.png", dir:"Songes/" },
-    { id:"c2", label:"Cauchemar 2", img:"Cauchemar 2.png", dir:"Songes/" },
-    { id:"c3", label:"Cauchemar 3", img:"Cauchemar 3.png", dir:"Songes/" },
-  ],
-  legends: [
-    { key:"Oto Mustam", img:"Légende d'Oto Mustam.png", dir:"Songes/" },
-    { key:"Menalt", img:"Légende de Menalt.png", dir:"Songes/" },
-    { key:"Mériana", img:"Légende de Mériana.png", dir:"Songes/" },
-    { key:"Jahash", img:"Légende de Jahash Jurgen.png", dir:"Songes/" },
-    { key:"Amayiro", img:"Légende d'Amayiro.png", dir:"Songes/" },
-    { key:"Servitude", img:"Légende de Servitude.png", dir:"Songes/" },
-    { key:"Guerre", img:"Légende de Guerre.png", dir:"Songes/" },
-    { key:"Misère", img:"Légende de Misère.png", dir:"Songes/" },
-    { key:"Corruption", img:"Légende de Corruption.png", dir:"Songes/" },
-  ],
-  bribesIcon: { key:"Bribes", img:"Bribe de rêve.png", dir:"Songes/" },
-
-  // ✅ 30 items légendaires (mini-compteurs) — dossier Songes/
-  legendItems: [
-    "Légende animale de Bakushana.png",
-    "Légende animale de Kwakarticho.png",
-    "Légende animale de Magicrabe.png",
-    "Légende animale de Poukachi.png",
-    "Légende d'Amayiro.png",
-    "Légende d'Helséphine.png",
-    "Légende d'Henual.png",
-    "Légende d'Oto Mustam.png",
-    "Légende de Brumaire.png",
-    "Légende de Brâm Barbe-Monde.png",
-    "Légende de Buhorado.png",
-    "Légende de Corruption.png",
-    "Légende de Crocobur.png",
-    "Légende de Dame Jhessica.png",
-    "Légende de Dodge.png",
-    "Légende de Fallanster.png",
-    "Légende de Ganymède.png",
-    "Légende de Guerre.png",
-    "Légende de Jahash Jurgen.png",
-    "Légende de Menalt.png",
-    "Légende de Mille Lieues.png",
-    "Légende de Misère.png",
-    "Légende de Mériana.png",
-    "Légende de Rykke Errel.png",
-    "Légende de Servitude.png",
-    "Légende de Thanatena.png",
-    "Légende du Cul Botté.png",
-    "Légende du Destin.png",
-    "Légende du Miroir.png",
-    "Légende du Trompe-la-Mort.png",
-  ]
-};
-
-function keyFromFile(filename){
-  return String(filename).replace(/\.[a-z0-9]+$/i, "");
-}
-
-function blankSonges(){
-  const s = { bribes:0, runs:{}, legends:{}, bribesI:{}, legendItems:{} };
-  SONGES.intensities.forEach(i=>{
-    s.runs[i.id]=0;
-    s.bribesI[i.id]=0;
-  });
-  SONGES.legends.forEach(l=>s.legends[l.key]=0);
-  SONGES.legendItems.forEach(f=> s.legendItems[keyFromFile(f)] = 0);
-  return s;
-}
-function loadSonges(){
-  try{
-    const raw = localStorage.getItem(kSonges);
-    if(!raw) return blankSonges();
-    const p = JSON.parse(raw);
-    const s = blankSonges();
-
-    s.bribes = clampInt(p.bribes ?? 0);
-
-    for(const i of SONGES.intensities){
-      s.runs[i.id] = clampInt(p.runs?.[i.id] ?? 0);
-      s.bribesI[i.id] = clampInt(p.bribesI?.[i.id] ?? 0);
-    }
-    for(const l of SONGES.legends){
-      s.legends[l.key] = clampInt(p.legends?.[l.key] ?? 0);
-    }
-    for(const f of SONGES.legendItems){
-      const k = keyFromFile(f);
-      s.legendItems[k] = clampInt(p.legendItems?.[k] ?? 0);
-    }
-    return s;
-  }catch{ return blankSonges(); }
-}
-function saveSonges(s){ localStorage.setItem(kSonges, JSON.stringify(s)); }
-
-/* =========================================================
-   PP (UNCHANGED CALC, UPDATED ICONS + "Shield authentificator")
-   ========================================================= */
-const PP_ICON = "Icône Calculateur PP.png";
-const kPP = `${LS_PREFIX}pp`;
-function blankPP(){ return { prospection:"", base:"", challenges:"", anomalie:"", shield:"", almanax:"" }; }
-function loadPP(){
-  try{
-    const raw = localStorage.getItem(kPP);
-    if(!raw) return blankPP();
-    const p = JSON.parse(raw);
-    return {
-      prospection: (p.prospection ?? ""),
-      base: (p.base ?? ""),
-      challenges: (p.challenges ?? ""),
-      anomalie: (p.anomalie ?? ""),
-      shield: (p.shield ?? ""),
-      almanax: (p.almanax ?? ""),
-    };
-  }catch{ return blankPP(); }
-}
-function savePP(s){ localStorage.setItem(kPP, JSON.stringify(s)); }
-function ppMultiplier(pp){
-  pp = toNum(pp);
-  const m = 0.74 + (1.755 / (1 + Math.exp((250 - pp) / 85)));
-  return Math.min(2.5, m);
-}
-function ppFinal(s){
-  const base = toNum(s.base);
-  const mult = ppMultiplier(s.prospection);
-  const final =
-    base * mult *
-    (1 + toNum(s.challenges)/100) *
-    (1 + toNum(s.anomalie)/100) *
-    (1 + toNum(s.shield)/100) *
-    (1 + toNum(s.almanax)/100);
-  return { mult, final };
-}
-
-/* =========================================================
-   Omega (UPDATED ICONS + message hidden)
-   ========================================================= */
-const kOmega = `${LS_PREFIX}omega`;
-function loadOmega(){
-  try{
-    const raw = localStorage.getItem(kOmega);
-    if(!raw) return { cur:0, target:0 };
-    const p = JSON.parse(raw);
-    return { cur: clampInt(p.cur??0), target: clampInt(p.target??0) };
-  }catch{ return { cur:0, target:0 }; }
-}
-function saveOmega(s){ localStorage.setItem(kOmega, JSON.stringify(s)); }
-function omegaXpToNext(i){ return Math.round(50000000 * Math.pow(1.01, i)); }
-function omegaXpRequired(cur, target){
-  cur = clampInt(cur); target = clampInt(target);
-  if(target<=cur) return 0;
-  let sum=0; for(let i=cur;i<target;i++) sum += omegaXpToNext(i);
-  return sum;
-}
-
-/* =========================================================
-   Router
-   ========================================================= */
-const app = $("#app");
-const pagePill = $("#pagePill");
-
-$("#btnHome").onclick   = ()=>location.hash = "#/";
-$("#btnDonjons").onclick= ()=>location.hash = "#/donjons";
-$("#btnSonges").onclick = ()=>location.hash = "#/songes";
-$("#btnStats").onclick  = ()=>location.hash = "#/stats";
-$("#btnPP").onclick     = ()=>location.hash = "#/pp";
-$("#btnOmega").onclick  = ()=>location.hash = "#/omega";
-
-$("#btnResetAll").onclick = ()=>{
-  if(!confirm("Reset TOUT (donjons + songes + stats + PP + oméga) ?")) return;
-  for(const k of Object.keys(localStorage)){
-    if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k);
-  }
-  saveOmega({cur:0,target:0});
-  savePP(blankPP());
-  render();
-};
-
-function route(){
-  const h = (location.hash || "#/").slice(1);
-  if(h==="/") return {page:"home"};
-  if(h==="/donjons") return {page:"donjons"};
-  if(h==="/songes") return {page:"songes"};
-  if(h==="/stats") return {page:"stats"};
-  if(h==="/pp") return {page:"pp"};
-  if(h==="/omega") return {page:"omega"};
-  const m = h.match(/^\/d\/(.+)$/);
-  if(m) return {page:"dungeon", id: decodeURIComponent(m[1])};
-  return {page:"home"};
-}
-window.addEventListener("hashchange", render);
-
-/* =========================================================
-   Helpers: totals
-   ========================================================= */
+/* ===================== Helpers totals ===================== */
 function sumKamasFromDungeon(d, st){
   let total = 0;
   for(const r of d.resources||[]){
@@ -961,9 +486,7 @@ function sumQty(mapObj){
   return s;
 }
 
-/* =========================================================
-   UI: shared item render
-   ========================================================= */
+/* ===================== UI rows ===================== */
 function renderCounterRow({dir, img, name, sub, value, onMinus, onPlus, onPick}){
   return `
     <div class="item">
@@ -986,13 +509,12 @@ function renderPricedRow({dir, img, name, qty, price, subtotal, onMinus, onPlus,
       <div class="ico"><img data-dir="${escapeHtml(dir)}" data-file="${escapeHtml(img)}" alt=""></div>
       <div class="name">
         <p class="n">${escapeHtml(name)}</p>
-        <p class="m">Sous-total: ${kamasInlineHtml(money(subtotal))}</p>
+        <p class="m">Sous-total: <b class="mono">${money(subtotal)}</b> k</p>
       </div>
       <div class="ctrls">
         <button class="btn small" data-act="${onMinus}">-</button>
         <div class="num mono" data-act="${onPickQty}">${fmt.format(qty)}</div>
         <button class="btn small" data-act="${onPlus}">+</button>
-
         <input class="price mono" data-act="${onPickPrice}" inputmode="decimal"
           value="${price?String(price).replace(".", ","):""}" placeholder="prix/u">
       </div>
@@ -1007,9 +529,7 @@ function bindActions(container, handlers){
     if(el.tagName === "INPUT"){
       el.addEventListener("focus", ()=>el.select());
       el.addEventListener("change", ()=>handlers[act](el.value));
-      el.addEventListener("keydown", (e)=>{
-        if(e.key==="Enter"){ e.preventDefault(); el.blur(); }
-      });
+      el.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); el.blur(); } });
     }else{
       el.addEventListener("click", ()=>handlers[act]());
     }
@@ -1018,90 +538,30 @@ function bindActions(container, handlers){
   activateImages(container);
 }
 
-/* =========================================================
-   Pages
-   ========================================================= */
-function renderHome(){
-  pagePill.textContent = "Accueil";
+/* ===================== Router minimal ===================== */
+const app = $("#app");
+const pagePill = $("#pagePill");
 
-  app.innerHTML = `
-    <div class="grid">
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb"><img data-dir="" data-file="${escapeHtml(ICONS.donjons)}" alt=""></div>
-          <div style="min-width:0">
-            <h3>Donjons</h3>
-            <p>Butins B4→B8 • + runs • mobs • ressources • équipements</p>
-          </div>
-        </div>
-        <div><button class="btn gold" onclick="location.hash='#/donjons'">Ouvrir</button></div>
-      </div>
+$("#btnDonjons").onclick = ()=>location.hash = "#/donjons";
 
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb"><img data-dir="" data-file="${escapeHtml(ICONS.songes)}" alt=""></div>
-          <div style="min-width:0">
-            <h3>Songes</h3>
-            <p>Runs, bribes, légendes + items légendaires</p>
-          </div>
-        </div>
-        <div><button class="btn gold" onclick="location.hash='#/songes'">Ouvrir</button></div>
-      </div>
+$("#btnResetAll").onclick = ()=>{
+  if(!confirm("Reset TOUT (donjons) ?")) return;
+  for(const k of Object.keys(localStorage)){
+    if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k);
+  }
+  render();
+};
 
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb">📊</div>
-          <div style="min-width:0">
-            <h3>Statistiques</h3>
-            <p>Vue globale : totals mobs/ressources/items + kamas</p>
-          </div>
-        </div>
-        <div><button class="btn gold" onclick="location.hash='#/stats'">Ouvrir</button></div>
-      </div>
-
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb"><img class="ppIcon" src="./Ic%C3%B4ne%20Calculateur%20PP.png" alt="PP"></div>
-          <div style="min-width:0">
-            <h3>Calcul PP</h3>
-            <p>Champs vides par défaut + pavé num</p>
-          </div>
-        </div>
-        <div><button class="btn gold" onclick="location.hash='#/pp'">Ouvrir</button></div>
-      </div>
-
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb">📈</div>
-          <div style="min-width:0">
-            <h3>Oméga</h3>
-            <p>Reset -> 0 • calcul XP</p>
-          </div>
-        </div>
-        <div><button class="btn gold" onclick="location.hash='#/omega'">Ouvrir</button></div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="topline">
-        <div class="title">
-          <div class="thumb" style="width:44px;height:44px">⚙️</div>
-          <div>
-            <h2>Notes rapides</h2>
-            <p class="sub">Si une image ne s’affiche pas, le site essaye plusieurs chemins automatiquement.</p>
-          </div>
-        </div>
-      </div>
-      <div class="hint">
-        ✅ Pour que toutes les images marchent : garde tes dossiers au même niveau que <b>index.html</b> (ex: <b>Comte/</b>, <b>Comtes/</b>, <b>Bethel/</b>, <b>Songes/</b> etc.).<br>
-        ✅ Toutes tes données sont en <b>local</b> (pas de cloud).
-      </div>
-    </div>
-  `;
-
-  activateImages(app);
+function route(){
+  const h = (location.hash || "#/donjons").slice(1);
+  if(h==="/donjons" || h==="/") return {page:"donjons"};
+  const m = h.match(/^\/d\/(.+)$/);
+  if(m) return {page:"dungeon", id: decodeURIComponent(m[1])};
+  return {page:"donjons"};
 }
+window.addEventListener("hashchange", render);
 
+/* ===================== Pages Donjons ===================== */
 function renderDonjons(){
   pagePill.textContent = "Donjons";
   const cards = DUNGEONS.map(d=>`
@@ -1121,6 +581,20 @@ function renderDonjons(){
 
   app.innerHTML = `<div class="grid">${cards}</div>`;
   activateImages(app);
+}
+
+function applyRuns(d, st, runs){
+  runs = clampInt(runs);
+  if(runs<=0) return;
+
+  const b = loadButin(d.id);
+  const inc = d.butins?.[b] || {};
+  for(const [k,v] of Object.entries(inc)){
+    st.mobs[k] = clampInt((st.mobs[k]||0) + v*runs);
+  }
+  st.runs = clampInt((st.runs||0) + runs);
+  saveDungeon(d.id, st);
+  render();
 }
 
 function renderDungeon(d){
@@ -1205,42 +679,27 @@ function renderDungeon(d){
       </div>
 
       <div class="summary">
-        <div class="kpi"><div class="k"><img class="kamasIcon" style="opacity:0" src="./${encodeURI(ICONS.kamas)}" alt="">Mobs total</div><div class="v mono">${fmt.format(totalMobs)}</div></div>
-        <div class="kpi"><div class="k"><img class="kamasIcon" style="opacity:0" src="./${encodeURI(ICONS.kamas)}" alt="">Ressources total</div><div class="v mono">${fmt.format(totalResQty)}</div></div>
-        <div class="kpi"><div class="k"><img class="kamasIcon" style="opacity:0" src="./${encodeURI(ICONS.kamas)}" alt="">Équipements total</div><div class="v mono">${fmt.format(totalEqQty)}</div></div>
-        <div class="kpi"><div class="k"><img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k">Kamas total</div><div class="v mono gold">${money(totalK)} <span class="kamasInline"><img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k"></span></div></div>
+        <div class="kpi"><div class="k">Mobs total</div><div class="v mono">${fmt.format(totalMobs)}</div></div>
+        <div class="kpi"><div class="k">Ressources total</div><div class="v mono">${fmt.format(totalResQty)}</div></div>
+        <div class="kpi"><div class="k">Équipements total</div><div class="v mono">${fmt.format(totalEqQty)}</div></div>
+        <div class="kpi"><div class="k">Kamas total</div><div class="v mono gold">${money(totalK)} k</div></div>
       </div>
     </div>
 
     <div class="row">
       <div class="section">
-        <div class="topline">
-          <div class="title">
-            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.mobs)}" alt=""></div>
-            <div><h2>Mobs</h2><p class="sub">+/- ou pavé numérique</p></div>
-          </div>
-        </div>
+        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">👹</div><div><h2>Mobs</h2><p class="sub">+/- ou pavé numérique</p></div></div></div>
         <div class="list">${mobList}</div>
       </div>
 
       <div class="section">
-        <div class="topline">
-          <div class="title">
-            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.ressources)}" alt=""></div>
-            <div><h2>Ressources</h2><p class="sub">Quantité + prix/u + sous-total</p></div>
-          </div>
-        </div>
+        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">📦</div><div><h2>Ressources</h2><p class="sub">Quantité + prix/u + sous-total</p></div></div></div>
         <div class="list">${resList}</div>
       </div>
     </div>
 
     <div class="section">
-      <div class="topline">
-        <div class="title">
-          <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.equips)}" alt=""></div>
-          <div><h2>Équipements</h2><p class="sub">Comme ressources : quantité + prix/u</p></div>
-        </div>
-      </div>
+      <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🧰</div><div><h2>Équipements</h2><p class="sub">Comme ressources : quantité + prix/u</p></div></div></div>
       <div class="list equipGrid">${eqList}</div>
     </div>
   `;
@@ -1276,692 +735,33 @@ function renderDungeon(d){
     handlers[`res:+:${r.key}`] = ()=>{ st.res[r.key]=clampInt((st.res[r.key]||0)+1); saveDungeon(d.id, st); render(); };
     handlers[`res:-:${r.key}`] = ()=>{ st.res[r.key]=clampInt((st.res[r.key]||0)-1); saveDungeon(d.id, st); render(); };
     handlers[`res:pick:${r.key}`] = ()=> openKeypad(r.key, st.res[r.key]||0, (v)=>{ st.res[r.key]=clampInt(v); saveDungeon(d.id, st); render(); });
-    handlers[`res:price:${r.key}`] = (val)=>{
-      const n = toNum(val);
-      st.resP[r.key] = n>0 ? n : 0;
-      saveDungeon(d.id, st);
-      render();
-    };
+    handlers[`res:price:${r.key}`] = (val)=>{ const n = toNum(val); st.resP[r.key]=n>0?n:0; saveDungeon(d.id, st); render(); };
   }
 
   for(const e of d.equipments){
     handlers[`eq:+:${e.key}`] = ()=>{ st.eq[e.key]=clampInt((st.eq[e.key]||0)+1); saveDungeon(d.id, st); render(); };
     handlers[`eq:-:${e.key}`] = ()=>{ st.eq[e.key]=clampInt((st.eq[e.key]||0)-1); saveDungeon(d.id, st); render(); };
     handlers[`eq:pick:${e.key}`] = ()=> openKeypad(e.key, st.eq[e.key]||0, (v)=>{ st.eq[e.key]=clampInt(v); saveDungeon(d.id, st); render(); });
-    handlers[`eq:price:${e.key}`] = (val)=>{
-      const n = toNum(val);
-      st.eqP[e.key] = n>0 ? n : 0;
-      saveDungeon(d.id, st);
-      render();
-    };
+    handlers[`eq:price:${e.key}`] = (val)=>{ const n = toNum(val); st.eqP[e.key]=n>0?n:0; saveDungeon(d.id, st); render(); };
   }
 
   bindActions(app, handlers);
 }
 
-function applyRuns(d, st, runs){
-  runs = clampInt(runs);
-  if(runs<=0) return;
-
-  const b = loadButin(d.id);
-  const inc = d.butins?.[b] || {};
-  for(const [k,v] of Object.entries(inc)){
-    st.mobs[k] = clampInt((st.mobs[k]||0) + v*runs);
-  }
-  st.runs = clampInt((st.runs||0) + runs);
-  saveDungeon(d.id, st);
-  render();
-}
-
-/* =========================================================
-   Songes (UPDATED)
-   ========================================================= */
-const modalIntensity = $("#modalIntensity");
-const intGrid = $("#intGrid");
-const intQty = $("#intQty");
-const intTitle = $("#intTitle");
-const intClose = $("#intClose");
-const intCancel = $("#intCancel");
-
-let pendingBribes = 0;
-
-function openIntensityPicker(qty){
-  pendingBribes = clampInt(qty);
-  intQty.textContent = fmt.format(pendingBribes);
-  intTitle.textContent = "Choisir l’intensité";
-  modalIntensity.classList.add("open");
-
-  // build buttons
-  intGrid.innerHTML = SONGES.intensities.map(it => `
-    <button class="intBtn" data-int="${escapeHtml(it.id)}">
-      <div class="i"><img data-dir="${escapeHtml(it.dir)}" data-file="${escapeHtml(it.img)}" alt=""></div>
-      <div class="t">
-        <p class="n">${escapeHtml(it.label)}</p>
-        <p class="s">Bribes: <b class="mono" id="bI:${escapeHtml(it.id)}">0</b></p>
-      </div>
-    </button>
-  `).join("");
-
-  // activate images & counts after renderSonges binds (safe here too)
-  activateImages(modalIntensity);
-}
-
-function closeIntensityPicker(){
-  pendingBribes = 0;
-  modalIntensity.classList.remove("open");
-}
-
-intClose.onclick = closeIntensityPicker;
-intCancel.onclick = closeIntensityPicker;
-modalIntensity.addEventListener("click", (e)=>{ if(e.target === modalIntensity) closeIntensityPicker(); });
-
-function renderSonges(){
-  pagePill.textContent = "Songes";
-  const s = loadSonges();
-
-  const runsList = SONGES.intensities.map(it=>{
-    const v = clampInt(s.runs[it.id]||0);
-    const b = clampInt(s.bribesI[it.id]||0);
-    return renderCounterRow({
-      dir:it.dir, img:it.img, name:it.label,
-      sub:`Bribes: <b class="mono">${fmt.format(b)}</b>`,
-      value:v,
-      onMinus:`run:-:${it.id}`, onPlus:`run:+:${it.id}`, onPick:`run:pick:${it.id}`
-    });
-  }).join("");
-
-  const bribesRow = `
-    <div class="item">
-      <div class="ico"><img data-dir="${escapeHtml(SONGES.bribesIcon.dir)}" data-file="${escapeHtml(SONGES.bribesIcon.img)}" alt=""></div>
-      <div class="name">
-        <p class="n">Bribes</p>
-        <p class="m">Total</p>
-      </div>
-      <div class="ctrls">
-        <button class="btn small" data-act="bribes:-">-</button>
-        <div class="num mono" data-act="bribes:pick">${fmt.format(s.bribes)}</div>
-        <button class="btn small" data-act="bribes:+">+</button>
-      </div>
-    </div>
-  `;
-
-  // ✅ No hiding: show ALL legends (even 0), no messages
-  const legendsList = SONGES.legends.map(l=>{
-    const v = clampInt(s.legends[l.key]||0);
-    return renderCounterRow({
-      dir:l.dir, img:l.img, name:l.key, sub:"",
-      value:v,
-      onMinus:`leg:-:${l.key}`, onPlus:`leg:+:${l.key}`, onPick:`leg:pick:${l.key}`
-    });
-  }).join("");
-
-  // ✅ 30 mini counters
-  const miniGrid = SONGES.legendItems.map(f=>{
-    const k = keyFromFile(f);
-    const v = clampInt(s.legendItems[k]||0);
-    return `
-      <div class="miniLegend">
-        <div class="left">
-          <div class="ico"><img data-dir="Songes/" data-file="${escapeHtml(f)}" alt=""></div>
-          <div class="lab" title="${escapeHtml(k)}">${escapeHtml(k)}</div>
-        </div>
-        <div class="ctrls">
-          <button class="btn small" data-act="li:-:${escapeHtml(k)}">-</button>
-          <div class="num mono" data-act="li:pick:${escapeHtml(k)}">${fmt.format(v)}</div>
-          <button class="btn small" data-act="li:+:${escapeHtml(k)}">+</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  const totalRuns = Object.values(s.runs).reduce((a,b)=>a+clampInt(b),0);
-
-  app.innerHTML = `
-    <div class="section">
-      <div class="topline">
-        <div class="title">
-          <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.songes)}" alt=""></div>
-          <div><h2>Songes</h2><p class="sub">Runs • bribes • légendes • items légendaires</p></div>
-        </div>
-        <div class="seg">
-          <button class="btn bad" id="btnResetSonges">Reset songes</button>
-        </div>
-      </div>
-
-      <div class="summary">
-        <div class="kpi"><div class="k"><img class="navIcon" src="./${encodeURI(ICONS.runs)}" alt="">Runs total</div><div class="v mono">${fmt.format(totalRuns)}</div></div>
-        <div class="kpi"><div class="k"><img class="navIcon" src="./${encodeURI(ICONS.bribesLeg)}" alt="">Bribes</div><div class="v mono gold">${fmt.format(s.bribes)}</div></div>
-        <div class="kpi"><div class="k">Total légendes</div><div class="v mono">${fmt.format(Object.values(s.legends).reduce((a,b)=>a+clampInt(b),0))}</div></div>
-        <div class="kpi"><div class="k">Total items légendaires</div><div class="v mono">${fmt.format(Object.values(s.legendItems).reduce((a,b)=>a+clampInt(b),0))}</div></div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="section">
-        <div class="topline">
-          <div class="title">
-            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.runs)}" alt=""></div>
-            <div><h2>Runs</h2><p class="sub">par intensité (Bribes séparées)</p></div>
-          </div>
-        </div>
-        <div class="list">${runsList}</div>
-      </div>
-
-      <div class="section">
-        <div class="topline">
-          <div class="title">
-            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.bribesLeg)}" alt=""></div>
-            <div><h2>Bribes & Légendes</h2><p class="sub">saisie + intensité</p></div>
-          </div>
-        </div>
-
-        <div class="list">${bribesRow}</div>
-
-        <div class="hint">
-          <b>Items légendaires</b> (mini-compteurs) :
-        </div>
-        <div class="miniLegendGrid">${miniGrid}</div>
-
-        <div style="height:12px"></div>
-        <div class="hint"><b>Légendes</b> :</div>
-        <div class="list">${legendsList}</div>
-      </div>
-    </div>
-  `;
-
-  const handlers = {};
-
-  for(const it of SONGES.intensities){
-    handlers[`run:+:${it.id}`] = ()=>{ s.runs[it.id]=clampInt((s.runs[it.id]||0)+1); saveSonges(s); render(); };
-    handlers[`run:-:${it.id}`] = ()=>{ s.runs[it.id]=clampInt((s.runs[it.id]||0)-1); saveSonges(s); render(); };
-    handlers[`run:pick:${it.id}`] = ()=> openKeypad(it.label, s.runs[it.id]||0, (v)=>{ s.runs[it.id]=clampInt(v); saveSonges(s); render(); });
-  }
-
-  // ✅ Bribes: + / - stay fast, pick opens keypad then intensity picker
-  handlers["bribes:+"] = ()=>{
-    // fast +1 => ask intensity (still)
-    openIntensityPicker(1);
-  };
-  handlers["bribes:-"] = ()=>{
-    s.bribes = clampInt(s.bribes-1);
-    saveSonges(s);
-    render();
-  };
-  handlers["bribes:pick"] = ()=> openKeypad("Bribes", 0, (v)=>{
-    if(v<=0) return;
-    // open intensity picker to route bribes
-    openIntensityPicker(v);
-  });
-
-  for(const l of SONGES.legends){
-    handlers[`leg:+:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)+1); saveSonges(s); render(); };
-    handlers[`leg:-:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)-1); saveSonges(s); render(); };
-    handlers[`leg:pick:${l.key}`] = ()=> openKeypad(l.key, s.legends[l.key]||0, (v)=>{ s.legends[l.key]=clampInt(v); saveSonges(s); render(); });
-  }
-
-  // mini legend items
-  for(const f of SONGES.legendItems){
-    const k = keyFromFile(f);
-    handlers[`li:+:${k}`] = ()=>{ s.legendItems[k]=clampInt((s.legendItems[k]||0)+1); saveSonges(s); render(); };
-    handlers[`li:-:${k}`] = ()=>{ s.legendItems[k]=clampInt((s.legendItems[k]||0)-1); saveSonges(s); render(); };
-    handlers[`li:pick:${k}`] = ()=> openKeypad(k, s.legendItems[k]||0, (v)=>{ s.legendItems[k]=clampInt(v); saveSonges(s); render(); });
-  }
-
-  $("#btnResetSonges").onclick = ()=>{
-    if(!confirm("Reset songes ?")) return;
-    localStorage.removeItem(kSonges);
-    render();
-  };
-
-  bindActions(app, handlers);
-
-  // ===== intensity modal binding =====
-  // update counts shown inside modal
-  const refreshModalCounts = ()=>{
-    for(const it of SONGES.intensities){
-      const el = document.getElementById(`bI:${it.id}`);
-      if(el) el.textContent = fmt.format(clampInt(s.bribesI[it.id]||0));
-    }
-  };
-
-  // click choose intensity
-  app.addEventListener("click", ()=>{}); // keep passive
-
-  // open modal only if pending was set by handlers
-  const openIfPending = ()=>{
-    if(!modalIntensity.classList.contains("open")) return;
-    refreshModalCounts();
-    intGrid.querySelectorAll("[data-int]").forEach(btn=>{
-      btn.onclick = ()=>{
-        const id = btn.dataset.int;
-        if(!id || pendingBribes<=0) return;
-        const qty = clampInt(pendingBribes);
-
-        // apply to total + intensity
-        s.bribes = clampInt(s.bribes + qty);
-        s.bribesI[id] = clampInt((s.bribesI[id]||0) + qty);
-
-        saveSonges(s);
-        closeIntensityPicker();
-        render();
-      };
-    });
-  };
-
-  // if openIntensityPicker called, modal is open now
-  if(modalIntensity.classList.contains("open")){
-    refreshModalCounts();
-    openIfPending();
-  }
-
-  // intercept openIntensityPicker calls: render modal with fresh state
-  // (we rebuild modal on demand here)
-  const originalOpen = openIntensityPicker;
-  window.openIntensityPicker = (qty)=>{
-    originalOpen(qty);
-    refreshModalCounts();
-    intGrid.querySelectorAll("[data-int]").forEach(btn=>{
-      btn.onclick = ()=>{
-        const id = btn.dataset.int;
-        if(!id || pendingBribes<=0) return;
-        const q = clampInt(pendingBribes);
-
-        s.bribes = clampInt(s.bribes + q);
-        s.bribesI[id] = clampInt((s.bribesI[id]||0) + q);
-
-        saveSonges(s);
-        closeIntensityPicker();
-        render();
-      };
-    });
-  };
-}
-
-/* =========================================================
-   Stats (UPDATED: icons + remove types legends + total legends pictos + Top ressources by avg price)
-   ========================================================= */
-function renderStats(){
-  pagePill.textContent = "Stats";
-
-  let mobsTotal=0, resQty=0, eqQty=0, kamasTotal=0;
-
-  const resAgg = [];
-  const eqAgg = [];
-
-  for(const d of DUNGEONS){
-    const st = ensureDungeonShape(d, loadDungeon(d.id));
-    kamasTotal += sumKamasFromDungeon(d, st);
-
-    for(const m of d.mobs){
-      const v = clampInt(st.mobs[m.key]||0);
-      mobsTotal += v;
-    }
-    for(const r of d.resources){
-      const q = clampInt(st.res[r.key]||0);
-      const p = toNum(st.resP[r.key]||0);
-      resQty += q;
-      resAgg.push({d, dir:d.imgDir, name:r.key, img:r.img, q, p});
-    }
-    for(const e of d.equipments){
-      const q = clampInt(st.eq[e.key]||0);
-      const p = toNum(st.eqP[e.key]||0);
-      eqQty += q;
-      eqAgg.push({d, dir:(e.dir || d.imgDir), name:e.key, img:e.img, q, p});
-    }
-  }
-
-  const s = loadSonges();
-  const runsTotal = Object.values(s.runs).reduce((a,b)=>a+clampInt(b),0);
-
-  const totalLegends = Object.values(s.legends).reduce((a,b)=>a+clampInt(b),0);
-
-  // legends pictos row (only if >0)
-  const legendPictos = SONGES.legends
-    .filter(l => clampInt(s.legends[l.key]||0) > 0)
-    .map(l=>{
-      const v = clampInt(s.legends[l.key]||0);
-      return `
-        <span class="pill" style="max-width:none">
-          <img class="navIcon" data-dir="${escapeHtml(l.dir)}" data-file="${escapeHtml(l.img)}" alt="">
-          <b class="mono">${fmt.format(v)}</b>
-        </span>
-      `;
-    }).join("");
-
-  function statCard(title, sub, value, iconHtml){
-    return `
-      <div class="kpi">
-        <div class="k">${iconHtml||""}${escapeHtml(title)}</div>
-        <div class="v mono ${title.toLowerCase().includes("kamas")?'gold':''}">${value}</div>
-        ${sub?`<div class="hint" style="margin:8px 0 0">${sub}</div>`:""}
-      </div>
-    `;
-  }
-
-  // ✅ Top ressources by avg price (p), take top 10, only where p>0
-  const topRes = resAgg
-    .filter(x => toNum(x.p) > 0)
-    .sort((a,b)=>toNum(b.p)-toNum(a.p))
-    .slice(0, 10);
-
-  const hero = topRes[0] || null;
-  const others = topRes.slice(1);
-
-  app.innerHTML = `
-    <div class="section">
-      <div class="topline">
-        <div class="title">
-          <div class="thumb" style="width:44px;height:44px">📊</div>
-          <div><h2>Statistiques</h2><p class="sub">Récap global propre en 1 page</p></div>
-        </div>
-      </div>
-
-      <div class="summary">
-        ${statCard("Mobs total", "", fmt.format(mobsTotal), "")}
-        ${statCard("Ressources total", "", fmt.format(resQty), "")}
-        ${statCard("Équipements total", "", fmt.format(eqQty), "")}
-        ${statCard("Kamas total", "", `${money(kamasTotal)} ${kamasInlineHtml("")}`, `<img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k">`)}
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="section">
-        <div class="topline">
-          <div class="title">
-            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.songes)}" alt=""></div>
-            <div><h2>Songes</h2><p class="sub">Stats rapides</p></div>
-          </div>
-        </div>
-        <div class="summary">
-          ${statCard("Runs total", "", fmt.format(runsTotal), `<img class="navIcon" src="./${encodeURI(ICONS.runs)}" alt="">`)}
-          ${statCard("Bribes", "", fmt.format(s.bribes), `<img class="navIcon" src="./${encodeURI(ICONS.bribesLeg)}" alt="">`)}
-          ${statCard("Total légendes", legendPictos ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${legendPictos}</div>` : "", fmt.format(totalLegends), "")}
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="topline">
-          <div class="title">
-            <div class="thumb" style="width:44px;height:44px">🏆</div>
-            <div><h2>Top ressources</h2><p class="sub">Top prix moyen (décroissant)</p></div>
-          </div>
-        </div>
-
-        <div class="topResWrap">
-          ${
-            hero ? `
-              <div class="topResHero">
-                <div class="L">
-                  <div class="ico"><img data-dir="${escapeHtml(hero.dir)}" data-file="${escapeHtml(hero.img)}" alt=""></div>
-                  <div class="name">
-                    <p class="n">${escapeHtml(hero.name)}</p>
-                    <p class="m">Prix moyen</p>
-                  </div>
-                </div>
-                <div class="price">${kamasInlineHtml(money(hero.p))}</div>
-              </div>
-            ` : `<div class="hint">Aucun prix moyen encore (mets des prix/u sur des ressources).</div>`
-          }
-
-          ${
-            others.length ? `
-              <div class="topResRow">
-                ${others.map(x=>`
-                  <div class="topResMini">
-                    <div class="ico"><img data-dir="${escapeHtml(x.dir)}" data-file="${escapeHtml(x.img)}" alt=""></div>
-                    <div class="p">${kamasInlineHtml(money(x.p))}</div>
-                  </div>
-                `).join("")}
-              </div>
-            ` : ``
-          }
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="topline">
-        <div class="title">
-          <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.donjons)}" alt=""></div>
-          <div><h2>Récap par donjon</h2><p class="sub">Mobs / ressources / items / kamas</p></div>
-        </div>
-      </div>
-      <div class="grid" id="donjonRecap"></div>
-    </div>
-  `;
-
-  const recap = $("#donjonRecap");
-  recap.innerHTML = DUNGEONS.map(d=>{
-    const st = ensureDungeonShape(d, loadDungeon(d.id));
-    const km = sumKamasFromDungeon(d, st);
-    return `
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb"><img data-dir="${escapeHtml(d.imgDir)}" data-file="${escapeHtml(d.thumb)}" alt=""></div>
-          <div style="min-width:0">
-            <h3>${escapeHtml(d.name)}</h3>
-            <p>Mobs: <b class="mono">${fmt.format(sumQty(st.mobs))}</b> • Ress: <b class="mono">${fmt.format(sumQty(st.res))}</b> • Items: <b class="mono">${fmt.format(sumQty(st.eq))}</b></p>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="pill">${kamasInlineHtml(money(km))}</div>
-          <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(d.id)}'">Ouvrir</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  activateImages(app);
-}
-
-/* =========================================================
-   PP (UPDATED icons + Shield rename)
-   ========================================================= */
-function renderPP(){
-  pagePill.textContent = "PP";
-  const s = loadPP();
-  const { mult, final } = ppFinal(s);
-
-  const iconImg = (file)=>`<img class="ppIcon" src="${encodeURI("./"+file)}" alt="">`;
-
-  const field = (label, key, iconFile)=>`
-    <div class="item">
-      <div class="ico">${iconFile ? iconImg(iconFile) : iconImg(PP_ICON)}</div>
-      <div class="name">
-        <p class="n">${label}</p>
-        <p class="m">Clique le nombre pour pavé numérique</p>
-      </div>
-      <div class="ctrls">
-        <div class="num mono" data-act="pp:pick:${key}">${s[key]==="" ? "—" : String(s[key]).replace(".", ",")}</div>
-      </div>
-    </div>
-  `;
-
-  app.innerHTML = `
-    <div class="section">
-      <div class="topline">
-        <div class="title">
-          <div class="thumb" style="width:44px;height:44px">${iconImg(PP_ICON)}</div>
-          <div><h2>Calcul PP</h2><p class="sub">Champs vides par défaut (clean)</p></div>
-        </div>
-        <div class="seg">
-          <button class="btn bad" id="btnResetPP">Reset PP</button>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="section" style="margin:0">
-          <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">⚙️</div><div><h2>Entrées</h2><p class="sub">PP / base / bonus</p></div></div></div>
-          <div class="list">
-            ${field("Prospection", "prospection", null)}
-            ${field("Base drop (%)", "base", ICONS.ppBase)}
-            ${field("Challenges (%)", "challenges", ICONS.ppChallenges)}
-            ${field("Anomalie (%)", "anomalie", ICONS.ppAnomaly)}
-            ${field("Shield authentificator (%)", "shield", ICONS.ppShield)}
-            ${field("Almanax (%)", "almanax", ICONS.ppAlmanax)}
-          </div>
-        </div>
-
-        <div class="section" style="margin:0">
-          <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">📌</div><div><h2>Résultat</h2><p class="sub">Indication</p></div></div></div>
-          <div class="summary">
-            <div class="kpi">
-              <div class="k">Multiplicateur PP</div>
-              <div class="v mono gold">${mult.toFixed(3)}</div>
-            </div>
-            <div class="kpi">
-              <div class="k">Drop final (%)</div>
-              <div class="v mono gold">${Number.isFinite(final)?final.toFixed(3):"0.000"}</div>
-            </div>
-            <div class="kpi">
-              <div class="k">Astuce</div>
-              <div class="v mono">${s.base==="" ? "Mets une base %" : "OK"}</div>
-            </div>
-            <div class="kpi">
-              <div class="k">Raccourcis</div>
-              <div class="v mono">C / Suppr</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const handlers = {};
-  const labels = {
-    prospection:"Prospection",
-    base:"Base drop (%)",
-    challenges:"Challenges (%)",
-    anomalie:"Anomalie (%)",
-    shield:"Shield authentificator (%)",
-    almanax:"Almanax (%)",
-  };
-
-  for(const key of Object.keys(labels)){
-    handlers[`pp:pick:${key}`] = ()=>{
-      const cur = s[key]==="" ? 0 : clampInt(toNum(s[key]));
-      openKeypad(labels[key], cur, (v)=>{
-        s[key] = (v===0 ? "" : String(v));
-        savePP(s);
-        render();
-      });
-    };
-  }
-
-  $("#btnResetPP").onclick = ()=>{
-    if(!confirm("Reset PP ? (remet vide)")) return;
-    savePP(blankPP());
-    render();
-  };
-
-  bindActions(app, handlers);
-}
-
-/* =========================================================
-   Omega (UPDATED icons + message removed)
-   ========================================================= */
-function renderOmega(){
-  pagePill.textContent = "Oméga";
-  const s = loadOmega();
-  const xp = omegaXpRequired(s.cur, s.target);
-
-  app.innerHTML = `
-    <div class="section">
-      <div class="topline">
-        <div class="title">
-          <div class="thumb" style="width:44px;height:44px">📈</div>
-          <div><h2>Calcul Oméga</h2><p class="sub"></p></div>
-        </div>
-        <div class="seg">
-          <button class="btn bad" id="btnResetOmega">Reset Oméga</button>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="section" style="margin:0">
-          <div class="topline">
-            <div class="title">
-              <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.omegaLevels)}" alt=""></div>
-              <div><h2>Niveaux</h2><p class="sub">Clique pour saisir</p></div>
-            </div>
-          </div>
-          <div class="list">
-            <div class="item">
-              <div class="ico"><img data-dir="" data-file="${escapeHtml(ICONS.omegaCur)}" alt=""></div>
-              <div class="name"><p class="n">Oméga actuel</p><p class="m">ton niveau</p></div>
-              <div class="ctrls"><div class="num mono" data-act="om:cur">${fmt.format(s.cur)}</div></div>
-            </div>
-            <div class="item">
-              <div class="ico"><img data-dir="" data-file="${escapeHtml(ICONS.omegaTar)}" alt=""></div>
-              <div class="name"><p class="n">Oméga objectif</p><p class="m">cible</p></div>
-              <div class="ctrls"><div class="num mono" data-act="om:tar">${fmt.format(s.target)}</div></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="section" style="margin:0">
-          <div class="topline">
-            <div class="title">
-              <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.omegaXp)}" alt=""></div>
-              <div><h2>XP requise</h2><p class="sub">entre actuel et objectif</p></div>
-            </div>
-          </div>
-          <div class="summary">
-            <div class="kpi">
-              <div class="k">XP totale</div>
-              <div class="v mono gold">${money(xp)}</div>
-            </div>
-            <div class="kpi">
-              <div class="k">Delta niveaux</div>
-              <div class="v mono">${fmt.format(Math.max(0, s.target - s.cur))}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const handlers = {};
-  handlers["om:cur"] = ()=> openKeypad("Oméga actuel", s.cur, (v)=>{ s.cur=clampInt(v); saveOmega(s); render(); });
-  handlers["om:tar"] = ()=> openKeypad("Oméga objectif", s.target, (v)=>{ s.target=clampInt(v); saveOmega(s); render(); });
-
-  $("#btnResetOmega").onclick = ()=>{
-    if(!confirm("Reset Oméga ? (0/0)")) return;
-    saveOmega({cur:0,target:0});
-    render();
-  };
-
-  bindActions(app, handlers);
-}
-
-/* =========================================================
-   Render dispatcher
-   ========================================================= */
+/* ===================== Render ===================== */
 function render(){
   const r = route();
-
-  if(r.page==="home") return renderHome();
   if(r.page==="donjons") return renderDonjons();
-  if(r.page==="songes") return renderSonges();
-  if(r.page==="stats") return renderStats();
-  if(r.page==="pp") return renderPP();
-  if(r.page==="omega") return renderOmega();
   if(r.page==="dungeon"){
     const d = DUNGEONS.find(x=>x.id===r.id);
     if(!d) { location.hash="#/donjons"; return; }
     pagePill.textContent = d.name;
     return renderDungeon(d);
   }
-  renderHome();
+  renderDonjons();
 }
-
-/* =========================================================
-   Boot
-   ========================================================= */
 (function boot(){
-  if(!localStorage.getItem(kOmega)) saveOmega({cur:0,target:0});
-  if(!localStorage.getItem(kPP)) savePP(blankPP());
-  if(!location.hash) location.hash="#/";
+  if(!location.hash) location.hash="#/donjons";
   render();
 })();
 </script>
