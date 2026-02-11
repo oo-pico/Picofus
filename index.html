@@ -588,71 +588,93 @@ const DUNGEONS = [
      donc on pointe directement dessus.
      ========================================================= */
   {
-    id:"comte",
-    name:"Comte Harebourg",
-    imgDir:"Compte/Compte/",
-    thumb:"comte.png",
-    mobs:[
-      {key:"Comte Harebourg", img:"comte.png"},
-      {key:"Granduk", img:"granduk.png"},
-      {key:"Strigide", img:"strigide.png"},
-      {key:"Sinistrofu", img:"sinistrofu.png"},
-      {key:"Noctu", img:"noctu.png"},
-      {key:"Cyclo", img:"cyclo.png"},
-    ],
-    butins:{
-      b4: {"Comte Harebourg":1,"Cyclo":5,"Noctu":5,"Sinistrofu":2,"Strigide":4,"Granduk":3},
-      b5: {"Comte Harebourg":1,"Cyclo":5,"Noctu":6,"Sinistrofu":2,"Strigide":6,"Granduk":5},
-      b6: {"Comte Harebourg":1,"Cyclo":6,"Noctu":7,"Sinistrofu":5,"Strigide":6,"Granduk":5},
-      b7: {"Comte Harebourg":1,"Cyclo":9,"Noctu":8,"Sinistrofu":5,"Strigide":7,"Granduk":5},
-      b8: {"Comte Harebourg":1,"Granduk":8,"Strigide":7,"Sinistrofu":6,"Noctu":9,"Cyclo":9},
-    },
-    resources:[
-      { key:"Bandelette de Comte", img:"bandelette comte.png" },
-      { key:"Scapula du Comte", img:"scapu comte.png" },
-      { key:"Pic de Noctu", img:"pic de noctu.png" },
-      { key:"Bec de Granduk", img:"bec de granduk.png" },
-      { key:"Bec de Strigide", img:"bec de strigide.png" },
-      { key:"Plume Cyclo", img:"plume cyclo.png" },
-      { key:"Aile de Noctu", img:"aille de noctu.png" },
-      { key:"Aile de Sinistrofu", img:"aille de sinistrofu.png" },
-      { key:"Queue de Sini", img:"queue de sini.png" },
-      { key:"Œil de Cyclo", img:"oeil de cyclo.png" },
-      { key:"Plume de Granduk", img:"plume de granduk.png" },
-      { key:"Griffe de Strigide", img:"griffe de strigide.png" },
-      { key:"Viande Goûtue", img:"viande goutue.png" },
-      { key:"Bidoche Goûtue", img:"bidoche goutue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Ceinture de Glourdorak", img:"ceinture glourdorak.png" },
-    ],
-    equipments:[
-      {key:"Coiffe du Comte Harebourg", img:"Coiffe du Comte Harebourg.png"},
-      {key:"Anneau du Comte Harebourg", img:"Anneau du Comte Harebourg.png"},
-      {key:"Bottes du Comte Harebourg", img:"Bottes du Comte Harebourg.png"},
-      {key:"Coiffe Séculaire", img:"Coiffe Séculaire.png"},
-      {key:"Amulette Séculaire", img:"Amulette Séculaire.png"},
-      {key:"Ceinture Séculaire", img:"Ceinture Séculaire.png"},
-      {key:"Coiffe Cryochrone", img:"Coiffe Cryochrone.png"},
-      {key:"Anneau Cryochrone", img:"Anneau Cryochrone.png"},
-      {key:"Amulette Cryochrone", img:"Amulette Cryochrone.png"},
-      {key:"Amulette du Nocturlabe", img:"Amulette du Nocturlabe.png"},
-      {key:"Ceinture du Nocturlabe", img:"Ceinture du Nocturlabe.png"},
-      {key:"Bottes du Nocturlabe", img:"Bottes du Nocturlabe.png"},
-      {key:"Cape du Sinistrofu", img:"Cape du Sinistrofu.png"},
-      {key:"Amulette du Sinistrofu", img:"Amulette du Sinistrofu.png"},
-      {key:"Bottes du Sinistrofu", img:"Bottes du Sinistrofu.png"},
-      {key:"Amulette du Cycloïde", img:"Amulette du Cycloïde.png"},
-      {key:"Anneau du Cycloïde", img:"Anneau du Cycloïde.png"},
-      {key:"Bottes du Cycloïde", img:"Bottes du Cycloïde.png"},
-      {key:"Bouclier du Cycloïde", img:"Bouclier du Cycloïde.png"},
-      {key:"Amulette du Strigide", img:"Amulette du Strigide.png"},
-      {key:"Ceinture du Strigide", img:"Ceinture du Strigide.png"},
-      {key:"Bottes du Strigide", img:"Bottes du Strigide.png"},
-      {key:"Masque du Granduk", img:"Masque du Granduk.png"},
-      {key:"Amulette du Granduk", img:"Amulette du Granduk.png"},
-      {key:"Épée du Granduk", img:"Épée du Granduk.png"},
-    ]
+  id:"comte",
+  name:"Comte Harebourg",
+
+  // ✅ mobs + ressources dans Comte/
+  imgDir:"Comte/",
+  thumb:"comte.png",
+
+  mobs:[
+    {key:"Comte Harebourg", img:"comte.png"},
+    {key:"Granduk", img:"granduk.png"},
+    {key:"Strigide", img:"strigide.png"},
+    {key:"Sinistrofu", img:"sinistrofu.png"},
+    {key:"Noctu", img:"noctu.png"},
+    {key:"Cyclo", img:"cyclo.png"},
+  ],
+
+  butins:{
+    b4: {"Comte Harebourg":1,"Cyclo":5,"Noctu":5,"Sinistrofu":2,"Strigide":4,"Granduk":3},
+    b5: {"Comte Harebourg":1,"Cyclo":5,"Noctu":6,"Sinistrofu":2,"Strigide":6,"Granduk":5},
+    b6: {"Comte Harebourg":1,"Cyclo":6,"Noctu":7,"Sinistrofu":5,"Strigide":6,"Granduk":5},
+    b7: {"Comte Harebourg":1,"Cyclo":9,"Noctu":8,"Sinistrofu":5,"Strigide":7,"Granduk":5},
+    b8: {"Comte Harebourg":1,"Granduk":8,"Strigide":7,"Sinistrofu":6,"Noctu":9,"Cyclo":9},
   },
+
+  // ✅ ressources: j’aligne EXACTEMENT avec tes noms listés
+  resources:[
+    { key:"Bandelette de Comte", img:"bandelette comte.png" },
+    { key:"Scapula du Comte", img:"scapu comte.png" },
+    { key:"Pic de Noctu", img:"pic de noctu.png" },
+    { key:"Bec de Granduk", img:"bec de granduk.png" },
+    { key:"Bec de Strigide", img:"bec de strigide.png" },
+    { key:"Plume Cyclo", img:"plume cyclo.png" },
+    { key:"Aile de Noctu", img:"aille de noctu.png" },
+    { key:"Aile de Sinistrofu", img:"aille de sinistrofu.png" },
+    { key:"Queue de Sini", img:"queue de sini.png" },
+    { key:"Œil de Cyclo", img:"œil de cyclo.png" },            // ✅ ton vrai nom de fichier
+    { key:"Plume de Granduk", img:"plume de granduk.png" },
+    { key:"Griffe de Strigide", img:"griffe de strigide.png" },
+
+    // ✅ tes fichiers ont des typos (goutte/goutteue) → je mets EXACTEMENT tes noms
+    { key:"Viande Goûtue", img:"viande goutteue.png" },
+    { key:"Bidoche Goûtue", img:"bidoche goutte.png" },
+
+    { key:"Éklâme suprême", img:"Éklâme suprême.png" },
+    { key:"Ceinture de Glourdorak", img:"ceinture glourdorak.png" },
+  ],
+
+  // ✅ équipements: ils sont dans Comtes/ (avec S)
+  equipments:[
+    {key:"Coiffe du Comte Harebourg", img:"Coiffe du Comte Harebourg.png", dir:"Comtes/"},
+    {key:"Anneau du Comte Harebourg", img:"Anneau du Comte Harebourg.png", dir:"Comtes/"},
+    {key:"Bottes du Comte Harebourg", img:"Bottes du Comte Harebourg.png", dir:"Comtes/"},
+
+    {key:"Coiffe Séculaire", img:"Coiffe Séculaire.png", dir:"Comtes/"},
+    {key:"Amulette Séculaire", img:"Amulette Séculaire.png", dir:"Comtes/"},
+    {key:"Ceinture Séculaire", img:"Ceinture Séculaire.png", dir:"Comtes/"},
+
+    {key:"Coiffe Cryochrone", img:"Coiffe Cryochrone.png", dir:"Comtes/"},
+    {key:"Anneau Cryochrone", img:"Anneau Cryochrone.png", dir:"Comtes/"},
+    {key:"Amulette Cryochrone", img:"Amulette Cryochrone.png", dir:"Comtes/"},
+
+    {key:"Amulette du Nocturlabe", img:"Amulette du Nocturlabe.png", dir:"Comtes/"},
+    {key:"Ceinture du Nocturlabe", img:"Ceinture du Nocturlabe.png", dir:"Comtes/"},
+    {key:"Bottes du Nocturlabe", img:"Bottes du Nocturlabe.png", dir:"Comtes/"},
+
+    // ⚠️ tu as “Cap du Sinistrofu.png” dans ton repo (sans e) → j’aligne dessus
+    {key:"Cap du Sinistrofu", img:"Cap du Sinistrofu.png", dir:"Comtes/"},
+    {key:"Amulette du Sinistrofu", img:"Amulette du Sinistrofu.png", dir:"Comtes/"},
+    {key:"Bottes du Sinistrofu", img:"Bottes du Sinistrofu.png", dir:"Comtes/"},
+
+    {key:"Amulette du Cycloïde", img:"Amulette du Cycloïde.png", dir:"Comtes/"},
+    {key:"Anneau du Cycloïde", img:"Anneau du Cycloïde.png", dir:"Comtes/"},
+    {key:"Bottes du Cycloïde", img:"Bottes du Cycloïde.png", dir:"Comtes/"},
+    {key:"Bouclier du Cycloïde", img:"Bouclier du Cycloïde.png", dir:"Comtes/"},
+
+    {key:"Amulette du Strigide", img:"Amulette du Strigide.png", dir:"Comtes/"},
+    {key:"Ceinture du Strigide", img:"Ceinture du Strigide.png", dir:"Comtes/"},
+    {key:"Bottes du Strigide", img:"Bottes du Strigide.png", dir:"Comtes/"},
+
+    {key:"Masque du Granduk", img:"Masque du Granduk.png", dir:"Comtes/"},
+    {key:"Amulette du Granduk", img:"Amulette du Granduk.png", dir:"Comtes/"},
+    {key:"Épée du Granduk", img:"Épée du Granduk.png", dir:"Comtes/"},
+  ]
+},
+
+  
+  
 
   {
     id:"tempetes",
