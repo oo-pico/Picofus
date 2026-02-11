@@ -242,45 +242,30 @@
     .statItem .info .v{font-size:14px;font-weight:900;margin:2px 0 0;font-variant-numeric:tabular-nums;color:var(--gold)}
     .statItem .right{font-variant-numeric:tabular-nums;font-weight:900}
 
-    /* ====== Songes: miniatures ONLY (supprime la grosse liste) ====== */
-    .legendGrid{
+    /* ✅ NEW: mini legends grid (Songes) */
+    .miniGrid{
       display:grid;
-      grid-template-columns:repeat(5, minmax(0, 1fr));
+      grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
       gap:10px;
     }
-    @media (max-width: 980px){ .legendGrid{grid-template-columns:repeat(6, minmax(0, 1fr))} }
-    @media (max-width: 620px){ .legendGrid{grid-template-columns:repeat(5, minmax(0, 1fr))} }
-
-    .legendTile{
+    .miniCard{
       border:1px solid var(--stroke);
+      border-radius:14px;
       background:rgba(255,255,255,.02);
-      border-radius:16px;
       padding:10px;
-      display:grid;
-      grid-template-rows:46px auto;
-      gap:8px;
-      min-height:92px;
-      position:relative;
-      overflow:hidden;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      user-select:none;
     }
-    .legendTile:hover{border-color:rgba(214,179,106,.45);background:rgba(214,179,106,.06)}
-    .legendIcon{
-      width:46px;height:46px;border-radius:14px;
-      border:1px solid rgba(214,179,106,.18);
-      background:rgba(214,179,106,.05);
-      display:grid;place-items:center;overflow:hidden;
-      margin:0 auto;
+    .miniCard:hover{border-color:rgba(214,179,106,.45);background:rgba(214,179,106,.06)}
+    .miniCard .ico{
+      width:36px;height:36px;border-radius:12px;flex:0 0 auto;
     }
-    .legendIcon img{width:100%;height:100%;object-fit:contain}
-    .legendCtrls{display:flex;gap:8px;align-items:center;justify-content:space-between}
-    .legendCtrls .btn{padding:6px 8px;border-radius:12px;font-size:12px}
-    .legendCount{
-      font-weight:950;
-      font-variant-numeric:tabular-nums;
-      color:var(--gold);
-      min-width:28px;
-      text-align:center;
-    }
+    .miniCard .txt{min-width:0;flex:1}
+    .miniCard .txt .n{margin:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .miniCard .txt .v{margin:2px 0 0;font-size:15px;font-weight:950;font-variant-numeric:tabular-nums;color:var(--gold)}
   </style>
 </head>
 
@@ -978,7 +963,8 @@ function loadButin(id){ return localStorage.getItem(kButin(id)) || "b8"; }
 function saveButin(id, b){ localStorage.setItem(kButin(id), b); }
 
 /* =========================================================
-   Songes (miniatures ONLY + légendes masquées si 0)
+   Songes (légendes masquées si 0)
+   ✅ CHANGE: on garde UNIQUEMENT les miniatures carrées (plus de gros items)
    ========================================================= */
 const kSonges = `${LS_PREFIX}songes`;
 const SONGES = {
@@ -1228,7 +1214,7 @@ function renderHome(){
           <div class="thumb">🌙</div>
           <div style="min-width:0">
             <h3>Songes</h3>
-            <p>Runs, bribes, légendes (miniatures only)</p>
+            <p>Runs, bribes, légendes (miniatures uniquement)</p>
           </div>
         </div>
         <div><button class="btn gold" onclick="location.hash='#/songes'">Ouvrir</button></div>
@@ -1498,7 +1484,7 @@ function applyRuns(d, st, runs){
 }
 
 /* =========================================================
-   Songes (MINIATURES ONLY)
+   Songes  ✅ ONLY MINIATURES (no big list)
    ========================================================= */
 function renderSonges(){
   pagePill.textContent = "Songes";
@@ -1528,24 +1514,19 @@ function renderSonges(){
     </div>
   `;
 
-  // ✅ IMPORTANT: on ne montre PLUS la grosse liste en dessous
-  // -> uniquement des miniatures carrées (cachées si 0)
   const legendsShown = SONGES.legends.filter(l => clampInt(s.legends[l.key]||0) > 0);
 
-  const legendsGrid = legendsShown.length
+  const legendGrid = legendsShown.length
     ? `
-      <div class="legendGrid">
+      <div class="miniGrid">
         ${legendsShown.map(l=>{
           const v = clampInt(s.legends[l.key]||0);
           return `
-            <div class="legendTile">
-              <div class="legendIcon">
-                <img data-dir="${escapeHtml(l.dir)}" data-file="${escapeHtml(l.img)}" alt="">
-              </div>
-              <div class="legendCtrls">
-                <button class="btn small" data-act="leg:-:${escapeHtml(l.key)}">-</button>
-                <div class="legendCount mono" data-act="leg:pick:${escapeHtml(l.key)}">${fmt.format(v)}</div>
-                <button class="btn small" data-act="leg:+:${escapeHtml(l.key)}">+</button>
+            <div class="miniCard" data-act="leg:pick:${escapeHtml(l.key)}" title="${escapeHtml(l.key)}">
+              <div class="ico"><img data-dir="${escapeHtml(l.dir)}" data-file="${escapeHtml(l.img)}" alt=""></div>
+              <div class="txt">
+                <p class="n">${escapeHtml(l.key)}</p>
+                <p class="v mono">${fmt.format(v)}</p>
               </div>
             </div>
           `;
@@ -1561,7 +1542,7 @@ function renderSonges(){
       <div class="topline">
         <div class="title">
           <div class="thumb" style="width:44px;height:44px">🌙</div>
-          <div><h2>Songes</h2><p class="sub">Runs • bribes • légendes</p></div>
+          <div><h2>Songes</h2><p class="sub">Runs • bribes • légendes (miniatures)</p></div>
         </div>
         <div class="seg">
           <button class="btn bad" id="btnResetSonges">Reset songes</button>
@@ -1583,10 +1564,10 @@ function renderSonges(){
       </div>
 
       <div class="section">
-        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🧩</div><div><h2>Bribes & légendes</h2><p class="sub">miniatures seulement (légendes à 0 cachées)</p></div></div></div>
+        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🧩</div><div><h2>Bribes & légendes</h2><p class="sub">légendes à 0 cachées (miniatures uniquement)</p></div></div></div>
         <div class="list">${bribesRow}</div>
         <div style="height:10px"></div>
-        ${legendsGrid}
+        ${legendGrid}
       </div>
     </div>
   `;
@@ -1604,9 +1585,14 @@ function renderSonges(){
   handlers["bribes:pick"] = ()=> openKeypad("Bribes", s.bribes, (v)=>{ s.bribes=clampInt(v); saveSonges(s); render(); });
 
   for(const l of SONGES.legends){
-    handlers[`leg:+:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)+1); saveSonges(s); render(); };
-    handlers[`leg:-:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)-1); saveSonges(s); render(); };
-    handlers[`leg:pick:${l.key}`] = ()=> openKeypad(l.key, s.legends[l.key]||0, (v)=>{ s.legends[l.key]=clampInt(v); saveSonges(s); render(); });
+    handlers[`leg:pick:${l.key}`] = ()=>{
+      const cur = clampInt(s.legends[l.key]||0);
+      openKeypad(l.key, cur, (v)=>{
+        s.legends[l.key]=clampInt(v);
+        saveSonges(s);
+        render();
+      });
+    };
   }
 
   $("#btnResetSonges").onclick = ()=>{
@@ -1619,7 +1605,7 @@ function renderSonges(){
 }
 
 /* =========================================================
-   Stats
+   Stats (tableau donjon intact)
    ========================================================= */
 function renderStats(){
   pagePill.textContent = "Stats";
