@@ -66,6 +66,7 @@
       transition:transform .08s ease, border-color .15s ease, background .15s ease;
       user-select:none;
       font-size:13px;
+      line-height:1;
     }
     .btn:hover{border-color:rgba(214,179,106,.45);background:rgba(214,179,106,.07)}
     .btn:active{transform:translateY(1px)}
@@ -75,12 +76,17 @@
     .btn.bad{border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.08)}
     .btn.active{border-color:rgba(214,179,106,.75);background:rgba(214,179,106,.15);font-weight:700}
 
-    /* ✅ icône PP dans les boutons */
+    /* Icone image dans boutons / titres */
     .navIcon{
       width:18px;height:18px;
       object-fit:contain;
       display:block;
-      filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
+      filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+    }
+    .ppIcon{
+      width:22px;height:22px;
+      object-fit:contain;
+      display:block;
     }
 
     main{padding-top:16px}
@@ -240,9 +246,6 @@
     .statItem .info .v{font-size:14px;font-weight:900;margin:2px 0 0;font-variant-numeric:tabular-nums;color:var(--gold)}
     .statItem .right{font-variant-numeric:tabular-nums;font-weight:900}
   </style>
-
-  <!-- Supabase JS v2 (on garde seulement l'import, PAS de const ici) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -252,28 +255,26 @@
         <div class="logo">P</div>
         <div style="min-width:0">
           <h1>Picofus – Tracker</h1>
-          <p>Donjons • Songes • Stats • PP • Oméga • Cloud</p>
+          <p>Donjons • Songes • Stats • PP • Oméga</p>
         </div>
       </div>
 
       <div class="nav">
         <span class="pill" id="pagePill">Accueil</span>
-        <span class="pill" id="authPill">🔒 Local</span>
 
-        <button class="btn small" id="btnHome">🏠</button>
-        <button class="btn small" id="btnDonjons">🗝️</button>
-        <button class="btn small" id="btnSonges">🌙</button>
-        <button class="btn small" id="btnStats">📊</button>
+        <button class="btn small" id="btnHome" title="Accueil">🏠</button>
+        <button class="btn small" id="btnDonjons" title="Donjons">🗝️</button>
+        <button class="btn small" id="btnSonges" title="Songes">🌙</button>
+        <button class="btn small" id="btnStats" title="Stats">📊</button>
 
-        <!-- ✅ Bouton PP restauré (important: id="btnPP") -->
-        <button class="btn small" id="btnPP" title="PP">
+        <!-- Bouton PP avec ton image -->
+        <button class="btn small" id="btnPP" title="Calcul PP">
           <img class="navIcon" src="./Ic%C3%B4ne%20Calculateur%20PP.png" alt="PP">
         </button>
 
-        <button class="btn small" id="btnOmega">📈</button>
+        <button class="btn small" id="btnOmega" title="Oméga">📈</button>
 
-        <button class="btn small good" id="btnAuth">🔑 Connexion</button>
-        <button class="btn small bad" id="btnResetAll">🧹 Reset</button>
+        <button class="btn small bad" id="btnResetAll" title="Reset tout">🧹 Reset</button>
       </div>
     </header>
 
@@ -332,12 +333,7 @@ function escapeHtml(s){
 }
 
 /* =========================================================
-   PP Icon (ton fichier)
-   ========================================================= */
-const PP_ICON_SRC = "./Ic%C3%B4ne%20Calculateur%20PP.png";
-
-/* =========================================================
-   Image fallback (essaye plusieurs chemins)
+   Images: fallback (essaie plusieurs chemins)
    ========================================================= */
 function uniq(arr){ const s=new Set(); return arr.filter(x=>x && !s.has(x) && (s.add(x), true)); }
 function normDir(d){ if(!d) return ""; return d.endsWith("/")?d:(d+"/"); }
@@ -371,79 +367,6 @@ function activateImages(container, defaultDir){
   container.querySelectorAll("img[data-file]").forEach(img=>{
     setImgWithFallback(img, img.dataset.dir || defaultDir || "", img.dataset.file || "");
   });
-}
-
-/* =========================================================
-   Supabase Cloud (✅ une seule déclaration + vraie clé)
-   ========================================================= */
-const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
-const SUPABASE_TABLE = "saves";
-
-let sb = null;
-try{
-  if(window.supabase?.createClient && SUPABASE_URL && SUPABASE_ANON_KEY){
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-}catch(e){ sb=null; }
-
-const cloud = { user:null, saving:false, saveTimer:null };
-const CLOUD_META_KEY = `${LS_PREFIX}cloud_meta`;
-
-function getCloudMeta(){ try{return JSON.parse(localStorage.getItem(CLOUD_META_KEY)||"null")}catch{return null} }
-function setCloudMeta(meta){ localStorage.setItem(CLOUD_META_KEY, JSON.stringify(meta)); }
-
-function collectLS(){
-  const out = {};
-  for(const k of Object.keys(localStorage)){
-    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY) out[k]=localStorage.getItem(k);
-  }
-  return out;
-}
-function replaceLS(map){
-  for(const k of Object.keys(localStorage)){
-    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY) localStorage.removeItem(k);
-  }
-  for(const [k,v] of Object.entries(map||{})){
-    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY) localStorage.setItem(k, v);
-  }
-}
-async function cloudLoad(){
-  if(!sb || !cloud.user) return false;
-  const { data, error } = await sb.from(SUPABASE_TABLE).select("data, updated_at").eq("user_id", cloud.user.id).maybeSingle();
-  if(error || !data?.data) return false;
-
-  const cloudTs = data.updated_at ? new Date(data.updated_at).getTime() : Date.now();
-  const meta = getCloudMeta();
-  const localTs = meta?.localUpdatedAt ? Number(meta.localUpdatedAt) : 0;
-
-  if(cloudTs >= localTs){
-    replaceLS(data.data.ls || {});
-    setCloudMeta({ localUpdatedAt: cloudTs, lastCloudUpdatedAt: cloudTs });
-    return true;
-  }
-  return false;
-}
-async function cloudSaveNow(){
-  if(!sb || !cloud.user) return;
-  cloud.saving = true; updateAuthUI();
-
-  const payload = { version: 1, savedAt: new Date().toISOString(), ls: collectLS() };
-  const { error } = await sb.from(SUPABASE_TABLE).upsert({
-    user_id: cloud.user.id,
-    data: payload,
-    updated_at: new Date().toISOString(),
-  }, { onConflict:"user_id" });
-
-  cloud.saving = false; updateAuthUI();
-  if(error) return;
-
-  setCloudMeta({ localUpdatedAt: Date.now(), lastCloudUpdatedAt: Date.now() });
-}
-function cloudScheduleSave(){
-  if(!sb || !cloud.user) return;
-  if(cloud.saveTimer) clearTimeout(cloud.saveTimer);
-  cloud.saveTimer = setTimeout(cloudSaveNow, 800);
 }
 
 /* =========================================================
@@ -534,7 +457,7 @@ window.addEventListener("keydown", (e)=>{
 });
 
 /* =========================================================
-   Data: Donjons (ton contenu inchangé)
+   Data: Donjons
    ========================================================= */
 const DUNGEONS = [
   {
@@ -842,7 +765,7 @@ const kButin = (id)=>`${LS_PREFIX}butin:${id}`;
 function loadDungeon(id){
   try{
     const raw = localStorage.getItem(kDungeon(id));
-    if(!raw) return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{} };
+    if(!raw) return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0 };
     const p = JSON.parse(raw);
     return {
       mobs: p.mobs||{},
@@ -850,25 +773,26 @@ function loadDungeon(id){
       resP: p.resP||{},
       eq: p.eq||{},
       eqP: p.eqP||{},
+      runs: clampInt(p.runs ?? 0),
     };
   }catch{
-    return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{} };
+    return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0 };
   }
 }
 function saveDungeon(id, st){
   localStorage.setItem(kDungeon(id), JSON.stringify(st));
-  cloudScheduleSave();
 }
 function ensureDungeonShape(d, st){
-  const out = st || { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{} };
+  const out = st || { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0 };
   out.mobs ||= {}; out.res ||= {}; out.resP ||= {}; out.eq ||= {}; out.eqP ||= {};
+  out.runs = clampInt(out.runs ?? 0);
   (d.mobs||[]).forEach(m=>{ if(!(m.key in out.mobs)) out.mobs[m.key]=0; });
   (d.resources||[]).forEach(r=>{ if(!(r.key in out.res)) out.res[r.key]=0; if(!(r.key in out.resP)) out.resP[r.key]=0; });
   (d.equipments||[]).forEach(e=>{ if(!(e.key in out.eq)) out.eq[e.key]=0; if(!(e.key in out.eqP)) out.eqP[e.key]=0; });
   return out;
 }
 function loadButin(id){ return localStorage.getItem(kButin(id)) || "b8"; }
-function saveButin(id, b){ localStorage.setItem(kButin(id), b); cloudScheduleSave(); }
+function saveButin(id, b){ localStorage.setItem(kButin(id), b); }
 
 /* =========================================================
    Songes (simple + legends masquées si 0)
@@ -919,11 +843,12 @@ function loadSonges(){
     return s;
   }catch{ return blankSonges(); }
 }
-function saveSonges(s){ localStorage.setItem(kSonges, JSON.stringify(s)); cloudScheduleSave(); }
+function saveSonges(s){ localStorage.setItem(kSonges, JSON.stringify(s)); }
 
 /* =========================================================
    PP (valeurs vides par défaut)
    ========================================================= */
+const PP_ICON = "Icône Calculateur PP.png";
 const kPP = `${LS_PREFIX}pp`;
 function blankPP(){ return { prospection:"", base:"", challenges:"", anomalie:"", shield:"", almanax:"" }; }
 function loadPP(){
@@ -941,7 +866,7 @@ function loadPP(){
     };
   }catch{ return blankPP(); }
 }
-function savePP(s){ localStorage.setItem(kPP, JSON.stringify(s)); cloudScheduleSave(); }
+function savePP(s){ localStorage.setItem(kPP, JSON.stringify(s)); }
 function ppMultiplier(pp){
   pp = toNum(pp);
   const m = 0.74 + (1.755 / (1 + Math.exp((250 - pp) / 85)));
@@ -971,7 +896,7 @@ function loadOmega(){
     return { cur: clampInt(p.cur??0), target: clampInt(p.target??0) };
   }catch{ return { cur:0, target:0 }; }
 }
-function saveOmega(s){ localStorage.setItem(kOmega, JSON.stringify(s)); cloudScheduleSave(); }
+function saveOmega(s){ localStorage.setItem(kOmega, JSON.stringify(s)); }
 function omegaXpToNext(i){ return Math.round(50000000 * Math.pow(1.01, i)); }
 function omegaXpRequired(cur, target){
   cur = clampInt(cur); target = clampInt(target);
@@ -985,15 +910,13 @@ function omegaXpRequired(cur, target){
    ========================================================= */
 const app = $("#app");
 const pagePill = $("#pagePill");
-const authPill = $("#authPill");
-const btnAuth = $("#btnAuth");
 
-$("#btnHome").onclick = ()=>location.hash = "#/";
-$("#btnDonjons").onclick = ()=>location.hash = "#/donjons";
+$("#btnHome").onclick   = ()=>location.hash = "#/";
+$("#btnDonjons").onclick= ()=>location.hash = "#/donjons";
 $("#btnSonges").onclick = ()=>location.hash = "#/songes";
-$("#btnStats").onclick = ()=>location.hash = "#/stats";
-$("#btnPP").onclick = ()=>location.hash = "#/pp";
-$("#btnOmega").onclick = ()=>location.hash = "#/omega";
+$("#btnStats").onclick  = ()=>location.hash = "#/stats";
+$("#btnPP").onclick     = ()=>location.hash = "#/pp";
+$("#btnOmega").onclick  = ()=>location.hash = "#/omega";
 
 $("#btnResetAll").onclick = ()=>{
   if(!confirm("Reset TOUT (donjons + songes + stats + PP + oméga) ?")) return;
@@ -1018,67 +941,6 @@ function route(){
   return {page:"home"};
 }
 window.addEventListener("hashchange", render);
-
-/* =========================================================
-   Auth UI + login/logout
-   ========================================================= */
-function updateAuthUI(){
-  if(!sb){
-    authPill.textContent = "⚠️ Supabase OFF";
-    btnAuth.textContent = "🔑 Connexion";
-    btnAuth.classList.remove("bad"); btnAuth.classList.add("good");
-    return;
-  }
-  if(cloud.user){
-    const email = cloud.user.email || "connecté";
-    const short = email.length>22 ? email.slice(0,20)+"…" : email;
-    authPill.textContent = cloud.saving ? "☁️ Sync…" : `☁️ ${short}`;
-    btnAuth.textContent = "🚪 Déco";
-    btnAuth.classList.remove("good"); btnAuth.classList.add("bad");
-  }else{
-    authPill.textContent = "🔒 Local";
-    btnAuth.textContent = "🔑 Connexion";
-    btnAuth.classList.remove("bad"); btnAuth.classList.add("good");
-  }
-}
-async function doLogin(){
-  if(!sb) return alert("Supabase OFF (clé manquante).");
-  const email = prompt("Email (magic link) :");
-  if(!email) return;
-  const redirectTo = window.location.origin + window.location.pathname;
-  const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: redirectTo }});
-  if(error) return alert("Erreur login: "+(error.message||"unknown"));
-  alert("✅ Lien envoyé. Ouvre-le pour te connecter.");
-}
-async function doLogout(){
-  if(!sb) return;
-  const { error } = await sb.auth.signOut();
-  if(error) alert("Erreur logout: "+(error.message||"unknown"));
-}
-btnAuth.onclick = ()=> cloud.user ? doLogout() : doLogin();
-
-async function initAuth(){
-  updateAuthUI();
-  if(!sb) return;
-
-  if(window.location.search.includes("code=")){
-    try{ await sb.auth.exchangeCodeForSession(window.location.href); }catch{}
-    const clean = window.location.origin + window.location.pathname + window.location.hash;
-    history.replaceState({}, document.title, clean);
-  }
-
-  const { data } = await sb.auth.getSession();
-  cloud.user = data?.session?.user || null;
-  updateAuthUI();
-  if(cloud.user){ await cloudLoad(); }
-
-  sb.auth.onAuthStateChange(async (_evt, session)=>{
-    cloud.user = session?.user || null;
-    updateAuthUI();
-    if(cloud.user){ await cloudLoad(); }
-    render();
-  });
-}
 
 /* =========================================================
    Helpers: totals
@@ -1202,7 +1064,7 @@ function renderHome(){
 
       <div class="card">
         <div class="card-left">
-          <div class="thumb"><img src="${PP_ICON_SRC}" alt="PP"></div>
+          <div class="thumb"><img class="ppIcon" src="./Ic%C3%B4ne%20Calculateur%20PP.png" alt="PP"></div>
           <div style="min-width:0">
             <h3>Calcul PP</h3>
             <p>Champs vides par défaut + pavé num</p>
@@ -1221,17 +1083,6 @@ function renderHome(){
         </div>
         <div><button class="btn gold" onclick="location.hash='#/omega'">Ouvrir</button></div>
       </div>
-
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb">☁️</div>
-          <div style="min-width:0">
-            <h3>Cloud</h3>
-            <p>Connexion Supabase (magic link) + sync auto</p>
-          </div>
-        </div>
-        <div><button class="btn" onclick="alert('Supabase OK. Si besoin, on check la table saves.');">Infos</button></div>
-      </div>
     </div>
 
     <div class="section">
@@ -1245,8 +1096,8 @@ function renderHome(){
         </div>
       </div>
       <div class="hint">
-        ✅ Pour que toutes les images marchent : garde tes dossiers au même niveau que index.html (ex: <b>Comte/</b>, <b>Bethel/</b>, <b>Songes/</b> etc.).<br>
-        ✅ Cloud activé : tu peux te connecter avec magic link.
+        ✅ Pour que toutes les images marchent : garde tes dossiers au même niveau que <b>index.html</b> (ex: <b>Comte/</b>, <b>Bethel/</b>, <b>Songes/</b> etc.).<br>
+        ✅ Toutes tes données sont en <b>local</b> (pas de cloud).
       </div>
     </div>
   `;
@@ -1350,6 +1201,7 @@ function renderDungeon(d){
       <div class="seg">
         <button class="btn gold" data-act="runs:add">+ runs</button>
         <button class="btn" data-act="runs:pick">Saisir runs</button>
+        <span class="pill">Runs: <b class="mono">${fmt.format(st.runs||0)}</b></span>
       </div>
 
       <div class="summary">
@@ -1410,7 +1262,7 @@ function renderDungeon(d){
 
   let lastRuns = 1;
   handlers["runs:pick"] = ()=>{
-    openKeypad("Nombre de runs", lastRuns, (v)=>{
+    openKeypad("Nombre de runs à ajouter", lastRuns, (v)=>{
       lastRuns = v||1;
       applyRuns(d, st, lastRuns);
     });
@@ -1461,11 +1313,12 @@ function applyRuns(d, st, runs){
   for(const [k,v] of Object.entries(inc)){
     st.mobs[k] = clampInt((st.mobs[k]||0) + v*runs);
   }
+  st.runs = clampInt((st.runs||0) + runs);
   saveDungeon(d.id, st);
   render();
 }
 
-function renderSonges(){ /* inchangé: ton code original */
+function renderSonges(){
   pagePill.textContent = "Songes";
   const s = loadSonges();
 
@@ -1543,6 +1396,7 @@ function renderSonges(){ /* inchangé: ton code original */
   `;
 
   const handlers = {};
+
   for(const it of SONGES.intensities){
     handlers[`run:+:${it.id}`] = ()=>{ s.runs[it.id]=clampInt((s.runs[it.id]||0)+1); saveSonges(s); render(); };
     handlers[`run:-:${it.id}`] = ()=>{ s.runs[it.id]=clampInt((s.runs[it.id]||0)-1); saveSonges(s); render(); };
@@ -1568,15 +1422,11 @@ function renderSonges(){ /* inchangé: ton code original */
   bindActions(app, handlers);
 }
 
-/* =========================================================
-   Stats (ton code original)
-   ========================================================= */
-function renderStats(){ /* ton bloc original inchangé */
+function renderStats(){
   pagePill.textContent = "Stats";
 
   let mobsTotal=0, resQty=0, eqQty=0, kamasTotal=0;
 
-  const mobAgg = new Map();
   const resAgg = new Map();
   const eqAgg = new Map();
 
@@ -1587,8 +1437,6 @@ function renderStats(){ /* ton bloc original inchangé */
     for(const m of d.mobs){
       const v = clampInt(st.mobs[m.key]||0);
       mobsTotal += v;
-      const key = `${d.id}::mob::${m.key}`;
-      mobAgg.set(key, {d, name:m.key, img:m.img, v});
     }
     for(const r of d.resources){
       const q = clampInt(st.res[r.key]||0);
@@ -1614,7 +1462,7 @@ function renderStats(){ /* ton bloc original inchangé */
     return `
       <div class="kpi">
         <div class="k">${escapeHtml(title)}</div>
-        <div class="v mono ${title.includes("kamas")?'gold':''}">${value}</div>
+        <div class="v mono ${title.toLowerCase().includes("kamas")?'gold':''}">${value}</div>
         ${sub?`<div class="hint" style="margin:8px 0 0">${sub}</div>`:""}
       </div>
     `;
@@ -1638,7 +1486,7 @@ function renderStats(){ /* ton bloc original inchangé */
         ${statCard("Mobs total", "", fmt.format(mobsTotal))}
         ${statCard("Ressources total", "", fmt.format(resQty))}
         ${statCard("Équipements total", "", fmt.format(eqQty))}
-        ${statCard("kamas total", "", money(kamasTotal)+" k")}
+        ${statCard("Kamas total", "", money(kamasTotal)+" k")}
       </div>
     </div>
 
@@ -1700,17 +1548,16 @@ function renderStats(){ /* ton bloc original inchangé */
   activateImages(app);
 }
 
-/* =========================================================
-   PP (✅ icône propre partout, sans casser le grid)
-   ========================================================= */
 function renderPP(){
   pagePill.textContent = "PP";
   const s = loadPP();
   const { mult, final } = ppFinal(s);
 
+  const ppIconHtml = `<img class="ppIcon" src="${encodeURI(PP_ICON)}" alt="PP">`;
+
   const field = (label, key)=>`
     <div class="item">
-      <div class="ico"><img src="${PP_ICON_SRC}" alt="PP"></div>
+      <div class="ico">${ppIconHtml}</div>
       <div class="name">
         <p class="n">${label}</p>
         <p class="m">Clique le nombre pour pavé numérique</p>
@@ -1725,7 +1572,7 @@ function renderPP(){
     <div class="section">
       <div class="topline">
         <div class="title">
-          <div class="thumb" style="width:44px;height:44px"><img src="${PP_ICON_SRC}" alt="PP"></div>
+          <div class="thumb" style="width:44px;height:44px">${ppIconHtml}</div>
           <div><h2>Calcul PP</h2><p class="sub">Champs vides par défaut (clean)</p></div>
         </div>
         <div class="seg">
@@ -1801,9 +1648,6 @@ function renderPP(){
   bindActions(app, handlers);
 }
 
-/* =========================================================
-   Omega (ton code original)
-   ========================================================= */
 function renderOmega(){
   pagePill.textContent = "Oméga";
   const s = loadOmega();
@@ -1872,7 +1716,6 @@ function renderOmega(){
    Render dispatcher
    ========================================================= */
 function render(){
-  updateAuthUI();
   const r = route();
 
   if(r.page==="home") return renderHome();
@@ -1893,11 +1736,9 @@ function render(){
 /* =========================================================
    Boot
    ========================================================= */
-(async function boot(){
+(function boot(){
   if(!localStorage.getItem(kOmega)) saveOmega({cur:0,target:0});
   if(!localStorage.getItem(kPP)) savePP(blankPP());
-
-  await initAuth();
   if(!location.hash) location.hash="#/";
   render();
 })();
