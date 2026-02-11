@@ -75,6 +75,14 @@
     .btn.bad{border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.08)}
     .btn.active{border-color:rgba(214,179,106,.75);background:rgba(214,179,106,.15);font-weight:700}
 
+    /* ✅ icône PP dans les boutons */
+    .navIcon{
+      width:18px;height:18px;
+      object-fit:contain;
+      display:block;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
+    }
+
     main{padding-top:16px}
 
     .grid{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:12px;}
@@ -233,19 +241,9 @@
     .statItem .right{font-variant-numeric:tabular-nums;font-weight:900}
   </style>
 
-  <!-- Supabase JS v2 -->
+  <!-- Supabase JS v2 (on garde seulement l'import, PAS de const ici) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
-
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
-  </script>
 </head>
-
 
 <body>
   <div class="wrap">
@@ -266,7 +264,12 @@ const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
         <button class="btn small" id="btnDonjons">🗝️</button>
         <button class="btn small" id="btnSonges">🌙</button>
         <button class="btn small" id="btnStats">📊</button>
-<img src="Icône Calculateur PP.png" class="icon">
+
+        <!-- ✅ Bouton PP restauré (important: id="btnPP") -->
+        <button class="btn small" id="btnPP" title="PP">
+          <img class="navIcon" src="./Ic%C3%B4ne%20Calculateur%20PP.png" alt="PP">
+        </button>
+
         <button class="btn small" id="btnOmega">📈</button>
 
         <button class="btn small good" id="btnAuth">🔑 Connexion</button>
@@ -329,6 +332,11 @@ function escapeHtml(s){
 }
 
 /* =========================================================
+   PP Icon (ton fichier)
+   ========================================================= */
+const PP_ICON_SRC = "./Ic%C3%B4ne%20Calculateur%20PP.png";
+
+/* =========================================================
    Image fallback (essaye plusieurs chemins)
    ========================================================= */
 function uniq(arr){ const s=new Set(); return arr.filter(x=>x && !s.has(x) && (s.add(x), true)); }
@@ -366,15 +374,15 @@ function activateImages(container, defaultDir){
 }
 
 /* =========================================================
-   Supabase Cloud
+   Supabase Cloud (✅ une seule déclaration + vraie clé)
    ========================================================= */
 const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
-const SUPABASE_ANON_KEY = "PUT_YOUR_ANON_KEY_HERE"; // <-- IMPORTANT: colle ta vraie anon key ici
+const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
 const SUPABASE_TABLE = "saves";
 
 let sb = null;
 try{
-  if(window.supabase?.createClient && SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes("PUT_YOUR")){
+  if(window.supabase?.createClient && SUPABASE_URL && SUPABASE_ANON_KEY){
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 }catch(e){ sb=null; }
@@ -461,7 +469,6 @@ function openKeypad(title, currentValue, onApply){
   kbdValue.textContent = keypad.buffer;
   modal.classList.add("open");
 
-  // auto-select
   setTimeout(()=>{
     const sel = window.getSelection();
     const range = document.createRange();
@@ -493,7 +500,6 @@ function applyBuf(){
   closeKeypad();
 }
 
-// build keypad buttons
 (function(){
   kbdGrid.innerHTML = "";
   for(let i=1;i<=9;i++){
@@ -521,15 +527,14 @@ window.addEventListener("keydown", (e)=>{
 
   if(e.key>="0" && e.key<="9"){ e.preventDefault(); pushDigit(e.key); return; }
   if(e.key==="Backspace"){ e.preventDefault(); backspace(); return; }
-  if(e.key==="Delete"){ e.preventDefault(); clearBuf(); return; }        // Suppr = clear
+  if(e.key==="Delete"){ e.preventDefault(); clearBuf(); return; }
   if(e.key.toLowerCase()==="c"){ e.preventDefault(); clearBuf(); return; }
   if(e.key==="Escape"){ e.preventDefault(); closeKeypad(); return; }
   if(e.key==="Enter"){ e.preventDefault(); applyBuf(); return; }
 });
 
 /* =========================================================
-   Data: Donjons (BUTINS + mobs + resources + equipments)
-   IMPORTANT: imgDir = nom de dossier
+   Data: Donjons (ton contenu inchangé)
    ========================================================= */
 const DUNGEONS = [
   {
@@ -995,7 +1000,6 @@ $("#btnResetAll").onclick = ()=>{
   for(const k of Object.keys(localStorage)){
     if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k);
   }
-  // defaults voulus
   saveOmega({cur:0,target:0});
   savePP(blankPP());
   render();
@@ -1038,7 +1042,7 @@ function updateAuthUI(){
   }
 }
 async function doLogin(){
-  if(!sb) return alert("Supabase OFF (mets ton ANON KEY dans le code).");
+  if(!sb) return alert("Supabase OFF (clé manquante).");
   const email = prompt("Email (magic link) :");
   if(!email) return;
   const redirectTo = window.location.origin + window.location.pathname;
@@ -1057,7 +1061,6 @@ async function initAuth(){
   updateAuthUI();
   if(!sb) return;
 
-  // callback magic link
   if(window.location.search.includes("code=")){
     try{ await sb.auth.exchangeCodeForSession(window.location.href); }catch{}
     const clean = window.location.origin + window.location.pathname + window.location.hash;
@@ -1199,7 +1202,7 @@ function renderHome(){
 
       <div class="card">
         <div class="card-left">
-<img src="Icône Calculateur PP.png" class="icon">
+          <div class="thumb"><img src="${PP_ICON_SRC}" alt="PP"></div>
           <div style="min-width:0">
             <h3>Calcul PP</h3>
             <p>Champs vides par défaut + pavé num</p>
@@ -1227,7 +1230,7 @@ function renderHome(){
             <p>Connexion Supabase (magic link) + sync auto</p>
           </div>
         </div>
-        <div><button class="btn" onclick="alert('Pour activer Supabase: colle ta ANON KEY dans le code (SUPABASE_ANON_KEY).')">Infos</button></div>
+        <div><button class="btn" onclick="alert('Supabase OK. Si besoin, on check la table saves.');">Infos</button></div>
       </div>
     </div>
 
@@ -1243,7 +1246,7 @@ function renderHome(){
       </div>
       <div class="hint">
         ✅ Pour que toutes les images marchent : garde tes dossiers au même niveau que index.html (ex: <b>Comte/</b>, <b>Bethel/</b>, <b>Songes/</b> etc.).<br>
-        ✅ Si tu veux activer le Cloud : colle ta <b>SUPABASE_ANON_KEY</b> dans le code (ligne en haut).
+        ✅ Cloud activé : tu peux te connecter avec magic link.
       </div>
     </div>
   `;
@@ -1392,7 +1395,6 @@ function renderDungeon(d){
 
   const handlers = {};
 
-  // butin select
   ["b4","b5","b6","b7","b8"].forEach(b=>{
     handlers[`butin:${b}`] = ()=>{
       saveButin(d.id, b);
@@ -1400,14 +1402,12 @@ function renderDungeon(d){
     };
   });
 
-  // reset dungeon
   $("#btnResetDungeon").onclick = ()=>{
     if(!confirm(`Reset ${d.name} ?`)) return;
     localStorage.removeItem(kDungeon(d.id));
     render();
   };
 
-  // +runs / saisir runs
   let lastRuns = 1;
   handlers["runs:pick"] = ()=>{
     openKeypad("Nombre de runs", lastRuns, (v)=>{
@@ -1416,18 +1416,15 @@ function renderDungeon(d){
     });
   };
   handlers["runs:add"] = ()=>{
-    // +1 run direct = utilise lastRuns (1 par défaut)
     applyRuns(d, st, lastRuns || 1);
   };
 
-  // mobs
   for(const m of d.mobs){
     handlers[`mob:+:${m.key}`] = ()=>{ st.mobs[m.key]=clampInt((st.mobs[m.key]||0)+1); saveDungeon(d.id, st); render(); };
     handlers[`mob:-:${m.key}`] = ()=>{ st.mobs[m.key]=clampInt((st.mobs[m.key]||0)-1); saveDungeon(d.id, st); render(); };
     handlers[`mob:pick:${m.key}`] = ()=> openKeypad(m.key, st.mobs[m.key]||0, (v)=>{ st.mobs[m.key]=clampInt(v); saveDungeon(d.id, st); render(); });
   }
 
-  // resources
   for(const r of d.resources){
     handlers[`res:+:${r.key}`] = ()=>{ st.res[r.key]=clampInt((st.res[r.key]||0)+1); saveDungeon(d.id, st); render(); };
     handlers[`res:-:${r.key}`] = ()=>{ st.res[r.key]=clampInt((st.res[r.key]||0)-1); saveDungeon(d.id, st); render(); };
@@ -1440,7 +1437,6 @@ function renderDungeon(d){
     };
   }
 
-  // equipments
   for(const e of d.equipments){
     handlers[`eq:+:${e.key}`] = ()=>{ st.eq[e.key]=clampInt((st.eq[e.key]||0)+1); saveDungeon(d.id, st); render(); };
     handlers[`eq:-:${e.key}`] = ()=>{ st.eq[e.key]=clampInt((st.eq[e.key]||0)-1); saveDungeon(d.id, st); render(); };
@@ -1469,7 +1465,7 @@ function applyRuns(d, st, runs){
   render();
 }
 
-function renderSonges(){
+function renderSonges(){ /* inchangé: ton code original */
   pagePill.textContent = "Songes";
   const s = loadSonges();
 
@@ -1547,20 +1543,16 @@ function renderSonges(){
   `;
 
   const handlers = {};
-
-  // runs
   for(const it of SONGES.intensities){
     handlers[`run:+:${it.id}`] = ()=>{ s.runs[it.id]=clampInt((s.runs[it.id]||0)+1); saveSonges(s); render(); };
     handlers[`run:-:${it.id}`] = ()=>{ s.runs[it.id]=clampInt((s.runs[it.id]||0)-1); saveSonges(s); render(); };
     handlers[`run:pick:${it.id}`] = ()=> openKeypad(it.label, s.runs[it.id]||0, (v)=>{ s.runs[it.id]=clampInt(v); saveSonges(s); render(); });
   }
 
-  // bribes
   handlers["bribes:+"] = ()=>{ s.bribes=clampInt(s.bribes+1); saveSonges(s); render(); };
   handlers["bribes:-"] = ()=>{ s.bribes=clampInt(s.bribes-1); saveSonges(s); render(); };
   handlers["bribes:pick"] = ()=> openKeypad("Bribes", s.bribes, (v)=>{ s.bribes=clampInt(v); saveSonges(s); render(); });
 
-  // legends
   for(const l of SONGES.legends){
     handlers[`leg:+:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)+1); saveSonges(s); render(); };
     handlers[`leg:-:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)-1); saveSonges(s); render(); };
@@ -1576,10 +1568,12 @@ function renderSonges(){
   bindActions(app, handlers);
 }
 
-function renderStats(){
+/* =========================================================
+   Stats (ton code original)
+   ========================================================= */
+function renderStats(){ /* ton bloc original inchangé */
   pagePill.textContent = "Stats";
 
-  // totals global
   let mobsTotal=0, resQty=0, eqQty=0, kamasTotal=0;
 
   const mobAgg = new Map();
@@ -1612,7 +1606,6 @@ function renderStats(){
     }
   }
 
-  // songes stats
   const s = loadSonges();
   const runsTotal = Object.values(s.runs).reduce((a,b)=>a+clampInt(b),0);
   const legendsShown = SONGES.legends.filter(l => clampInt(s.legends[l.key]||0)>0);
@@ -1683,7 +1676,6 @@ function renderStats(){
     </div>
   `;
 
-  // recap cards
   const recap = $("#donjonRecap");
   recap.innerHTML = DUNGEONS.map(d=>{
     const st = ensureDungeonShape(d, loadDungeon(d.id));
@@ -1708,6 +1700,9 @@ function renderStats(){
   activateImages(app);
 }
 
+/* =========================================================
+   PP (✅ icône propre partout, sans casser le grid)
+   ========================================================= */
 function renderPP(){
   pagePill.textContent = "PP";
   const s = loadPP();
@@ -1715,7 +1710,7 @@ function renderPP(){
 
   const field = (label, key)=>`
     <div class="item">
-<img src="Icône Calculateur PP.png" class="icon">
+      <div class="ico"><img src="${PP_ICON_SRC}" alt="PP"></div>
       <div class="name">
         <p class="n">${label}</p>
         <p class="m">Clique le nombre pour pavé numérique</p>
@@ -1730,7 +1725,7 @@ function renderPP(){
     <div class="section">
       <div class="topline">
         <div class="title">
-<img src="Icône Calculateur PP.png" class="icon">
+          <div class="thumb" style="width:44px;height:44px"><img src="${PP_ICON_SRC}" alt="PP"></div>
           <div><h2>Calcul PP</h2><p class="sub">Champs vides par défaut (clean)</p></div>
         </div>
         <div class="seg">
@@ -1788,7 +1783,6 @@ function renderPP(){
 
   for(const key of Object.keys(labels)){
     handlers[`pp:pick:${key}`] = ()=>{
-      // keypad veut un int -> on laisse int (tu peux mettre % sans décimales)
       const cur = s[key]==="" ? 0 : clampInt(toNum(s[key]));
       openKeypad(labels[key], cur, (v)=>{
         s[key] = (v===0 ? "" : String(v));
@@ -1807,6 +1801,9 @@ function renderPP(){
   bindActions(app, handlers);
 }
 
+/* =========================================================
+   Omega (ton code original)
+   ========================================================= */
 function renderOmega(){
   pagePill.textContent = "Oméga";
   const s = loadOmega();
@@ -1897,7 +1894,6 @@ function render(){
    Boot
    ========================================================= */
 (async function boot(){
-  // defaults demandés
   if(!localStorage.getItem(kOmega)) saveOmega({cur:0,target:0});
   if(!localStorage.getItem(kPP)) savePP(blankPP());
 
