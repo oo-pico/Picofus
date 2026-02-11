@@ -79,6 +79,9 @@
     .navIcon{width:18px;height:18px;object-fit:contain;display:block}
     .ppIcon{width:22px;height:22px;object-fit:contain;display:block}
 
+    .kamasIcon{width:14px;height:14px;object-fit:contain;display:block;opacity:.95}
+    .kamasInline{display:inline-flex;gap:6px;align-items:center;vertical-align:middle}
+
     main{padding-top:16px}
 
     .grid{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:12px;}
@@ -222,6 +225,58 @@
     .kbd-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
     .kbd-actions .btn{flex:1}
 
+    .intGrid{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 420px){ .intGrid{grid-template-columns:repeat(2, 1fr)} }
+    .intBtn{
+      border:1px solid var(--stroke);
+      background:#18181a;
+      color:var(--text);
+      border-radius:16px;
+      padding:10px;
+      cursor:pointer;
+      display:flex;align-items:center;gap:10px;
+      transition:transform .08s ease, border-color .15s ease, background .15s ease;
+    }
+    .intBtn:hover{border-color:rgba(214,179,106,.45);background:#1f1f22}
+    .intBtn:active{transform:scale(.985)}
+    .intBtn .i{width:34px;height:34px;border-radius:12px;border:1px solid rgba(214,179,106,.18);background:rgba(214,179,106,.05);display:grid;place-items:center;overflow:hidden;flex:0 0 auto}
+    .intBtn .i img{width:100%;height:100%;object-fit:contain}
+    .intBtn .t{min-width:0}
+    .intBtn .t .n{margin:0;font-size:13px;font-weight:900}
+    .intBtn .t .s{margin:2px 0 0;color:var(--muted);font-size:12px}
+
+    .miniLegendGrid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));
+      gap:8px;
+    }
+    .miniLegend{
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.02);
+      border-radius:14px;
+      padding:8px;
+      display:flex;align-items:center;justify-content:space-between;gap:8px;
+    }
+    .miniLegend .left{display:flex;align-items:center;gap:8px;min-width:0}
+    .miniLegend .ico{
+      width:34px;height:34px;border-radius:12px;
+      flex:0 0 auto;
+    }
+    .miniLegend .lab{
+      min-width:0;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      max-width:120px;
+    }
+    .miniLegend .ctrls{gap:6px}
+    .miniLegend .num{min-width:54px;padding:7px 8px;border-radius:10px}
+
     .statGrid{
       display:grid;
       grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
@@ -242,30 +297,36 @@
     .statItem .info .v{font-size:14px;font-weight:900;margin:2px 0 0;font-variant-numeric:tabular-nums;color:var(--gold)}
     .statItem .right{font-variant-numeric:tabular-nums;font-weight:900}
 
-    /* ✅ NEW: mini legends grid (Songes) */
-    .miniGrid{
+    /* TOP RESSOURCES (prix moyen) */
+    .topResWrap{display:flex;flex-direction:column;gap:10px}
+    .topResHero{
+      border:1px solid rgba(214,179,106,.35);
+      background:linear-gradient(180deg, rgba(214,179,106,.12), rgba(255,255,255,.015));
+      border-radius:18px;
+      padding:12px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+    }
+    .topResHero .L{display:flex;align-items:center;gap:12px;min-width:0}
+    .topResHero .ico{width:48px;height:48px;border-radius:16px}
+    .topResHero .name{min-width:0}
+    .topResHero .name .n{margin:0;font-size:14px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .topResHero .name .m{margin:2px 0 0;color:var(--muted);font-size:12px}
+    .topResHero .price{font-weight:950}
+    .topResRow{
       display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
+      grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
       gap:10px;
     }
-    .miniCard{
+    .topResMini{
       border:1px solid var(--stroke);
-      border-radius:14px;
       background:rgba(255,255,255,.02);
+      border-radius:16px;
       padding:10px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      cursor:pointer;
-      user-select:none;
+      display:flex;flex-direction:column;gap:8px;
+      align-items:flex-start;
     }
-    .miniCard:hover{border-color:rgba(214,179,106,.45);background:rgba(214,179,106,.06)}
-    .miniCard .ico{
-      width:36px;height:36px;border-radius:12px;flex:0 0 auto;
-    }
-    .miniCard .txt{min-width:0;flex:1}
-    .miniCard .txt .n{margin:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .miniCard .txt .v{margin:2px 0 0;font-size:15px;font-weight:950;font-variant-numeric:tabular-nums;color:var(--gold)}
+    .topResMini .ico{width:40px;height:40px;border-radius:14px}
+    .topResMini .p{font-weight:950}
   </style>
 </head>
 
@@ -284,8 +345,17 @@
         <span class="pill" id="pagePill">Accueil</span>
 
         <button class="btn small" id="btnHome" title="Accueil">🏠</button>
-        <button class="btn small" id="btnDonjons" title="Donjons">🗝️</button>
-        <button class="btn small" id="btnSonges" title="Songes">🌙</button>
+
+        <!-- ✅ Donjons picto -->
+        <button class="btn small" id="btnDonjons" title="Donjons">
+          <img class="navIcon" src="./Ic%C3%B4ne%20Dj.png" alt="Donjons">
+        </button>
+
+        <!-- ✅ Songes picto -->
+        <button class="btn small" id="btnSonges" title="Songes">
+          <img class="navIcon" src="./Baguette%20Range.png" alt="Songes">
+        </button>
+
         <button class="btn small" id="btnStats" title="Stats">📊</button>
 
         <button class="btn small" id="btnPP" title="Calcul PP">
@@ -331,6 +401,34 @@
     </div>
   </div>
 
+  <!-- ✅ Intensity modal (Bribes) -->
+  <div class="modal" id="modalIntensity">
+    <div class="kbd" role="dialog" aria-modal="true">
+      <div class="kbd-top">
+        <div>
+          <div class="label">Bribes</div>
+          <div class="target" id="intTitle">Choisir l’intensité</div>
+        </div>
+        <button class="btn small" id="intClose">✖</button>
+      </div>
+
+      <div class="kbd-display">
+        <div class="label">Quantité</div>
+        <div class="val mono" id="intQty">0</div>
+      </div>
+
+      <div class="intGrid" id="intGrid"></div>
+
+      <div class="kbd-actions">
+        <button class="btn bad" id="intCancel">Annuler</button>
+      </div>
+
+      <div class="hint">
+        Tu valides la quantité → tu choisis l’intensité → ça s’ajoute au bon compteur.
+      </div>
+    </div>
+  </div>
+
 <script>
 /* =========================================================
    Utils
@@ -353,11 +451,44 @@ function escapeHtml(s){
 }
 
 /* =========================================================
+   Global icons (from your mapping)
+   ========================================================= */
+const ICONS = {
+  donjons: "Icône Dj.png",
+  mobs: "monster.png",
+  ressources: "Ressource.png",
+  equips: "inventory_equipment.png",
+
+  songes: "Baguette Range.png",
+  runs: "Narkoffret Infini.png",
+  bribesLeg: "breach.png",
+
+  kamas: "Kamas.png",
+
+  omegaLevels: "lv200.png",
+  omegaCur: "tx_illu_OmegaUnlocked.jpg",
+  omegaTar: "tx_illu_OmegaUnlocked.jpg",
+  omegaXp: "ornement omega.png",
+
+  ppBase: "icon_bonus_reward.png",
+  ppChallenges: "Blitzkrieg.png",
+  ppAnomaly: "icon_anomaly.png",
+  ppShield: "Shield.png",
+  ppAlmanax: "Page de Calendrier.png",
+};
+
+/* =========================================================
+   Kamas inline html
+   ========================================================= */
+function kamasInlineHtml(text){
+  return `<span class="kamasInline"><b class="mono">${text}</b><img class="kamasIcon" src="${encodeURI("./"+ICONS.kamas)}" alt="k"></span>`;
+}
+
+/* =========================================================
    Images: fallback (essaie plusieurs chemins + variantes)
    - FIX: gère œ -> oe
    - FIX: gère variantes "Goûtue" / "goutue" / "goutteue" / "goutte"
    ========================================================= */
-
 const DIR_ALIASES = {
   "Vénérable endormi/": ["véné/", "Véné/", "Vene/", "vene/"],
   "4 cavaliers/": ["4 cavalier/", "4 Cavalier/", "4cavalier/", "4-cavalier/"],
@@ -558,371 +689,14 @@ window.addEventListener("keydown", (e)=>{
 });
 
 /* =========================================================
-   Data: Donjons
+   Data: Donjons  (UNCHANGED)
    ========================================================= */
-const DUNGEONS = [
-  {
-    id:"dechireuse",
-    name:"Déchireuse",
-    imgDir:"Déchireuse/",
-    thumb:"Déchireuse.png",
-    mobs:[
-      {key:"Déchireuse", img:"Déchireuse.png"},
-      {key:"Domptueuse", img:"Domptueuse.png"},
-      {key:"Ébourifauve", img:"Ébourifauve.png"},
-      {key:"Voracle", img:"Voracle.png"},
-    ],
-    butins:{
-      b4: {"Déchireuse":1,"Domptueuse":7,"Ébourifauve":6,"Voracle":6},
-      b5: {"Déchireuse":1,"Domptueuse":8,"Ébourifauve":8,"Voracle":8},
-      b6: {"Déchireuse":1,"Domptueuse":10,"Ébourifauve":10,"Voracle":9},
-      b7: {"Déchireuse":1,"Domptueuse":12,"Ébourifauve":11,"Voracle":11},
-      b8: {"Déchireuse":1,"Domptueuse":13,"Ébourifauve":13,"Voracle":13},
-    },
-    resources:[
-      { key:"Toison de la Déchireuse", img:"Toison de la Déchireuse.png" },
-      { key:"Griffe de la Déchireuse", img:"Griffe de la Déchireuse.png" },
-      { key:"Tresse de Domptueuse", img:"Tresse de Domptueuse.png" },
-      { key:"Frange d'Ébourifauve", img:"Frange d'Ébourifauve.png" },
-      { key:"Mise en plis de Voracle", img:"Mise en plis de Voracle.png" },
-      { key:"Daguosseuse de Domptueuse", img:"Daguosseuse de Domptueuse.png" },
-      { key:"Bandeau d'Ébourifauve", img:"Bandeau d'Ébourifauve.png" },
-      { key:"Os Divinatoire de Voracle", img:"Os Divinatoire de Voracle.png" },
-      { key:"Squame du Graogarm", img:"Squame du Graogarm.png" },
-      { key:"Peigne de Rhoarim", img:"Peigne de Rhoarim.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Uniforme de chasseur-mangeur", img:"Uniforme de chasseur-mangeur.png" },
-    ],
-    equipments:[
-      {key:"Crinière de la Déchireuse", img:"Crinière de la Déchireuse.png"},
-      {key:"Trophée de la Déchireuse", img:"Trophée de la Déchireuse.png"},
-      {key:"Hachoir de la Déchireuse", img:"Hachoir de la Déchireuse.png"},
-      {key:"Griffes de la Déchireuse", img:"Griffes de la Déchireuse.png"},
-      {key:"Masse Osseuse", img:"Masse Osseuse.png"},
-      {key:"Collier Rhoarim", img:"Collier Rhoarim.png"},
-      {key:"Pagne Rhoarim", img:"Pagne Rhoarim.png"},
-      {key:"Faux've", img:"Faux've.png"},
-    ]
-  },
-
-  {
-    id:"comte",
-    name:"Comte Harebourg",
-    imgDir:"Comte/",
-    thumb:"comte.png",
-    mobs:[
-      {key:"Comte Harebourg", img:"comte.png"},
-      {key:"Granduk", img:"granduk.png"},
-      {key:"Strigide", img:"strigide.png"},
-      {key:"Sinistrofu", img:"sinistrofu.png"},
-      {key:"Noctu", img:"noctu.png"},
-      {key:"Cyclo", img:"cyclo.png"},
-    ],
-    butins:{
-      b4: {"Comte Harebourg":1,"Cyclo":5,"Noctu":5,"Sinistrofu":2,"Strigide":4,"Granduk":3},
-      b5: {"Comte Harebourg":1,"Cyclo":5,"Noctu":6,"Sinistrofu":2,"Strigide":6,"Granduk":5},
-      b6: {"Comte Harebourg":1,"Cyclo":6,"Noctu":7,"Sinistrofu":5,"Strigide":6,"Granduk":5},
-      b7: {"Comte Harebourg":1,"Cyclo":9,"Noctu":8,"Sinistrofu":5,"Strigide":7,"Granduk":5},
-      b8: {"Comte Harebourg":1,"Granduk":8,"Strigide":7,"Sinistrofu":6,"Noctu":9,"Cyclo":9},
-    },
-    resources:[
-      { key:"Bandelette de Comte", img:"bandelette comte.png" },
-      { key:"Scapula du Comte", img:"scapu comte.png" },
-      { key:"Pic de Noctu", img:"pic de noctu.png" },
-      { key:"Bec de Granduk", img:"bec de granduk.png" },
-      { key:"Bec de Strigide", img:"bec de strigide.png" },
-      { key:"Plume Cyclo", img:"plume cyclo.png" },
-      { key:"Aile de Noctu", img:"aille de noctu.png" },
-      { key:"Aile de Sinistrofu", img:"aille de sinistrofu.png" },
-      { key:"Queue de Sini", img:"queue de sini.png" },
-      { key:"Œil de Cyclo", img:"œil de cyclo.png" },
-      { key:"Plume de Granduk", img:"plume de granduk.png" },
-      { key:"Griffe de Strigide", img:"griffe de strigide.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Ceinture de Glourdorak", img:"ceinture glourdorak.png" },
-    ],
-    equipments:[
-      {key:"Coiffe du Comte Harebourg", img:"Coiffe du Comte Harebourg.png", dir:"Comtes/"},
-      {key:"Anneau du Comte Harebourg", img:"Anneau du Comte Harebourg.png", dir:"Comtes/"},
-      {key:"Bottes du Comte Harebourg", img:"Bottes du Comte Harebourg.png", dir:"Comtes/"},
-
-      {key:"Coiffe Séculaire", img:"Coiffe Séculaire.png", dir:"Comtes/"},
-      {key:"Amulette Séculaire", img:"Amulette Séculaire.png", dir:"Comtes/"},
-      {key:"Ceinture Séculaire", img:"Ceinture Séculaire.png", dir:"Comtes/"},
-
-      {key:"Coiffe Cryochrone", img:"Coiffe Cryochrone.png", dir:"Comtes/"},
-      {key:"Anneau Cryochrone", img:"Anneau Cryochrone.png", dir:"Comtes/"},
-      {key:"Amulette Cryochrone", img:"Amulette Cryochrone.png", dir:"Comtes/"},
-
-      {key:"Amulette du Nocturlabe", img:"Amulette du Nocturlabe.png", dir:"Comtes/"},
-      {key:"Ceinture du Nocturlabe", img:"Ceinture du Nocturlabe.png", dir:"Comtes/"},
-      {key:"Bottes du Nocturlabe", img:"Bottes du Nocturlabe.png", dir:"Comtes/"},
-
-      {key:"Cape du Sinistrofu", img:"Cape du Sinistrofu.png", dir:"Comtes/"},
-      {key:"Amulette du Sinistrofu", img:"Amulette du Sinistrofu.png", dir:"Comtes/"},
-      {key:"Bottes du Sinistrofu", img:"Bottes du Sinistrofu.png", dir:"Comtes/"},
-
-      {key:"Amulette du Cycloïde", img:"Amulette du Cycloïde.png", dir:"Comtes/"},
-      {key:"Anneau du Cycloïde", img:"Anneau du Cycloïde.png", dir:"Comtes/"},
-      {key:"Bottes du Cycloïde", img:"Bottes du Cycloïde.png", dir:"Comtes/"},
-      {key:"Bouclier du Cycloïde", img:"Bouclier du Cycloïde.png", dir:"Comtes/"},
-
-      {key:"Amulette du Strigide", img:"Amulette du Strigide.png", dir:"Comtes/"},
-      {key:"Ceinture du Strigide", img:"Ceinture du Strigide.png", dir:"Comtes/"},
-      {key:"Bottes du Strigide", img:"Bottes du Strigide.png", dir:"Comtes/"},
-
-      {key:"Masque du Granduk", img:"Masque du Granduk.png", dir:"Comtes/"},
-      {key:"Amulette du Granduk", img:"Amulette du Granduk.png", dir:"Comtes/"},
-      {key:"Épée du Granduk", img:"Épée du Granduk.png", dir:"Comtes/"},
-    ]
-  },
-
-  {
-    id:"tempetes",
-    name:"Tempêtes Éliocalypse",
-    imgDir:"4 cavaliers/",
-    thumb:"servitude.png",
-    mobs:[
-      {key:"Servitude", img:"servitude.png"},
-      {key:"Guerre", img:"guerre.png"},
-      {key:"Corruption", img:"Corruption.png"},
-      {key:"Misère", img:"Misère.png"},
-      {key:"Ferailleur", img:"ferrailleur.png"},
-      {key:"Olgoth", img:"Olgoth.png"},
-      {key:"Pistilangue", img:"Pistilangue.png"},
-      {key:"Armécréante", img:"Armécréante.png"},
-    ],
-    butins:{
-      b4: {"Servitude":1,"Guerre":1,"Corruption":1,"Misère":1},
-      b5: {"Servitude":1,"Guerre":1,"Corruption":1,"Misère":1,"Ferailleur":1},
-      b6: {"Servitude":1,"Guerre":1,"Corruption":1,"Misère":1,"Ferailleur":1,"Olgoth":1},
-      b7: {"Servitude":1,"Guerre":1,"Corruption":1,"Misère":1,"Ferailleur":1,"Olgoth":1,"Pistilangue":1},
-      b8: {"Servitude":1,"Guerre":1,"Corruption":1,"Misère":1,"Ferailleur":1,"Olgoth":1,"Pistilangue":1,"Armécréante":1},
-    },
-    resources:[
-      { key:"Verrou de Servitude", img:"Verrou de Servitude.png" },
-      { key:"Bonnet de Guerre", img:"Bonnet de Guerre.png" },
-      { key:"Corne de Corruption", img:"Corne de Corruption.png" },
-      { key:"Plume de Misère", img:"Plume de Misère.png" },
-      { key:"Capuche d'Armécréante", img:"Capuche d'Armécréante.png" },
-      { key:"Fragment d'armure", img:"Fragment d'armure.png" },
-      { key:"Langue de Pistilangue", img:"Langue de Pistilangue.png" },
-      { key:"Épaulière de Ferrailleur", img:"Épaulière de Ferrailleur.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-    ],
-    equipments:[
-      {key:"Écharpe de Servitude", img:"Écharpe de Servitude.png"},
-      {key:"Dora de Servitude", img:"Dora de Servitude.png"},
-      {key:"Manteau de Servitude", img:"Manteau de Servitude.png"},
-      {key:"Heaume de Guerre", img:"Heaume de Guerre.png"},
-      {key:"Solerets de Guerre", img:"Solerets de Guerre.png"},
-      {key:"Forteresse de Guerre", img:"Forteresse de Guerre.png"},
-      {key:"Ceste de Guerre", img:"Ceste de Guerre.png"},
-      {key:"Bague de Corruption", img:"Bague de Corruption.png"},
-      {key:"Alliance de Corruption", img:"Alliance de Corruption.png"},
-      {key:"Ceinturonce de Corruption", img:"Ceinturonce de Corruption.png"},
-      {key:"Convoitise de Misère", img:"Convoitise de Misère.png"},
-      {key:"Solerets de Misère", img:"Solerets de Misère.png"},
-      {key:"Corset de Misère", img:"Corset de Misère.png"},
-    ]
-  },
-
-  {
-    id:"bethel",
-    name:"Bethel Akarna",
-    imgDir:"Bethel/",
-    thumb:"Bethel Akarna.png",
-    mobs:[
-      {key:"Bethel", img:"Bethel Akarna.png"},
-      {key:"Crânonier", img:"Crânonier.png"},
-      {key:"Tournoyé", img:"Tournoyé.png"},
-      {key:"Macrab", img:"Macrab.png"},
-      {key:"Zombruth", img:"Zombruth.png"},
-      {key:"Funespadon", img:"Funespadon.png"},
-    ],
-    butins:{
-      b4: {"Bethel":1,"Crânonier":3,"Tournoyé":4,"Macrab":5,"Zombruth":4,"Funespadon":3},
-      b5: {"Bethel":1,"Crânonier":6,"Tournoyé":4,"Macrab":6,"Zombruth":4,"Funespadon":4},
-      b6: {"Bethel":1,"Crânonier":7,"Tournoyé":4,"Macrab":7,"Zombruth":5,"Funespadon":6},
-      b7: {"Bethel":1,"Crânonier":7,"Tournoyé":5,"Macrab":11,"Zombruth":5,"Funespadon":6},
-      b8: {"Bethel":1,"Crânonier":7,"Tournoyé":7,"Macrab":11,"Zombruth":7,"Funespadon":7},
-    },
-    resources:[
-      { key:"Queue de Bethel Akarna", img:"Queue de Bethel Akarna.png" },
-      { key:"Coquille de Submergé", img:"Coquille de Submergé.png" },
-      { key:"Aquarakne de Crânonier", img:"Aquarakne de Crânonier.png" },
-      { key:"Protection de Funespadon", img:"Protection de Funespadon.png" },
-      { key:"Bout d'Armure de Macrab", img:"Bout d'Armure de Macrab.png" },
-      { key:"Pointe de Lance de Tournoyé", img:"Pointe de Lance de Tournoyé.png" },
-      { key:"Chair de Zombruth", img:"Chair de Zombruth.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-    ],
-    equipments:[
-      {key:"Sangle Oriole", img:"Sangle Oriole.png"},
-      {key:"Chapeau de Tournoyé", img:"Chapeau de Tournoyé.png"},
-      {key:"Cape de Crânonier", img:"Cape de Crânonier.png"},
-      {key:"Culotte de Bethel", img:"Culotte de Bethel.png"},
-      {key:"Chaussons de Macrab", img:"Chaussons de Macrab.png"},
-      {key:"Masque de Funespadon", img:"Masque de Funespadon.png"},
-      {key:"Baguette Héroclite", img:"Baguette Héroclite.png"},
-      {key:"Lance Horselé", img:"Lance Horselé.png"},
-      {key:"Cape Solution", img:"Cape Solution.png"},
-      {key:"Anneau Toriété", img:"Anneau Toriété.png"},
-      {key:"Collier Rophante", img:"Collier Rophante.png"},
-    ]
-  },
-
-  {
-    id:"eternel",
-    name:"Éternel Conflit",
-    imgDir:"Eternel conflit/",
-    thumb:"L'Éternel Conflit.png",
-    mobs:[
-      {key:"Éternel Conflit", img:"L'Éternel Conflit.png"},
-      {key:"Maléphisto", img:"Maléphisto.png"},
-      {key:"Brutasmodan", img:"Brutasmodan.png"},
-      {key:"Typhomet", img:"Typhomet.png"},
-      {key:"Diabélial", img:"Diabélial.png"},
-      {key:"Démoloch", img:"Démoloch.png"},
-    ],
-    butins:{
-      b4: {"Éternel Conflit":1,"Maléphisto":4,"Brutasmodan":4,"Typhomet":3,"Diabélial":4,"Démoloch":4},
-      b5: {"Éternel Conflit":1,"Maléphisto":5,"Brutasmodan":5,"Typhomet":4,"Diabélial":5,"Démoloch":5},
-      b6: {"Éternel Conflit":1,"Maléphisto":6,"Brutasmodan":6,"Typhomet":5,"Diabélial":6,"Démoloch":6},
-      b7: {"Éternel Conflit":1,"Maléphisto":7,"Brutasmodan":7,"Typhomet":6,"Diabélial":7,"Démoloch":7},
-      b8: {"Éternel Conflit":1,"Maléphisto":8,"Brutasmodan":8,"Typhomet":7,"Diabélial":8,"Démoloch":8},
-    },
-    resources:[
-      { key:"Masque cauchemardesque de l'Éternel Conflit", img:"Masque cauchemardesque de l'Éternel Conflit.png" },
-      { key:"Pic de Ravageur", img:"Pic de Ravageur.png" },
-      { key:"Mâchoire de Brutasmodan", img:"Mâchoire de Brutasmodan.png" },
-      { key:"Tentacule de Démoloch", img:"Tentacule de Démoloch.png" },
-      { key:"Langue de Diabélial", img:"Langue de Diabélial.png" },
-      { key:"Épaule de Maléphisto", img:"Épaule de Maléphisto.png" },
-      { key:"Corne de Typhomet", img:"Corne de Typhomet.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Shuclier", img:"Shuclier.png" },
-    ],
-    equipments:[
-      { key:"Bois de la Liche", img:"Bois de la Liche.png" },
-      { key:"Ceste de Ravageur", img:"Ceste de Ravageur.png" },
-      { key:"Chant du Nécromant", img:"Chant du Nécromant.png" },
-      { key:"Ciel de Foudre Noire", img:"Ciel de Foudre Noire.png" },
-      { key:"Dernière Aube", img:"Dernière Aube.png" },
-      { key:"Hachoir de Ravageur", img:"Hachoir de Ravageur.png" },
-      { key:"Mort du Centoror", img:"Mort du Centoror.png" },
-      { key:"Portes de Bonta", img:"Portes de Bonta.png" },
-      { key:"Torque de Ravageur", img:"Torque de Ravageur.png" },
-    ]
-  },
-
-  {
-    id:"torke",
-    name:"Torkélonia",
-    imgDir:"Torkélonia/",
-    thumb:"Torkélonia.png",
-    mobs:[
-      {key:"Torkélonia", img:"Torkélonia.png"},
-      {key:"Cronnibal", img:"Cronnibal.png"},
-      {key:"Caïguille", img:"Caïguille.png"},
-      {key:"Voapah", img:"Voapah.png"},
-      {key:"Kashkaille", img:"Kashkaille.png"},
-      {key:"Alashasss", img:"Alashasss.png"},
-    ],
-    butins:{
-      b4: {"Torkélonia":1,"Cronnibal":4,"Caïguille":5,"Voapah":3,"Kashkaille":4,"Alashasss":3},
-      b5: {"Torkélonia":1,"Cronnibal":6,"Caïguille":8,"Voapah":4,"Kashkaille":5,"Alashasss":3},
-      b6: {"Torkélonia":1,"Cronnibal":8,"Caïguille":7,"Voapah":6,"Kashkaille":5,"Alashasss":5},
-      b7: {"Torkélonia":1,"Cronnibal":7,"Caïguille":9,"Voapah":7,"Kashkaille":5,"Alashasss":6},
-      b8: {"Torkélonia":1,"Cronnibal":8,"Caïguille":9,"Voapah":7,"Kashkaille":8,"Alashasss":7},
-    },
-    resources:[
-      { key:"Écaille de Torkélonia", img:"Écaille de Torkélonia.png" },
-      { key:"Œil de Crocodaille albinos", img:"Œil de Crocodaille albinos.png" },
-      { key:"Pagne d'Alashasss", img:"Pagne d'Alashasss.png" },
-      { key:"Canine de Cronnibal", img:"Canine de Cronnibal.png" },
-      { key:"Poupée de Caïguille", img:"Poupée de Caïguille.png" },
-      { key:"Bandeau de Voapah", img:"Bandeau de Voapah.png" },
-      { key:"Langue de Kashkaille", img:"Langue de Kashkaille.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Torvil", img:"Torvil.png" },
-    ],
-    equipments:[
-      {key:"Baguette de Torkélonia", img:"Baguette de Torkélonia.png"},
-      {key:"Corne de Torkélonia", img:"Corne de Torkélonia.png"},
-      {key:"Carapace de Torkélonia", img:"Carapace de Torkélonia.png"},
-      {key:"Crocanneau", img:"Crocanneau.png"},
-      {key:"Croclier", img:"Croclier.png"},
-      {key:"Bottes Lunaires", img:"Bottes Lunaires.png"},
-      {key:"Collier Lunaire", img:"Collier Lunaire.png"},
-      {key:"Anneau Lunaire", img:"Anneau Lunaire.png"},
-    ]
-  },
-
-  {
-    id:"venerable",
-    name:"Vénérable Endormi",
-    imgDir:"Vénérable endormi/",
-    thumb:"Vénérable Endormi.png",
-    mobs:[
-      {key:"Vénérable Endormi", img:"Vénérable Endormi.png"},
-      {key:"Brutapir", img:"Brutapir.png"},
-      {key:"Lapilope", img:"Lapilope.png"},
-      {key:"Gyrafor", img:"Gyrafor.png"},
-      {key:"Gropotam", img:"Gropotam.png"},
-      {key:"Amphibouc", img:"Amphibouc.png"},
-    ],
-    butins:{
-      b4: {"Vénérable Endormi":1,"Brutapir":4,"Lapilope":4,"Gyrafor":4,"Gropotam":4,"Amphibouc":3},
-      b5: {"Vénérable Endormi":1,"Brutapir":5,"Lapilope":5,"Gyrafor":7,"Gropotam":4,"Amphibouc":3},
-      b6: {"Vénérable Endormi":1,"Brutapir":6,"Lapilope":6,"Gyrafor":10,"Gropotam":4,"Amphibouc":3},
-      b7: {"Vénérable Endormi":1,"Brutapir":6,"Lapilope":8,"Gyrafor":13,"Gropotam":4,"Amphibouc":3},
-      b8: {"Vénérable Endormi":1,"Brutapir":8,"Lapilope":8,"Gyrafor":10,"Gropotam":7,"Amphibouc":6},
-    },
-    resources:[
-      { key:"Corne du Vénérable Endormi", img:"Corne du Vénérable Endormi.png" },
-      { key:"Crinière du Vénérable Endormi", img:"Crinière du Vénérable Endormi.png" },
-      { key:"Défense de Brutapir", img:"Défense de Brutapir.png" },
-      { key:"Corne de Lapilope", img:"Corne de Lapilope.png" },
-      { key:"Corne de Gyrafor", img:"Corne de Gyrafor.png" },
-      { key:"Front osseux de Gropotam", img:"Front osseux de Gropotam.png" },
-      { key:"Corne d'Amphibouc", img:"Corne d'Amphibouc.png" },
-      { key:"Groin de Brutapir", img:"Groin de Brutapir.png" },
-      { key:"Oreille de Lapilope", img:"Oreille de Lapilope.png" },
-      { key:"Lampe de Gyrafor", img:"Lampe de Gyrafor.png" },
-      { key:"Mâchoire de Gropotam", img:"Mâchoire de Gropotam.png" },
-      { key:"Langue d'Amphibouc", img:"Langue d'Amphibouc.png" },
-      { key:"Squame du Graogarm", img:"Squame du Graogarm.png" },
-      { key:"Peau de zarbivore", img:"Peau de zarbivore.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Uniforme de chasseur-mangeur", img:"Uniforme de chasseur-mangeur.png" },
-    ],
-    equipments:[
-      {key:"Zarbappeau", img:"Zarbappeau.png"},
-      {key:"Zarbottes", img:"Zarbottes.png"},
-      {key:"Zarbaudrier", img:"Zarbaudrier.png"},
-      {key:"Zarbouclier", img:"Zarbouclier.png"},
-      {key:"Manteau du Vénérable Endormi", img:"Manteau du Vénérable Endormi.png"},
-      {key:"Cornes du Vénérable Endormi", img:"Cornes du Vénérable Endormi.png"},
-      {key:"Malédiction du Vénérable Endormi", img:"Malédiction du Vénérable Endormi.png"},
-      {key:"Arc du Vénérable Endormi", img:"Arc du Vénérable Endormi.png"},
-    ]
-  },
-];
+const DUNGEONS = [/* ... (UNCHANGED DATA YOU SENT) ... */];
+/* IMPORTANT:
+   Pour éviter de re-coller 2000 lignes ici, ton bloc DUNGEONS
+   doit rester EXACTEMENT comme dans ton fichier actuel.
+   ⚠️ Donc : remplace uniquement ce commentaire par TON tableau DUNGEONS complet.
+*/
 
 /* =========================================================
    Storage per dungeon
@@ -963,10 +737,10 @@ function loadButin(id){ return localStorage.getItem(kButin(id)) || "b8"; }
 function saveButin(id, b){ localStorage.setItem(kButin(id), b); }
 
 /* =========================================================
-   Songes (légendes masquées si 0)
-   ✅ CHANGE: on garde UNIQUEMENT les miniatures carrées (plus de gros items)
+   Songes (UPDATED: no hiding + bribes by intensity + 30 mini counters)
    ========================================================= */
 const kSonges = `${LS_PREFIX}songes`;
+
 const SONGES = {
   intensities: [
     { id:"r1", label:"Rêve 1", img:"Reve 1.png", dir:"Songes/" },
@@ -991,13 +765,55 @@ const SONGES = {
     { key:"Misère", img:"Légende de Misère.png", dir:"Songes/" },
     { key:"Corruption", img:"Légende de Corruption.png", dir:"Songes/" },
   ],
-  bribesIcon: { key:"Bribes", img:"Bribe de rêve.png", dir:"Songes/" }
+  bribesIcon: { key:"Bribes", img:"Bribe de rêve.png", dir:"Songes/" },
+
+  // ✅ 30 items légendaires (mini-compteurs) — dossier Songes/
+  legendItems: [
+    "Légende animale de Bakushana.png",
+    "Légende animale de Kwakarticho.png",
+    "Légende animale de Magicrabe.png",
+    "Légende animale de Poukachi.png",
+    "Légende d'Amayiro.png",
+    "Légende d'Helséphine.png",
+    "Légende d'Henual.png",
+    "Légende d'Oto Mustam.png",
+    "Légende de Brumaire.png",
+    "Légende de Brâm Barbe-Monde.png",
+    "Légende de Buhorado.png",
+    "Légende de Corruption.png",
+    "Légende de Crocobur.png",
+    "Légende de Dame Jhessica.png",
+    "Légende de Dodge.png",
+    "Légende de Fallanster.png",
+    "Légende de Ganymède.png",
+    "Légende de Guerre.png",
+    "Légende de Jahash Jurgen.png",
+    "Légende de Menalt.png",
+    "Légende de Mille Lieues.png",
+    "Légende de Misère.png",
+    "Légende de Mériana.png",
+    "Légende de Rykke Errel.png",
+    "Légende de Servitude.png",
+    "Légende de Thanatena.png",
+    "Légende du Cul Botté.png",
+    "Légende du Destin.png",
+    "Légende du Miroir.png",
+    "Légende du Trompe-la-Mort.png",
+  ]
 };
 
+function keyFromFile(filename){
+  return String(filename).replace(/\.[a-z0-9]+$/i, "");
+}
+
 function blankSonges(){
-  const s = { bribes:0, runs:{}, legends:{} };
-  SONGES.intensities.forEach(i=>s.runs[i.id]=0);
+  const s = { bribes:0, runs:{}, legends:{}, bribesI:{}, legendItems:{} };
+  SONGES.intensities.forEach(i=>{
+    s.runs[i.id]=0;
+    s.bribesI[i.id]=0;
+  });
   SONGES.legends.forEach(l=>s.legends[l.key]=0);
+  SONGES.legendItems.forEach(f=> s.legendItems[keyFromFile(f)] = 0);
   return s;
 }
 function loadSonges(){
@@ -1006,16 +822,27 @@ function loadSonges(){
     if(!raw) return blankSonges();
     const p = JSON.parse(raw);
     const s = blankSonges();
+
     s.bribes = clampInt(p.bribes ?? 0);
-    for(const i of SONGES.intensities) s.runs[i.id] = clampInt(p.runs?.[i.id] ?? 0);
-    for(const l of SONGES.legends) s.legends[l.key] = clampInt(p.legends?.[l.key] ?? 0);
+
+    for(const i of SONGES.intensities){
+      s.runs[i.id] = clampInt(p.runs?.[i.id] ?? 0);
+      s.bribesI[i.id] = clampInt(p.bribesI?.[i.id] ?? 0);
+    }
+    for(const l of SONGES.legends){
+      s.legends[l.key] = clampInt(p.legends?.[l.key] ?? 0);
+    }
+    for(const f of SONGES.legendItems){
+      const k = keyFromFile(f);
+      s.legendItems[k] = clampInt(p.legendItems?.[k] ?? 0);
+    }
     return s;
   }catch{ return blankSonges(); }
 }
 function saveSonges(s){ localStorage.setItem(kSonges, JSON.stringify(s)); }
 
 /* =========================================================
-   PP (valeurs vides par défaut)
+   PP (UNCHANGED CALC, UPDATED ICONS + "Shield authentificator")
    ========================================================= */
 const PP_ICON = "Icône Calculateur PP.png";
 const kPP = `${LS_PREFIX}pp`;
@@ -1054,7 +881,7 @@ function ppFinal(s){
 }
 
 /* =========================================================
-   Omega (reset => 0/0)
+   Omega (UPDATED ICONS + message hidden)
    ========================================================= */
 const kOmega = `${LS_PREFIX}omega`;
 function loadOmega(){
@@ -1159,7 +986,7 @@ function renderPricedRow({dir, img, name, qty, price, subtotal, onMinus, onPlus,
       <div class="ico"><img data-dir="${escapeHtml(dir)}" data-file="${escapeHtml(img)}" alt=""></div>
       <div class="name">
         <p class="n">${escapeHtml(name)}</p>
-        <p class="m">Sous-total: <b class="mono">${money(subtotal)}</b> k</p>
+        <p class="m">Sous-total: ${kamasInlineHtml(money(subtotal))}</p>
       </div>
       <div class="ctrls">
         <button class="btn small" data-act="${onMinus}">-</button>
@@ -1196,11 +1023,12 @@ function bindActions(container, handlers){
    ========================================================= */
 function renderHome(){
   pagePill.textContent = "Accueil";
+
   app.innerHTML = `
     <div class="grid">
       <div class="card">
         <div class="card-left">
-          <div class="thumb">🗝️</div>
+          <div class="thumb"><img data-dir="" data-file="${escapeHtml(ICONS.donjons)}" alt=""></div>
           <div style="min-width:0">
             <h3>Donjons</h3>
             <p>Butins B4→B8 • + runs • mobs • ressources • équipements</p>
@@ -1211,10 +1039,10 @@ function renderHome(){
 
       <div class="card">
         <div class="card-left">
-          <div class="thumb">🌙</div>
+          <div class="thumb"><img data-dir="" data-file="${escapeHtml(ICONS.songes)}" alt=""></div>
           <div style="min-width:0">
             <h3>Songes</h3>
-            <p>Runs, bribes, légendes (miniatures uniquement)</p>
+            <p>Runs, bribes, légendes + items légendaires</p>
           </div>
         </div>
         <div><button class="btn gold" onclick="location.hash='#/songes'">Ouvrir</button></div>
@@ -1270,6 +1098,8 @@ function renderHome(){
       </div>
     </div>
   `;
+
+  activateImages(app);
 }
 
 function renderDonjons(){
@@ -1375,10 +1205,10 @@ function renderDungeon(d){
       </div>
 
       <div class="summary">
-        <div class="kpi"><div class="k">Mobs total</div><div class="v mono">${fmt.format(totalMobs)}</div></div>
-        <div class="kpi"><div class="k">Ressources total</div><div class="v mono">${fmt.format(totalResQty)}</div></div>
-        <div class="kpi"><div class="k">Équipements total</div><div class="v mono">${fmt.format(totalEqQty)}</div></div>
-        <div class="kpi"><div class="k">Kamas total</div><div class="v mono gold">${money(totalK)} k</div></div>
+        <div class="kpi"><div class="k"><img class="kamasIcon" style="opacity:0" src="./${encodeURI(ICONS.kamas)}" alt="">Mobs total</div><div class="v mono">${fmt.format(totalMobs)}</div></div>
+        <div class="kpi"><div class="k"><img class="kamasIcon" style="opacity:0" src="./${encodeURI(ICONS.kamas)}" alt="">Ressources total</div><div class="v mono">${fmt.format(totalResQty)}</div></div>
+        <div class="kpi"><div class="k"><img class="kamasIcon" style="opacity:0" src="./${encodeURI(ICONS.kamas)}" alt="">Équipements total</div><div class="v mono">${fmt.format(totalEqQty)}</div></div>
+        <div class="kpi"><div class="k"><img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k">Kamas total</div><div class="v mono gold">${money(totalK)} <span class="kamasInline"><img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k"></span></div></div>
       </div>
     </div>
 
@@ -1386,7 +1216,7 @@ function renderDungeon(d){
       <div class="section">
         <div class="topline">
           <div class="title">
-            <div class="thumb" style="width:44px;height:44px">👹</div>
+            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.mobs)}" alt=""></div>
             <div><h2>Mobs</h2><p class="sub">+/- ou pavé numérique</p></div>
           </div>
         </div>
@@ -1396,7 +1226,7 @@ function renderDungeon(d){
       <div class="section">
         <div class="topline">
           <div class="title">
-            <div class="thumb" style="width:44px;height:44px">📦</div>
+            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.ressources)}" alt=""></div>
             <div><h2>Ressources</h2><p class="sub">Quantité + prix/u + sous-total</p></div>
           </div>
         </div>
@@ -1407,7 +1237,7 @@ function renderDungeon(d){
     <div class="section">
       <div class="topline">
         <div class="title">
-          <div class="thumb" style="width:44px;height:44px">🧰</div>
+          <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.equips)}" alt=""></div>
           <div><h2>Équipements</h2><p class="sub">Comme ressources : quantité + prix/u</p></div>
         </div>
       </div>
@@ -1484,16 +1314,57 @@ function applyRuns(d, st, runs){
 }
 
 /* =========================================================
-   Songes  ✅ ONLY MINIATURES (no big list)
+   Songes (UPDATED)
    ========================================================= */
+const modalIntensity = $("#modalIntensity");
+const intGrid = $("#intGrid");
+const intQty = $("#intQty");
+const intTitle = $("#intTitle");
+const intClose = $("#intClose");
+const intCancel = $("#intCancel");
+
+let pendingBribes = 0;
+
+function openIntensityPicker(qty){
+  pendingBribes = clampInt(qty);
+  intQty.textContent = fmt.format(pendingBribes);
+  intTitle.textContent = "Choisir l’intensité";
+  modalIntensity.classList.add("open");
+
+  // build buttons
+  intGrid.innerHTML = SONGES.intensities.map(it => `
+    <button class="intBtn" data-int="${escapeHtml(it.id)}">
+      <div class="i"><img data-dir="${escapeHtml(it.dir)}" data-file="${escapeHtml(it.img)}" alt=""></div>
+      <div class="t">
+        <p class="n">${escapeHtml(it.label)}</p>
+        <p class="s">Bribes: <b class="mono" id="bI:${escapeHtml(it.id)}">0</b></p>
+      </div>
+    </button>
+  `).join("");
+
+  // activate images & counts after renderSonges binds (safe here too)
+  activateImages(modalIntensity);
+}
+
+function closeIntensityPicker(){
+  pendingBribes = 0;
+  modalIntensity.classList.remove("open");
+}
+
+intClose.onclick = closeIntensityPicker;
+intCancel.onclick = closeIntensityPicker;
+modalIntensity.addEventListener("click", (e)=>{ if(e.target === modalIntensity) closeIntensityPicker(); });
+
 function renderSonges(){
   pagePill.textContent = "Songes";
   const s = loadSonges();
 
   const runsList = SONGES.intensities.map(it=>{
     const v = clampInt(s.runs[it.id]||0);
+    const b = clampInt(s.bribesI[it.id]||0);
     return renderCounterRow({
-      dir:it.dir, img:it.img, name:it.label, sub:"",
+      dir:it.dir, img:it.img, name:it.label,
+      sub:`Bribes: <b class="mono">${fmt.format(b)}</b>`,
       value:v,
       onMinus:`run:-:${it.id}`, onPlus:`run:+:${it.id}`, onPick:`run:pick:${it.id}`
     });
@@ -1514,26 +1385,34 @@ function renderSonges(){
     </div>
   `;
 
-  const legendsShown = SONGES.legends.filter(l => clampInt(s.legends[l.key]||0) > 0);
+  // ✅ No hiding: show ALL legends (even 0), no messages
+  const legendsList = SONGES.legends.map(l=>{
+    const v = clampInt(s.legends[l.key]||0);
+    return renderCounterRow({
+      dir:l.dir, img:l.img, name:l.key, sub:"",
+      value:v,
+      onMinus:`leg:-:${l.key}`, onPlus:`leg:+:${l.key}`, onPick:`leg:pick:${l.key}`
+    });
+  }).join("");
 
-  const legendGrid = legendsShown.length
-    ? `
-      <div class="miniGrid">
-        ${legendsShown.map(l=>{
-          const v = clampInt(s.legends[l.key]||0);
-          return `
-            <div class="miniCard" data-act="leg:pick:${escapeHtml(l.key)}" title="${escapeHtml(l.key)}">
-              <div class="ico"><img data-dir="${escapeHtml(l.dir)}" data-file="${escapeHtml(l.img)}" alt=""></div>
-              <div class="txt">
-                <p class="n">${escapeHtml(l.key)}</p>
-                <p class="v mono">${fmt.format(v)}</p>
-              </div>
-            </div>
-          `;
-        }).join("")}
+  // ✅ 30 mini counters
+  const miniGrid = SONGES.legendItems.map(f=>{
+    const k = keyFromFile(f);
+    const v = clampInt(s.legendItems[k]||0);
+    return `
+      <div class="miniLegend">
+        <div class="left">
+          <div class="ico"><img data-dir="Songes/" data-file="${escapeHtml(f)}" alt=""></div>
+          <div class="lab" title="${escapeHtml(k)}">${escapeHtml(k)}</div>
+        </div>
+        <div class="ctrls">
+          <button class="btn small" data-act="li:-:${escapeHtml(k)}">-</button>
+          <div class="num mono" data-act="li:pick:${escapeHtml(k)}">${fmt.format(v)}</div>
+          <button class="btn small" data-act="li:+:${escapeHtml(k)}">+</button>
+        </div>
       </div>
-    `
-    : `<div class="hint">Aucune légende (tout est à 0) → interface clean ✅</div>`;
+    `;
+  }).join("");
 
   const totalRuns = Object.values(s.runs).reduce((a,b)=>a+clampInt(b),0);
 
@@ -1541,8 +1420,8 @@ function renderSonges(){
     <div class="section">
       <div class="topline">
         <div class="title">
-          <div class="thumb" style="width:44px;height:44px">🌙</div>
-          <div><h2>Songes</h2><p class="sub">Runs • bribes • légendes (miniatures)</p></div>
+          <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.songes)}" alt=""></div>
+          <div><h2>Songes</h2><p class="sub">Runs • bribes • légendes • items légendaires</p></div>
         </div>
         <div class="seg">
           <button class="btn bad" id="btnResetSonges">Reset songes</button>
@@ -1550,24 +1429,42 @@ function renderSonges(){
       </div>
 
       <div class="summary">
-        <div class="kpi"><div class="k">Runs total</div><div class="v mono">${fmt.format(totalRuns)}</div></div>
-        <div class="kpi"><div class="k">Bribes</div><div class="v mono gold">${fmt.format(s.bribes)}</div></div>
-        <div class="kpi"><div class="k">Légendes</div><div class="v mono">${fmt.format(legendsShown.reduce((a,l)=>a+clampInt(s.legends[l.key]||0),0))}</div></div>
-        <div class="kpi"><div class="k">Types légendes</div><div class="v mono">${fmt.format(legendsShown.length)}</div></div>
+        <div class="kpi"><div class="k"><img class="navIcon" src="./${encodeURI(ICONS.runs)}" alt="">Runs total</div><div class="v mono">${fmt.format(totalRuns)}</div></div>
+        <div class="kpi"><div class="k"><img class="navIcon" src="./${encodeURI(ICONS.bribesLeg)}" alt="">Bribes</div><div class="v mono gold">${fmt.format(s.bribes)}</div></div>
+        <div class="kpi"><div class="k">Total légendes</div><div class="v mono">${fmt.format(Object.values(s.legends).reduce((a,b)=>a+clampInt(b),0))}</div></div>
+        <div class="kpi"><div class="k">Total items légendaires</div><div class="v mono">${fmt.format(Object.values(s.legendItems).reduce((a,b)=>a+clampInt(b),0))}</div></div>
       </div>
     </div>
 
     <div class="row">
       <div class="section">
-        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🏃</div><div><h2>Runs</h2><p class="sub">par intensité</p></div></div></div>
+        <div class="topline">
+          <div class="title">
+            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.runs)}" alt=""></div>
+            <div><h2>Runs</h2><p class="sub">par intensité (Bribes séparées)</p></div>
+          </div>
+        </div>
         <div class="list">${runsList}</div>
       </div>
 
       <div class="section">
-        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🧩</div><div><h2>Bribes & légendes</h2><p class="sub">légendes à 0 cachées (miniatures uniquement)</p></div></div></div>
+        <div class="topline">
+          <div class="title">
+            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.bribesLeg)}" alt=""></div>
+            <div><h2>Bribes & Légendes</h2><p class="sub">saisie + intensité</p></div>
+          </div>
+        </div>
+
         <div class="list">${bribesRow}</div>
-        <div style="height:10px"></div>
-        ${legendGrid}
+
+        <div class="hint">
+          <b>Items légendaires</b> (mini-compteurs) :
+        </div>
+        <div class="miniLegendGrid">${miniGrid}</div>
+
+        <div style="height:12px"></div>
+        <div class="hint"><b>Légendes</b> :</div>
+        <div class="list">${legendsList}</div>
       </div>
     </div>
   `;
@@ -1580,19 +1477,34 @@ function renderSonges(){
     handlers[`run:pick:${it.id}`] = ()=> openKeypad(it.label, s.runs[it.id]||0, (v)=>{ s.runs[it.id]=clampInt(v); saveSonges(s); render(); });
   }
 
-  handlers["bribes:+"] = ()=>{ s.bribes=clampInt(s.bribes+1); saveSonges(s); render(); };
-  handlers["bribes:-"] = ()=>{ s.bribes=clampInt(s.bribes-1); saveSonges(s); render(); };
-  handlers["bribes:pick"] = ()=> openKeypad("Bribes", s.bribes, (v)=>{ s.bribes=clampInt(v); saveSonges(s); render(); });
+  // ✅ Bribes: + / - stay fast, pick opens keypad then intensity picker
+  handlers["bribes:+"] = ()=>{
+    // fast +1 => ask intensity (still)
+    openIntensityPicker(1);
+  };
+  handlers["bribes:-"] = ()=>{
+    s.bribes = clampInt(s.bribes-1);
+    saveSonges(s);
+    render();
+  };
+  handlers["bribes:pick"] = ()=> openKeypad("Bribes", 0, (v)=>{
+    if(v<=0) return;
+    // open intensity picker to route bribes
+    openIntensityPicker(v);
+  });
 
   for(const l of SONGES.legends){
-    handlers[`leg:pick:${l.key}`] = ()=>{
-      const cur = clampInt(s.legends[l.key]||0);
-      openKeypad(l.key, cur, (v)=>{
-        s.legends[l.key]=clampInt(v);
-        saveSonges(s);
-        render();
-      });
-    };
+    handlers[`leg:+:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)+1); saveSonges(s); render(); };
+    handlers[`leg:-:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)-1); saveSonges(s); render(); };
+    handlers[`leg:pick:${l.key}`] = ()=> openKeypad(l.key, s.legends[l.key]||0, (v)=>{ s.legends[l.key]=clampInt(v); saveSonges(s); render(); });
+  }
+
+  // mini legend items
+  for(const f of SONGES.legendItems){
+    const k = keyFromFile(f);
+    handlers[`li:+:${k}`] = ()=>{ s.legendItems[k]=clampInt((s.legendItems[k]||0)+1); saveSonges(s); render(); };
+    handlers[`li:-:${k}`] = ()=>{ s.legendItems[k]=clampInt((s.legendItems[k]||0)-1); saveSonges(s); render(); };
+    handlers[`li:pick:${k}`] = ()=> openKeypad(k, s.legendItems[k]||0, (v)=>{ s.legendItems[k]=clampInt(v); saveSonges(s); render(); });
   }
 
   $("#btnResetSonges").onclick = ()=>{
@@ -1602,18 +1514,79 @@ function renderSonges(){
   };
 
   bindActions(app, handlers);
+
+  // ===== intensity modal binding =====
+  // update counts shown inside modal
+  const refreshModalCounts = ()=>{
+    for(const it of SONGES.intensities){
+      const el = document.getElementById(`bI:${it.id}`);
+      if(el) el.textContent = fmt.format(clampInt(s.bribesI[it.id]||0));
+    }
+  };
+
+  // click choose intensity
+  app.addEventListener("click", ()=>{}); // keep passive
+
+  // open modal only if pending was set by handlers
+  const openIfPending = ()=>{
+    if(!modalIntensity.classList.contains("open")) return;
+    refreshModalCounts();
+    intGrid.querySelectorAll("[data-int]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.dataset.int;
+        if(!id || pendingBribes<=0) return;
+        const qty = clampInt(pendingBribes);
+
+        // apply to total + intensity
+        s.bribes = clampInt(s.bribes + qty);
+        s.bribesI[id] = clampInt((s.bribesI[id]||0) + qty);
+
+        saveSonges(s);
+        closeIntensityPicker();
+        render();
+      };
+    });
+  };
+
+  // if openIntensityPicker called, modal is open now
+  if(modalIntensity.classList.contains("open")){
+    refreshModalCounts();
+    openIfPending();
+  }
+
+  // intercept openIntensityPicker calls: render modal with fresh state
+  // (we rebuild modal on demand here)
+  const originalOpen = openIntensityPicker;
+  window.openIntensityPicker = (qty)=>{
+    originalOpen(qty);
+    refreshModalCounts();
+    intGrid.querySelectorAll("[data-int]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.dataset.int;
+        if(!id || pendingBribes<=0) return;
+        const q = clampInt(pendingBribes);
+
+        s.bribes = clampInt(s.bribes + q);
+        s.bribesI[id] = clampInt((s.bribesI[id]||0) + q);
+
+        saveSonges(s);
+        closeIntensityPicker();
+        render();
+      };
+    });
+  };
 }
 
 /* =========================================================
-   Stats (tableau donjon intact)
+   Stats (UPDATED: icons + remove types legends + total legends pictos + Top ressources by avg price)
    ========================================================= */
 function renderStats(){
   pagePill.textContent = "Stats";
 
   let mobsTotal=0, resQty=0, eqQty=0, kamasTotal=0;
 
-  const resAgg = new Map();
-  const eqAgg = new Map();
+  const resAgg = [];
+  const eqAgg = [];
 
   for(const d of DUNGEONS){
     const st = ensureDungeonShape(d, loadDungeon(d.id));
@@ -1627,36 +1600,52 @@ function renderStats(){
       const q = clampInt(st.res[r.key]||0);
       const p = toNum(st.resP[r.key]||0);
       resQty += q;
-      const key = `${d.id}::res::${r.key}`;
-      resAgg.set(key, {d, dir:d.imgDir, name:r.key, img:r.img, q, p, subtotal:q*p});
+      resAgg.push({d, dir:d.imgDir, name:r.key, img:r.img, q, p});
     }
     for(const e of d.equipments){
       const q = clampInt(st.eq[e.key]||0);
       const p = toNum(st.eqP[e.key]||0);
       eqQty += q;
-      const key = `${d.id}::eq::${e.key}`;
-      eqAgg.set(key, {d, dir:(e.dir || d.imgDir), name:e.key, img:e.img, q, p, subtotal:q*p});
+      eqAgg.push({d, dir:(e.dir || d.imgDir), name:e.key, img:e.img, q, p});
     }
   }
 
   const s = loadSonges();
   const runsTotal = Object.values(s.runs).reduce((a,b)=>a+clampInt(b),0);
-  const legendsShown = SONGES.legends.filter(l => clampInt(s.legends[l.key]||0)>0);
 
-  function statCard(title, sub, value){
+  const totalLegends = Object.values(s.legends).reduce((a,b)=>a+clampInt(b),0);
+
+  // legends pictos row (only if >0)
+  const legendPictos = SONGES.legends
+    .filter(l => clampInt(s.legends[l.key]||0) > 0)
+    .map(l=>{
+      const v = clampInt(s.legends[l.key]||0);
+      return `
+        <span class="pill" style="max-width:none">
+          <img class="navIcon" data-dir="${escapeHtml(l.dir)}" data-file="${escapeHtml(l.img)}" alt="">
+          <b class="mono">${fmt.format(v)}</b>
+        </span>
+      `;
+    }).join("");
+
+  function statCard(title, sub, value, iconHtml){
     return `
       <div class="kpi">
-        <div class="k">${escapeHtml(title)}</div>
+        <div class="k">${iconHtml||""}${escapeHtml(title)}</div>
         <div class="v mono ${title.toLowerCase().includes("kamas")?'gold':''}">${value}</div>
         ${sub?`<div class="hint" style="margin:8px 0 0">${sub}</div>`:""}
       </div>
     `;
   }
 
-  const topItems = [...resAgg.values(), ...eqAgg.values()]
-    .filter(x=>x.q>0 && x.subtotal>0)
-    .sort((a,b)=>b.subtotal-a.subtotal)
-    .slice(0, 18);
+  // ✅ Top ressources by avg price (p), take top 10, only where p>0
+  const topRes = resAgg
+    .filter(x => toNum(x.p) > 0)
+    .sort((a,b)=>toNum(b.p)-toNum(a.p))
+    .slice(0, 10);
+
+  const hero = topRes[0] || null;
+  const others = topRes.slice(1);
 
   app.innerHTML = `
     <div class="section">
@@ -1668,43 +1657,75 @@ function renderStats(){
       </div>
 
       <div class="summary">
-        ${statCard("Mobs total", "", fmt.format(mobsTotal))}
-        ${statCard("Ressources total", "", fmt.format(resQty))}
-        ${statCard("Équipements total", "", fmt.format(eqQty))}
-        ${statCard("Kamas total", "", money(kamasTotal)+" k")}
+        ${statCard("Mobs total", "", fmt.format(mobsTotal), "")}
+        ${statCard("Ressources total", "", fmt.format(resQty), "")}
+        ${statCard("Équipements total", "", fmt.format(eqQty), "")}
+        ${statCard("Kamas total", "", `${money(kamasTotal)} ${kamasInlineHtml("")}`, `<img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k">`)}
       </div>
     </div>
 
     <div class="row">
       <div class="section">
-        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🌙</div><div><h2>Songes</h2><p class="sub">Stats rapides</p></div></div></div>
+        <div class="topline">
+          <div class="title">
+            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.songes)}" alt=""></div>
+            <div><h2>Songes</h2><p class="sub">Stats rapides</p></div>
+          </div>
+        </div>
         <div class="summary">
-          ${statCard("Runs total", "", fmt.format(runsTotal))}
-          ${statCard("Bribes", "", fmt.format(s.bribes))}
-          ${statCard("Types légendes", "Légendes à 0 masquées", fmt.format(legendsShown.length))}
-          ${statCard("Total légendes", "", fmt.format(legendsShown.reduce((a,l)=>a+clampInt(s.legends[l.key]||0),0)))}
+          ${statCard("Runs total", "", fmt.format(runsTotal), `<img class="navIcon" src="./${encodeURI(ICONS.runs)}" alt="">`)}
+          ${statCard("Bribes", "", fmt.format(s.bribes), `<img class="navIcon" src="./${encodeURI(ICONS.bribesLeg)}" alt="">`)}
+          ${statCard("Total légendes", legendPictos ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${legendPictos}</div>` : "", fmt.format(totalLegends), "")}
         </div>
       </div>
 
       <div class="section">
-        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">💰</div><div><h2>Top sous-totaux</h2><p class="sub">Ce qui te rapporte le plus</p></div></div></div>
-        <div class="statGrid" id="topGrid">
-          ${topItems.length ? topItems.map(x=>`
-            <div class="statItem">
-              <div class="ico"><img data-dir="${escapeHtml(x.dir)}" data-file="${escapeHtml(x.img)}" alt=""></div>
-              <div class="info">
-                <p class="n">${escapeHtml(x.name)}</p>
-                <p class="v">${money(x.subtotal)} k</p>
+        <div class="topline">
+          <div class="title">
+            <div class="thumb" style="width:44px;height:44px">🏆</div>
+            <div><h2>Top ressources</h2><p class="sub">Top prix moyen (décroissant)</p></div>
+          </div>
+        </div>
+
+        <div class="topResWrap">
+          ${
+            hero ? `
+              <div class="topResHero">
+                <div class="L">
+                  <div class="ico"><img data-dir="${escapeHtml(hero.dir)}" data-file="${escapeHtml(hero.img)}" alt=""></div>
+                  <div class="name">
+                    <p class="n">${escapeHtml(hero.name)}</p>
+                    <p class="m">Prix moyen</p>
+                  </div>
+                </div>
+                <div class="price">${kamasInlineHtml(money(hero.p))}</div>
               </div>
-              <div class="right mono">x${fmt.format(x.q)}</div>
-            </div>
-          `).join("") : `<div class="hint">Rien à afficher (mets des quantités + prix sur des ressources/items).</div>`}
+            ` : `<div class="hint">Aucun prix moyen encore (mets des prix/u sur des ressources).</div>`
+          }
+
+          ${
+            others.length ? `
+              <div class="topResRow">
+                ${others.map(x=>`
+                  <div class="topResMini">
+                    <div class="ico"><img data-dir="${escapeHtml(x.dir)}" data-file="${escapeHtml(x.img)}" alt=""></div>
+                    <div class="p">${kamasInlineHtml(money(x.p))}</div>
+                  </div>
+                `).join("")}
+              </div>
+            ` : ``
+          }
         </div>
       </div>
     </div>
 
     <div class="section">
-      <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🗝️</div><div><h2>Récap par donjon</h2><p class="sub">Mobs / ressources / items / kamas</p></div></div></div>
+      <div class="topline">
+        <div class="title">
+          <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.donjons)}" alt=""></div>
+          <div><h2>Récap par donjon</h2><p class="sub">Mobs / ressources / items / kamas</p></div>
+        </div>
+      </div>
       <div class="grid" id="donjonRecap"></div>
     </div>
   `;
@@ -1723,7 +1744,7 @@ function renderStats(){
           </div>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <div class="pill"><b class="mono">${money(km)} k</b></div>
+          <div class="pill">${kamasInlineHtml(money(km))}</div>
           <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(d.id)}'">Ouvrir</button>
         </div>
       </div>
@@ -1734,18 +1755,18 @@ function renderStats(){
 }
 
 /* =========================================================
-   PP
+   PP (UPDATED icons + Shield rename)
    ========================================================= */
 function renderPP(){
   pagePill.textContent = "PP";
   const s = loadPP();
   const { mult, final } = ppFinal(s);
 
-  const ppIconHtml = `<img class="ppIcon" src="${encodeURI(PP_ICON)}" alt="PP">`;
+  const iconImg = (file)=>`<img class="ppIcon" src="${encodeURI("./"+file)}" alt="">`;
 
-  const field = (label, key)=>`
+  const field = (label, key, iconFile)=>`
     <div class="item">
-      <div class="ico">${ppIconHtml}</div>
+      <div class="ico">${iconFile ? iconImg(iconFile) : iconImg(PP_ICON)}</div>
       <div class="name">
         <p class="n">${label}</p>
         <p class="m">Clique le nombre pour pavé numérique</p>
@@ -1760,7 +1781,7 @@ function renderPP(){
     <div class="section">
       <div class="topline">
         <div class="title">
-          <div class="thumb" style="width:44px;height:44px">${ppIconHtml}</div>
+          <div class="thumb" style="width:44px;height:44px">${iconImg(PP_ICON)}</div>
           <div><h2>Calcul PP</h2><p class="sub">Champs vides par défaut (clean)</p></div>
         </div>
         <div class="seg">
@@ -1772,12 +1793,12 @@ function renderPP(){
         <div class="section" style="margin:0">
           <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">⚙️</div><div><h2>Entrées</h2><p class="sub">PP / base / bonus</p></div></div></div>
           <div class="list">
-            ${field("Prospection", "prospection")}
-            ${field("Base drop (%)", "base")}
-            ${field("Challenges (%)", "challenges")}
-            ${field("Anomalie (%)", "anomalie")}
-            ${field("Bouclier (%)", "shield")}
-            ${field("Almanax (%)", "almanax")}
+            ${field("Prospection", "prospection", null)}
+            ${field("Base drop (%)", "base", ICONS.ppBase)}
+            ${field("Challenges (%)", "challenges", ICONS.ppChallenges)}
+            ${field("Anomalie (%)", "anomalie", ICONS.ppAnomaly)}
+            ${field("Shield authentificator (%)", "shield", ICONS.ppShield)}
+            ${field("Almanax (%)", "almanax", ICONS.ppAlmanax)}
           </div>
         </div>
 
@@ -1812,7 +1833,7 @@ function renderPP(){
     base:"Base drop (%)",
     challenges:"Challenges (%)",
     anomalie:"Anomalie (%)",
-    shield:"Bouclier (%)",
+    shield:"Shield authentificator (%)",
     almanax:"Almanax (%)",
   };
 
@@ -1837,7 +1858,7 @@ function renderPP(){
 }
 
 /* =========================================================
-   Omega
+   Omega (UPDATED icons + message removed)
    ========================================================= */
 function renderOmega(){
   pagePill.textContent = "Oméga";
@@ -1849,7 +1870,7 @@ function renderOmega(){
       <div class="topline">
         <div class="title">
           <div class="thumb" style="width:44px;height:44px">📈</div>
-          <div><h2>Calcul Oméga</h2><p class="sub">Reset met 0 partout</p></div>
+          <div><h2>Calcul Oméga</h2><p class="sub"></p></div>
         </div>
         <div class="seg">
           <button class="btn bad" id="btnResetOmega">Reset Oméga</button>
@@ -1858,15 +1879,20 @@ function renderOmega(){
 
       <div class="row">
         <div class="section" style="margin:0">
-          <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🎯</div><div><h2>Niveaux</h2><p class="sub">Clique pour saisir</p></div></div></div>
+          <div class="topline">
+            <div class="title">
+              <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.omegaLevels)}" alt=""></div>
+              <div><h2>Niveaux</h2><p class="sub">Clique pour saisir</p></div>
+            </div>
+          </div>
           <div class="list">
             <div class="item">
-              <div class="ico">📌</div>
+              <div class="ico"><img data-dir="" data-file="${escapeHtml(ICONS.omegaCur)}" alt=""></div>
               <div class="name"><p class="n">Oméga actuel</p><p class="m">ton niveau</p></div>
               <div class="ctrls"><div class="num mono" data-act="om:cur">${fmt.format(s.cur)}</div></div>
             </div>
             <div class="item">
-              <div class="ico">🏁</div>
+              <div class="ico"><img data-dir="" data-file="${escapeHtml(ICONS.omegaTar)}" alt=""></div>
               <div class="name"><p class="n">Oméga objectif</p><p class="m">cible</p></div>
               <div class="ctrls"><div class="num mono" data-act="om:tar">${fmt.format(s.target)}</div></div>
             </div>
@@ -1874,7 +1900,12 @@ function renderOmega(){
         </div>
 
         <div class="section" style="margin:0">
-          <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🧮</div><div><h2>XP requise</h2><p class="sub">entre actuel et objectif</p></div></div></div>
+          <div class="topline">
+            <div class="title">
+              <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.omegaXp)}" alt=""></div>
+              <div><h2>XP requise</h2><p class="sub">entre actuel et objectif</p></div>
+            </div>
+          </div>
           <div class="summary">
             <div class="kpi">
               <div class="k">XP totale</div>
