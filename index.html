@@ -131,7 +131,22 @@
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     @media (max-width: 980px){ .row{grid-template-columns:1fr} }
 
-    .list{display:flex;flex-direction:column;gap:10px}
+.list{display:flex;flex-direction:column;gap:10px}
+
+/* =========================================================
+   Équipements en 2 colonnes (anti-scroll)
+   - Utilisé quand la liste a la classe "equipGrid"
+   - Mobile: repasse en 1 colonne
+   ========================================================= */
+.equipGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+@media (max-width: 980px){
+  .equipGrid{grid-template-columns:1fr}
+}
+    
     .item{
       display:grid;
       grid-template-columns:42px 1fr auto;
@@ -1291,7 +1306,7 @@ function renderDungeon(d){
           <div><h2>Équipements</h2><p class="sub">Comme ressources : quantité + prix/u</p></div>
         </div>
       </div>
-      <div class="list">${eqList}</div>
+<div class="list equipGrid">${eqList}</div>
     </div>
   `;
 
