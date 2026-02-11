@@ -348,23 +348,117 @@ function escapeHtml(s){
 }
 
 /* =========================================================
-   Images: fallback (essaie plusieurs chemins)
+   Images: fallback (essaie plusieurs chemins + alias dossiers)
    ========================================================= */
 function uniq(arr){ const s=new Set(); return arr.filter(x=>x && !s.has(x) && (s.add(x), true)); }
-function normDir(d){ if(!d) return ""; return d.endsWith("/")?d:(d+"/"); }
-function makeCandidates(dir, file){
-  dir = normDir(dir);
-  const f = file || "";
-  const enc = (p)=>{ try{return encodeURI(p);}catch{return p;} };
-  return uniq([
-    dir+f, "./"+dir+f,
-    enc(dir+f), enc("./"+dir+f),
-    f, "./"+f, enc(f), enc("./"+f),
-    "img/"+f, "./img/"+f,
-    "images/"+f, "./images/"+f,
-    "assets/"+f, "./assets/"+f,
-  ]);
+
+function stripAccents(str){
+  try{
+    return (str||"").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }catch{
+    return (str||"");
+  }
 }
+function normDir(d){
+  if(!d) return "";
+  d = String(d).trim();
+  if(!d) return "";
+  return d.endsWith("/") ? d : (d + "/");
+}
+function dirVariants(dir){
+  dir = normDir(dir);
+  if(!dir) return [""];
+
+  const raw = dir.replace(/\/+$/,""); // sans slash final
+  const base = raw;
+
+  const variants = [];
+  const add = (x)=>{ if(x==null) return; x=String(x).trim(); if(!x) return; variants.push(normDir(x)); };
+
+  // original + cas
+  add(base);
+  add(base.toLowerCase());
+  add(base.toUpperCase());
+
+  // Capitalize (première lettre)
+  add(base.charAt(0).toUpperCase() + base.slice(1));
+
+  // Sans accents
+  const noAcc = stripAccents(base);
+  add(noAcc);
+  add(noAcc.toLowerCase());
+  add(noAcc.toUpperCase());
+  add(noAcc.charAt(0).toUpperCase() + noAcc.slice(1));
+
+  // Espaces -> underscore / tiret
+  add(base.replace(/ /g, "_"));
+  add(base.replace(/ /g, "-"));
+  add(noAcc.replace(/ /g, "_"));
+  add(noAcc.replace(/ /g, "-"));
+
+  // Alias “courants” (tes cas réels)
+  // Comte ⇄ Compte ⇄ CONTE
+  if(/comte/i.test(base)){
+    add(base.replace(/comte/ig,"Compte"));
+    add(base.replace(/comte/ig,"COMPTE"));
+    add(base.replace(/comte/ig,"compte"));
+    add(base.replace(/comte/ig,"CONTE"));
+    add(base.replace(/comte/ig,"conte"));
+  }
+  // 4 cavaliers (variantes)
+  if(/4\s*cavaliers/i.test(base)){
+    add("4 cavaliers");
+    add("4 Cavaliers");
+    add("4_cavaliers");
+    add("4-Cavaliers");
+    add("4_cavaliers/");
+  }
+  // Vénérable endormi (sans accents)
+  if(/v[ée]n[ée]rable/i.test(base) || /endormi/i.test(base)){
+    add("Vénérable endormi");
+    add("Venerable endormi");
+    add("Venerable Endormi");
+    add("Venerable_endormi");
+    add("Venerable-Endormi");
+  }
+  // Éternel conflit (accents/casse)
+  if(/eternel/i.test(base) || /conflit/i.test(base)){
+    add("Éternel Conflit");
+    add("Eternel Conflit");
+    add("Eternel conflit");
+    add("Eternel_conflit");
+    add("Eternel-Conflit");
+  }
+
+  return uniq(variants);
+}
+
+function makeCandidates(dir, file){
+  const f = String(file || "").trim();
+  const dirs = dirVariants(dir);
+
+  const enc = (p)=>{ try{return encodeURI(p);}catch{return p;} };
+
+  const out = [];
+  for(const d of dirs){
+    // d inclut déjà le "/" final (ou "")
+    out.push(d + f);
+    out.push("./" + d + f);
+
+    // versions encodées (espaces/accents)
+    out.push(enc(d + f));
+    out.push(enc("./" + d + f));
+  }
+
+  // fallback “racine + dossiers classiques”
+  out.push(f, "./"+f, enc(f), enc("./"+f));
+  out.push("img/"+f, "./img/"+f);
+  out.push("images/"+f, "./images/"+f);
+  out.push("assets/"+f, "./assets/"+f);
+
+  return uniq(out);
+}
+
 function setImgWithFallback(imgEl, dir, file){
   const list = makeCandidates(dir, file);
   imgEl.dataset.cands = JSON.stringify(list);
@@ -378,6 +472,7 @@ function setImgWithFallback(imgEl, dir, file){
     else imgEl.onerror = null;
   };
 }
+
 function activateImages(container, defaultDir){
   container.querySelectorAll("img[data-file]").forEach(img=>{
     setImgWithFallback(img, img.dataset.dir || defaultDir || "", img.dataset.file || "");
