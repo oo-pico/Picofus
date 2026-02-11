@@ -350,111 +350,61 @@ function escapeHtml(s){
 /* =========================================================
    Images: fallback (essaie plusieurs chemins + alias dossiers)
    ========================================================= */
-function uniq(arr){ const s=new Set(); return arr.filter(x=>x && !s.has(x) && (s.add(x), true)); }
 
-function stripAccents(str){
-  try{
-    return (str||"").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  }catch{
-    return (str||"");
-  }
+// Alias de dossiers (pour matcher EXACTEMENT tes noms GitHub)
+const DIR_ALIASES = {
+  "Vénérable endormi/": ["véné/", "Véné/", "Vene/", "vene/"],
+  "4 cavaliers/": ["4 cavalier/", "4 Cavalier/", "4cavalier/", "4-cavalier/"],
+  "Eternel conflit/": ["Eternel conflit/", "Eternel Conflit/", "eternel conflit/", "eternel Conflit/"],
+  "Comte/": ["Comte/", "comte/", "Compte/","compte/"], // au cas où
+};
+
+function uniq(arr){
+  const s = new Set();
+  return arr.filter(x => x && !s.has(x) && (s.add(x), true));
 }
 function normDir(d){
   if(!d) return "";
   d = String(d).trim();
-  if(!d) return "";
   return d.endsWith("/") ? d : (d + "/");
 }
 function dirVariants(dir){
   dir = normDir(dir);
-  if(!dir) return [""];
+  const vars = [dir];
 
-  const raw = dir.replace(/\/+$/,""); // sans slash final
-  const base = raw;
+  // Ajoute les alias configurés
+  const extra = DIR_ALIASES[dir];
+  if(Array.isArray(extra)) extra.forEach(v => vars.push(normDir(v)));
 
-  const variants = [];
-  const add = (x)=>{ if(x==null) return; x=String(x).trim(); if(!x) return; variants.push(normDir(x)); };
+  // Ajoute aussi une version "sans slash" puis re-normalisée (robuste)
+  vars.push(normDir(dir.replace(/\/+$/,"")));
 
-  // original + cas
-  add(base);
-  add(base.toLowerCase());
-  add(base.toUpperCase());
-
-  // Capitalize (première lettre)
-  add(base.charAt(0).toUpperCase() + base.slice(1));
-
-  // Sans accents
-  const noAcc = stripAccents(base);
-  add(noAcc);
-  add(noAcc.toLowerCase());
-  add(noAcc.toUpperCase());
-  add(noAcc.charAt(0).toUpperCase() + noAcc.slice(1));
-
-  // Espaces -> underscore / tiret
-  add(base.replace(/ /g, "_"));
-  add(base.replace(/ /g, "-"));
-  add(noAcc.replace(/ /g, "_"));
-  add(noAcc.replace(/ /g, "-"));
-
-  // Alias “courants” (tes cas réels)
-  // Comte ⇄ Compte ⇄ CONTE
-  if(/comte/i.test(base)){
-    add(base.replace(/comte/ig,"Compte"));
-    add(base.replace(/comte/ig,"COMPTE"));
-    add(base.replace(/comte/ig,"compte"));
-    add(base.replace(/comte/ig,"CONTE"));
-    add(base.replace(/comte/ig,"conte"));
-  }
-  // 4 cavaliers (variantes)
-  if(/4\s*cavaliers/i.test(base)){
-    add("4 cavaliers");
-    add("4 Cavaliers");
-    add("4_cavaliers");
-    add("4-Cavaliers");
-    add("4_cavaliers/");
-  }
-  // Vénérable endormi (sans accents)
-  if(/v[ée]n[ée]rable/i.test(base) || /endormi/i.test(base)){
-    add("Vénérable endormi");
-    add("Venerable endormi");
-    add("Venerable Endormi");
-    add("Venerable_endormi");
-    add("Venerable-Endormi");
-  }
-  // Éternel conflit (accents/casse)
-  if(/eternel/i.test(base) || /conflit/i.test(base)){
-    add("Éternel Conflit");
-    add("Eternel Conflit");
-    add("Eternel conflit");
-    add("Eternel_conflit");
-    add("Eternel-Conflit");
-  }
-
-  return uniq(variants);
+  return uniq(vars);
 }
 
 function makeCandidates(dir, file){
-  const f = String(file || "").trim();
-  const dirs = dirVariants(dir);
+  const f = file || "";
+  const enc = (p)=>{ try { return encodeURI(p); } catch { return p; } };
 
-  const enc = (p)=>{ try{return encodeURI(p);}catch{return p;} };
+  const dirs = dirVariants(dir);
 
   const out = [];
   for(const d of dirs){
-    // d inclut déjà le "/" final (ou "")
-    out.push(d + f);
-    out.push("./" + d + f);
+    // chemins directs
+    out.push(d+f, "./"+d+f);
+    out.push(enc(d+f), enc("./"+d+f));
 
-    // versions encodées (espaces/accents)
-    out.push(enc(d + f));
-    out.push(enc("./" + d + f));
+    // variantes "au cas où" (si jamais tu as rangé différemment)
+    out.push("img/"+d+f, "./img/"+d+f);
+    out.push("images/"+d+f, "./images/"+d+f);
+    out.push("assets/"+d+f, "./assets/"+d+f);
+    out.push(enc("img/"+d+f), enc("./img/"+d+f));
+    out.push(enc("images/"+d+f), enc("./images/"+d+f));
+    out.push(enc("assets/"+d+f), enc("./assets/"+d+f));
   }
 
-  // fallback “racine + dossiers classiques”
+  // en dernier : juste le fichier (si tu l’as mis à la racine)
   out.push(f, "./"+f, enc(f), enc("./"+f));
-  out.push("img/"+f, "./img/"+f);
-  out.push("images/"+f, "./images/"+f);
-  out.push("assets/"+f, "./assets/"+f);
 
   return uniq(out);
 }
@@ -464,10 +414,12 @@ function setImgWithFallback(imgEl, dir, file){
   imgEl.dataset.cands = JSON.stringify(list);
   imgEl.dataset.idx = "0";
   imgEl.src = list[0] || "";
+
   imgEl.onerror = ()=>{
-    const cands = JSON.parse(imgEl.dataset.cands||"[]");
-    let i = parseInt(imgEl.dataset.idx||"0",10)+1;
+    const cands = JSON.parse(imgEl.dataset.cands || "[]");
+    let i = parseInt(imgEl.dataset.idx || "0", 10) + 1;
     imgEl.dataset.idx = String(i);
+
     if(i < cands.length) imgEl.src = cands[i];
     else imgEl.onerror = null;
   };
