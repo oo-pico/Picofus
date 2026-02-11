@@ -76,18 +76,8 @@
     .btn.bad{border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.08)}
     .btn.active{border-color:rgba(214,179,106,.75);background:rgba(214,179,106,.15);font-weight:700}
 
-    /* Icone image dans boutons / titres */
-    .navIcon{
-      width:18px;height:18px;
-      object-fit:contain;
-      display:block;
-      filter: drop-shadow(0 0 0 rgba(0,0,0,0));
-    }
-    .ppIcon{
-      width:22px;height:22px;
-      object-fit:contain;
-      display:block;
-    }
+    .navIcon{width:18px;height:18px;object-fit:contain;display:block}
+    .ppIcon{width:22px;height:22px;object-fit:contain;display:block}
 
     main{padding-top:16px}
 
@@ -133,19 +123,12 @@
 
     .list{display:flex;flex-direction:column;gap:10px}
 
-    /* =========================================================
-      Équipements en 2 colonnes (anti-scroll)
-      - Utilisé quand la liste a la classe "equipGrid"
-      - Mobile: repasse en 1 colonne
-      ========================================================= */
     .equipGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:10px;
     }
-    @media (max-width: 980px){
-      .equipGrid{grid-template-columns:1fr}
-    }
+    @media (max-width: 980px){ .equipGrid{grid-template-columns:1fr} }
 
     .item{
       display:grid;
@@ -188,7 +171,6 @@
       text-align:right;
     }
     .price:focus{border-color:rgba(214,179,106,.55)}
-    .muted{color:var(--muted)}
     .mono{font-variant-numeric:tabular-nums}
 
     .summary{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:10px;margin-top:12px;}
@@ -202,7 +184,6 @@
     .butinSelector{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
     .butinLabel{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
 
-    /* Modal keypad */
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:99;}
     .modal.open{display:flex}
     .kbd{
@@ -282,7 +263,6 @@
         <button class="btn small" id="btnSonges" title="Songes">🌙</button>
         <button class="btn small" id="btnStats" title="Stats">📊</button>
 
-        <!-- Bouton PP avec ton image -->
         <button class="btn small" id="btnPP" title="Calcul PP">
           <img class="navIcon" src="./Ic%C3%B4ne%20Calculateur%20PP.png" alt="PP">
         </button>
@@ -349,10 +329,10 @@ function escapeHtml(s){
 
 /* =========================================================
    Images: fallback (essaie plusieurs chemins + variantes)
+   - FIX: gère œ -> oe
+   - FIX: gère variantes "Goûtue" / "goutue" / "goutteue" / "goutte"
    ========================================================= */
 
-// Ici on garde des alias “safe” (PAS de Comte<->Compte)
-// parce que Comte est spécial: tes images sont dans Compte/Compte/
 const DIR_ALIASES = {
   "Vénérable endormi/": ["véné/", "Véné/", "Vene/", "vene/"],
   "4 cavaliers/": ["4 cavalier/", "4 Cavalier/", "4cavalier/", "4-cavalier/"],
@@ -390,7 +370,40 @@ function fileVariants(file){
   const apos1 = base.replaceAll("’", "'");
   const apos2 = base.replaceAll("'", "’");
 
-  return uniq([base, lower, noAcc, noAccLower, unders, undersLower, apos1, apos2]);
+  // ✅ ligatures: œ / Œ -> oe / OE
+  const lig1 = base.replaceAll("œ", "oe").replaceAll("Œ", "OE");
+  const lig2 = lower.replaceAll("œ", "oe");
+  const lig3 = noAcc.replaceAll("œ", "oe").replaceAll("Œ", "OE");
+  const lig4 = noAccLower.replaceAll("œ", "oe");
+
+  // ✅ variantes goûtue / goutue / goutteue / goutte
+  const goutFix = (s)=>{
+    const t = stripAccents(s); // Goûtue -> Goutue
+    const out = [s, t];
+
+    // si on a "goutue" quelque part, on tente aussi les typos fréquentes
+    if(t.toLowerCase().includes("goutue")){
+      out.push(
+        s.replaceAll("Goûtue","Goutteue").replaceAll("goûtue","goutteue").replaceAll("Goutue","Goutteue").replaceAll("goutue","goutteue"),
+        s.replaceAll("Goûtue","Goutte").replaceAll("goûtue","goutte").replaceAll("Goutue","Goutte").replaceAll("goutue","goutte")
+      );
+      out.push(
+        t.replaceAll("Goutue","Goutteue").replaceAll("goutue","goutteue"),
+        t.replaceAll("Goutue","Goutte").replaceAll("goutue","goutte")
+      );
+    }
+    return out;
+  };
+  const gout = uniq(goutFix(base).flatMap(x => [x, x.toLowerCase()]));
+
+  return uniq([
+    base, lower,
+    noAcc, noAccLower,
+    unders, undersLower,
+    apos1, apos2,
+    lig1, lig2, lig3, lig4,
+    ...gout
+  ]);
 }
 function dirVariants(dir){
   dir = normDir(dir);
@@ -416,7 +429,6 @@ function makeCandidates(dir, file){
     }
   }
 
-  // en dernier : juste le fichier (si jamais il est à la racine)
   for(const f of files){
     out.push(f, "./"+f, enc(f), enc("./"+f));
   }
@@ -477,22 +489,10 @@ function openKeypad(title, currentValue, onApply){
     sel.addRange(range);
   }, 30);
 }
-function closeKeypad(){
-  keypad.open = false;
-  modal.classList.remove("open");
-}
-function setBuffer(v){
-  keypad.buffer = v;
-  kbdValue.textContent = keypad.buffer;
-}
-function pushDigit(d){
-  if(keypad.buffer === "0") setBuffer(String(d));
-  else setBuffer(keypad.buffer + String(d));
-}
-function backspace(){
-  if(keypad.buffer.length <= 1) setBuffer("0");
-  else setBuffer(keypad.buffer.slice(0,-1));
-}
+function closeKeypad(){ keypad.open = false; modal.classList.remove("open"); }
+function setBuffer(v){ keypad.buffer = v; kbdValue.textContent = keypad.buffer; }
+function pushDigit(d){ if(keypad.buffer === "0") setBuffer(String(d)); else setBuffer(keypad.buffer + String(d)); }
+function backspace(){ if(keypad.buffer.length <= 1) setBuffer("0"); else setBuffer(keypad.buffer.slice(0,-1)); }
 function clearBuf(){ setBuffer("0"); }
 function applyBuf(){
   const v = clampInt(parseInt(keypad.buffer,10));
@@ -500,7 +500,7 @@ function applyBuf(){
   closeKeypad();
 }
 
-(function(){
+(function buildKeypad(){
   kbdGrid.innerHTML = "";
   for(let i=1;i<=9;i++){
     const b = document.createElement("button");
@@ -583,98 +583,80 @@ const DUNGEONS = [
     ]
   },
 
-  /* =========================================================
-     ✅ FIX COMTE : tes images sont dans Compte/Compte/
-     donc on pointe directement dessus.
-     ========================================================= */
   {
-  id:"comte",
-  name:"Comte Harebourg",
+    id:"comte",
+    name:"Comte Harebourg",
+    imgDir:"Comte/",
+    thumb:"comte.png",
+    mobs:[
+      {key:"Comte Harebourg", img:"comte.png"},
+      {key:"Granduk", img:"granduk.png"},
+      {key:"Strigide", img:"strigide.png"},
+      {key:"Sinistrofu", img:"sinistrofu.png"},
+      {key:"Noctu", img:"noctu.png"},
+      {key:"Cyclo", img:"cyclo.png"},
+    ],
+    butins:{
+      b4: {"Comte Harebourg":1,"Cyclo":5,"Noctu":5,"Sinistrofu":2,"Strigide":4,"Granduk":3},
+      b5: {"Comte Harebourg":1,"Cyclo":5,"Noctu":6,"Sinistrofu":2,"Strigide":6,"Granduk":5},
+      b6: {"Comte Harebourg":1,"Cyclo":6,"Noctu":7,"Sinistrofu":5,"Strigide":6,"Granduk":5},
+      b7: {"Comte Harebourg":1,"Cyclo":9,"Noctu":8,"Sinistrofu":5,"Strigide":7,"Granduk":5},
+      b8: {"Comte Harebourg":1,"Granduk":8,"Strigide":7,"Sinistrofu":6,"Noctu":9,"Cyclo":9},
+    },
+    resources:[
+      { key:"Bandelette de Comte", img:"bandelette comte.png" },
+      { key:"Scapula du Comte", img:"scapu comte.png" },
+      { key:"Pic de Noctu", img:"pic de noctu.png" },
+      { key:"Bec de Granduk", img:"bec de granduk.png" },
+      { key:"Bec de Strigide", img:"bec de strigide.png" },
+      { key:"Plume Cyclo", img:"plume cyclo.png" },
+      { key:"Aile de Noctu", img:"aille de noctu.png" },
+      { key:"Aile de Sinistrofu", img:"aille de sinistrofu.png" },
+      { key:"Queue de Sini", img:"queue de sini.png" },
+      { key:"Œil de Cyclo", img:"œil de cyclo.png" },
+      { key:"Plume de Granduk", img:"plume de granduk.png" },
+      { key:"Griffe de Strigide", img:"griffe de strigide.png" },
+      { key:"Viande Goûtue", img:"viande goutteue.png" },
+      { key:"Bidoche Goûtue", img:"bidoche goutte.png" },
+      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
+      { key:"Ceinture de Glourdorak", img:"ceinture glourdorak.png" },
+    ],
+    // ✅ équipements dans Comtes/ + FIX rendu (on utilisera e.dir plus bas)
+    equipments:[
+      {key:"Coiffe du Comte Harebourg", img:"Coiffe du Comte Harebourg.png", dir:"Comtes/"},
+      {key:"Anneau du Comte Harebourg", img:"Anneau du Comte Harebourg.png", dir:"Comtes/"},
+      {key:"Bottes du Comte Harebourg", img:"Bottes du Comte Harebourg.png", dir:"Comtes/"},
 
-  // ✅ mobs + ressources dans Comte/
-  imgDir:"Comte/",
-  thumb:"comte.png",
+      {key:"Coiffe Séculaire", img:"Coiffe Séculaire.png", dir:"Comtes/"},
+      {key:"Amulette Séculaire", img:"Amulette Séculaire.png", dir:"Comtes/"},
+      {key:"Ceinture Séculaire", img:"Ceinture Séculaire.png", dir:"Comtes/"},
 
-  mobs:[
-    {key:"Comte Harebourg", img:"comte.png"},
-    {key:"Granduk", img:"granduk.png"},
-    {key:"Strigide", img:"strigide.png"},
-    {key:"Sinistrofu", img:"sinistrofu.png"},
-    {key:"Noctu", img:"noctu.png"},
-    {key:"Cyclo", img:"cyclo.png"},
-  ],
+      {key:"Coiffe Cryochrone", img:"Coiffe Cryochrone.png", dir:"Comtes/"},
+      {key:"Anneau Cryochrone", img:"Anneau Cryochrone.png", dir:"Comtes/"},
+      {key:"Amulette Cryochrone", img:"Amulette Cryochrone.png", dir:"Comtes/"},
 
-  butins:{
-    b4: {"Comte Harebourg":1,"Cyclo":5,"Noctu":5,"Sinistrofu":2,"Strigide":4,"Granduk":3},
-    b5: {"Comte Harebourg":1,"Cyclo":5,"Noctu":6,"Sinistrofu":2,"Strigide":6,"Granduk":5},
-    b6: {"Comte Harebourg":1,"Cyclo":6,"Noctu":7,"Sinistrofu":5,"Strigide":6,"Granduk":5},
-    b7: {"Comte Harebourg":1,"Cyclo":9,"Noctu":8,"Sinistrofu":5,"Strigide":7,"Granduk":5},
-    b8: {"Comte Harebourg":1,"Granduk":8,"Strigide":7,"Sinistrofu":6,"Noctu":9,"Cyclo":9},
+      {key:"Amulette du Nocturlabe", img:"Amulette du Nocturlabe.png", dir:"Comtes/"},
+      {key:"Ceinture du Nocturlabe", img:"Ceinture du Nocturlabe.png", dir:"Comtes/"},
+      {key:"Bottes du Nocturlabe", img:"Bottes du Nocturlabe.png", dir:"Comtes/"},
+
+      {key:"Cap du Sinistrofu", img:"Cap du Sinistrofu.png", dir:"Comtes/"},
+      {key:"Amulette du Sinistrofu", img:"Amulette du Sinistrofu.png", dir:"Comtes/"},
+      {key:"Bottes du Sinistrofu", img:"Bottes du Sinistrofu.png", dir:"Comtes/"},
+
+      {key:"Amulette du Cycloïde", img:"Amulette du Cycloïde.png", dir:"Comtes/"},
+      {key:"Anneau du Cycloïde", img:"Anneau du Cycloïde.png", dir:"Comtes/"},
+      {key:"Bottes du Cycloïde", img:"Bottes du Cycloïde.png", dir:"Comtes/"},
+      {key:"Bouclier du Cycloïde", img:"Bouclier du Cycloïde.png", dir:"Comtes/"},
+
+      {key:"Amulette du Strigide", img:"Amulette du Strigide.png", dir:"Comtes/"},
+      {key:"Ceinture du Strigide", img:"Ceinture du Strigide.png", dir:"Comtes/"},
+      {key:"Bottes du Strigide", img:"Bottes du Strigide.png", dir:"Comtes/"},
+
+      {key:"Masque du Granduk", img:"Masque du Granduk.png", dir:"Comtes/"},
+      {key:"Amulette du Granduk", img:"Amulette du Granduk.png", dir:"Comtes/"},
+      {key:"Épée du Granduk", img:"Épée du Granduk.png", dir:"Comtes/"},
+    ]
   },
-
-  // ✅ ressources: j’aligne EXACTEMENT avec tes noms listés
-  resources:[
-    { key:"Bandelette de Comte", img:"bandelette comte.png" },
-    { key:"Scapula du Comte", img:"scapu comte.png" },
-    { key:"Pic de Noctu", img:"pic de noctu.png" },
-    { key:"Bec de Granduk", img:"bec de granduk.png" },
-    { key:"Bec de Strigide", img:"bec de strigide.png" },
-    { key:"Plume Cyclo", img:"plume cyclo.png" },
-    { key:"Aile de Noctu", img:"aille de noctu.png" },
-    { key:"Aile de Sinistrofu", img:"aille de sinistrofu.png" },
-    { key:"Queue de Sini", img:"queue de sini.png" },
-    { key:"Œil de Cyclo", img:"œil de cyclo.png" },            // ✅ ton vrai nom de fichier
-    { key:"Plume de Granduk", img:"plume de granduk.png" },
-    { key:"Griffe de Strigide", img:"griffe de strigide.png" },
-
-    // ✅ tes fichiers ont des typos (goutte/goutteue) → je mets EXACTEMENT tes noms
-    { key:"Viande Goûtue", img:"viande goutteue.png" },
-    { key:"Bidoche Goûtue", img:"bidoche goutte.png" },
-
-    { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-    { key:"Ceinture de Glourdorak", img:"ceinture glourdorak.png" },
-  ],
-
-  // ✅ équipements: ils sont dans Comtes/ (avec S)
-  equipments:[
-    {key:"Coiffe du Comte Harebourg", img:"Coiffe du Comte Harebourg.png", dir:"Comtes/"},
-    {key:"Anneau du Comte Harebourg", img:"Anneau du Comte Harebourg.png", dir:"Comtes/"},
-    {key:"Bottes du Comte Harebourg", img:"Bottes du Comte Harebourg.png", dir:"Comtes/"},
-
-    {key:"Coiffe Séculaire", img:"Coiffe Séculaire.png", dir:"Comtes/"},
-    {key:"Amulette Séculaire", img:"Amulette Séculaire.png", dir:"Comtes/"},
-    {key:"Ceinture Séculaire", img:"Ceinture Séculaire.png", dir:"Comtes/"},
-
-    {key:"Coiffe Cryochrone", img:"Coiffe Cryochrone.png", dir:"Comtes/"},
-    {key:"Anneau Cryochrone", img:"Anneau Cryochrone.png", dir:"Comtes/"},
-    {key:"Amulette Cryochrone", img:"Amulette Cryochrone.png", dir:"Comtes/"},
-
-    {key:"Amulette du Nocturlabe", img:"Amulette du Nocturlabe.png", dir:"Comtes/"},
-    {key:"Ceinture du Nocturlabe", img:"Ceinture du Nocturlabe.png", dir:"Comtes/"},
-    {key:"Bottes du Nocturlabe", img:"Bottes du Nocturlabe.png", dir:"Comtes/"},
-
-    // ⚠️ tu as “Cap du Sinistrofu.png” dans ton repo (sans e) → j’aligne dessus
-    {key:"Cap du Sinistrofu", img:"Cap du Sinistrofu.png", dir:"Comtes/"},
-    {key:"Amulette du Sinistrofu", img:"Amulette du Sinistrofu.png", dir:"Comtes/"},
-    {key:"Bottes du Sinistrofu", img:"Bottes du Sinistrofu.png", dir:"Comtes/"},
-
-    {key:"Amulette du Cycloïde", img:"Amulette du Cycloïde.png", dir:"Comtes/"},
-    {key:"Anneau du Cycloïde", img:"Anneau du Cycloïde.png", dir:"Comtes/"},
-    {key:"Bottes du Cycloïde", img:"Bottes du Cycloïde.png", dir:"Comtes/"},
-    {key:"Bouclier du Cycloïde", img:"Bouclier du Cycloïde.png", dir:"Comtes/"},
-
-    {key:"Amulette du Strigide", img:"Amulette du Strigide.png", dir:"Comtes/"},
-    {key:"Ceinture du Strigide", img:"Ceinture du Strigide.png", dir:"Comtes/"},
-    {key:"Bottes du Strigide", img:"Bottes du Strigide.png", dir:"Comtes/"},
-
-    {key:"Masque du Granduk", img:"Masque du Granduk.png", dir:"Comtes/"},
-    {key:"Amulette du Granduk", img:"Amulette du Granduk.png", dir:"Comtes/"},
-    {key:"Épée du Granduk", img:"Épée du Granduk.png", dir:"Comtes/"},
-  ]
-},
-
-  
-  
 
   {
     id:"tempetes",
@@ -775,9 +757,6 @@ const DUNGEONS = [
     ]
   },
 
-  /* =========================================================
-     ✅ FIX ÉTERNEL CONFLIT : ajoute les équipements (9 PNG)
-     ========================================================= */
   {
     id:"eternel",
     name:"Éternel Conflit",
@@ -945,23 +924,23 @@ function loadDungeon(id){
     return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0 };
   }
 }
-function saveDungeon(id, st){
-  localStorage.setItem(kDungeon(id), JSON.stringify(st));
-}
+function saveDungeon(id, st){ localStorage.setItem(kDungeon(id), JSON.stringify(st)); }
 function ensureDungeonShape(d, st){
   const out = st || { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0 };
   out.mobs ||= {}; out.res ||= {}; out.resP ||= {}; out.eq ||= {}; out.eqP ||= {};
   out.runs = clampInt(out.runs ?? 0);
+
   (d.mobs||[]).forEach(m=>{ if(!(m.key in out.mobs)) out.mobs[m.key]=0; });
   (d.resources||[]).forEach(r=>{ if(!(r.key in out.res)) out.res[r.key]=0; if(!(r.key in out.resP)) out.resP[r.key]=0; });
   (d.equipments||[]).forEach(e=>{ if(!(e.key in out.eq)) out.eq[e.key]=0; if(!(e.key in out.eqP)) out.eqP[e.key]=0; });
+
   return out;
 }
 function loadButin(id){ return localStorage.getItem(kButin(id)) || "b8"; }
 function saveButin(id, b){ localStorage.setItem(kButin(id), b); }
 
 /* =========================================================
-   Songes (simple + legends masquées si 0)
+   Songes (légendes masquées si 0)
    ========================================================= */
 const kSonges = `${LS_PREFIX}songes`;
 const SONGES = {
@@ -1150,7 +1129,6 @@ function renderCounterRow({dir, img, name, sub, value, onMinus, onPlus, onPick})
     </div>
   `;
 }
-
 function renderPricedRow({dir, img, name, qty, price, subtotal, onMinus, onPlus, onPickQty, onPickPrice}){
   return `
     <div class="item">
@@ -1170,11 +1148,11 @@ function renderPricedRow({dir, img, name, qty, price, subtotal, onMinus, onPlus,
     </div>
   `;
 }
-
 function bindActions(container, handlers){
   container.querySelectorAll("[data-act]").forEach(el=>{
     const act = el.dataset.act;
     if(!act || !handlers[act]) return;
+
     if(el.tagName === "INPUT"){
       el.addEventListener("focus", ()=>el.select());
       el.addEventListener("change", ()=>handlers[act](el.value));
@@ -1185,6 +1163,7 @@ function bindActions(container, handlers){
       el.addEventListener("click", ()=>handlers[act]());
     }
   });
+
   activateImages(container);
 }
 
@@ -1262,7 +1241,7 @@ function renderHome(){
         </div>
       </div>
       <div class="hint">
-        ✅ Pour que toutes les images marchent : garde tes dossiers au même niveau que <b>index.html</b> (ex: <b>Compte/</b>, <b>Bethel/</b>, <b>Songes/</b> etc.).<br>
+        ✅ Pour que toutes les images marchent : garde tes dossiers au même niveau que <b>index.html</b> (ex: <b>Comte/</b>, <b>Comtes/</b>, <b>Bethel/</b>, <b>Songes/</b> etc.).<br>
         ✅ Toutes tes données sont en <b>local</b> (pas de cloud).
       </div>
     </div>
@@ -1320,11 +1299,13 @@ function renderDungeon(d){
     });
   }).join("");
 
+  // ✅ FIX: équipements utilisent e.dir si fourni (ex: Comtes/)
   const eqList = (d.equipments||[]).map(e=>{
     const q = clampInt(st.eq[e.key]||0);
     const p = toNum(st.eqP[e.key]||0);
     return renderPricedRow({
-      dir:d.imgDir, img:e.img, name:e.key,
+      dir:(e.dir || d.imgDir),
+      img:e.img, name:e.key,
       qty:q,
       price: (st.eqP[e.key] ? st.eqP[e.key] : ""),
       subtotal: q*p,
@@ -1414,10 +1395,7 @@ function renderDungeon(d){
   const handlers = {};
 
   ["b4","b5","b6","b7","b8"].forEach(b=>{
-    handlers[`butin:${b}`] = ()=>{
-      saveButin(d.id, b);
-      render();
-    };
+    handlers[`butin:${b}`] = ()=>{ saveButin(d.id, b); render(); };
   });
 
   $("#btnResetDungeon").onclick = ()=>{
@@ -1433,9 +1411,7 @@ function renderDungeon(d){
       applyRuns(d, st, lastRuns);
     });
   };
-  handlers["runs:add"] = ()=>{
-    applyRuns(d, st, lastRuns || 1);
-  };
+  handlers["runs:add"] = ()=>{ applyRuns(d, st, lastRuns || 1); };
 
   for(const m of d.mobs){
     handlers[`mob:+:${m.key}`] = ()=>{ st.mobs[m.key]=clampInt((st.mobs[m.key]||0)+1); saveDungeon(d.id, st); render(); };
@@ -1592,7 +1568,7 @@ function renderSonges(){
 }
 
 /* =========================================================
-   Stats
+   Stats (FIX: top items utilisent le bon dir pour équipements)
    ========================================================= */
 function renderStats(){
   pagePill.textContent = "Stats";
@@ -1615,14 +1591,14 @@ function renderStats(){
       const p = toNum(st.resP[r.key]||0);
       resQty += q;
       const key = `${d.id}::res::${r.key}`;
-      resAgg.set(key, {d, name:r.key, img:r.img, q, p, subtotal:q*p});
+      resAgg.set(key, {d, dir:d.imgDir, name:r.key, img:r.img, q, p, subtotal:q*p});
     }
     for(const e of d.equipments){
       const q = clampInt(st.eq[e.key]||0);
       const p = toNum(st.eqP[e.key]||0);
       eqQty += q;
       const key = `${d.id}::eq::${e.key}`;
-      eqAgg.set(key, {d, name:e.key, img:e.img, q, p, subtotal:q*p});
+      eqAgg.set(key, {d, dir:(e.dir || d.imgDir), name:e.key, img:e.img, q, p, subtotal:q*p});
     }
   }
 
@@ -1678,7 +1654,7 @@ function renderStats(){
         <div class="statGrid" id="topGrid">
           ${topItems.length ? topItems.map(x=>`
             <div class="statItem">
-              <div class="ico"><img data-dir="${escapeHtml(x.d.imgDir)}" data-file="${escapeHtml(x.img)}" alt=""></div>
+              <div class="ico"><img data-dir="${escapeHtml(x.dir)}" data-file="${escapeHtml(x.img)}" alt=""></div>
               <div class="info">
                 <p class="n">${escapeHtml(x.name)}</p>
                 <p class="v">${money(x.subtotal)} k</p>
