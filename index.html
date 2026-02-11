@@ -1,9 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Picofus – Tracker</title>
+
+  <!-- Favicon simple "P" -->
+  <link rel="icon" type="image/svg+xml"
+    href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="%23d6b36a" stop-opacity=".9"/><stop stop-color="%23d6b36a" stop-opacity=".15"/></linearGradient></defs><rect x="6" y="6" width="52" height="52" rx="16" fill="url(%23g)" stroke="%23d6b36a" stroke-opacity=".55"/><text x="32" y="41" font-size="30" text-anchor="middle" font-family="system-ui" font-weight="800" fill="%23d6b36a">P</text></svg>'>
 
   <style>
     :root{
@@ -16,32 +20,41 @@
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
-      background:radial-gradient(1200px 600px at 30% -10%, rgba(214,179,106,.08), transparent 60%),
-                 radial-gradient(900px 500px at 110% 10%, rgba(214,179,106,.06), transparent 55%),
-                 var(--bg);
+      background:
+        radial-gradient(1200px 600px at 30% -10%, rgba(214,179,106,.08), transparent 60%),
+        radial-gradient(900px 500px at 110% 10%, rgba(214,179,106,.06), transparent 55%),
+        var(--bg);
       color:var(--text);
+      min-height:100vh;
     }
-    a{color:inherit}
-    .wrap{max-width:1150px;margin:0 auto;padding:22px}
+    .wrap{max-width:1180px;margin:0 auto;padding:18px}
     header{
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
-      padding:14px 16px;border:1px solid var(--stroke);border-radius:var(--r);
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      padding:14px 14px;border:1px solid var(--stroke);border-radius:var(--r);
       background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
       box-shadow:var(--shadow);
-      position:sticky;top:10px;z-index:20;backdrop-filter:blur(10px);
+      position:sticky;top:10px;z-index:40;backdrop-filter:blur(10px);
     }
-    .brand{display:flex;align-items:center;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
     .logo{
       width:38px;height:38px;border-radius:12px;
       background:linear-gradient(135deg, rgba(214,179,106,.35), rgba(214,179,106,.05));
       border:1px solid rgba(214,179,106,.35);
       display:grid;place-items:center;
-      font-weight:800;color:var(--gold);
+      font-weight:900;color:var(--gold);font-size:18px;
+      flex:0 0 auto;
     }
-    .brand h1{font-size:16px;margin:0;line-height:1}
-    .brand p{margin:0;color:var(--muted);font-size:12px}
-    .nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-
+    .brand h1{font-size:15px;margin:0;line-height:1}
+    .brand p{margin:3px 0 0;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      font-size:12px;color:var(--muted);
+      border:1px solid var(--stroke);background:rgba(255,255,255,.02);
+      padding:7px 10px;border-radius:999px;
+      display:inline-flex;align-items:center;gap:8px;
+      max-width:360px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
     .btn{
       border:1px solid var(--stroke);
       background:rgba(255,255,255,.03);
@@ -52,27 +65,19 @@
       display:inline-flex;align-items:center;gap:8px;
       transition:transform .08s ease, border-color .15s ease, background .15s ease;
       user-select:none;
+      font-size:13px;
     }
     .btn:hover{border-color:rgba(214,179,106,.45);background:rgba(214,179,106,.07)}
     .btn:active{transform:translateY(1px)}
-    .btn.gold{border-color:rgba(214,179,106,.55);background:rgba(214,179,106,.08)}
-    .btn.bad{border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.08)}
-    .btn.good{border-color:rgba(69,208,122,.5);background:rgba(69,208,122,.08)}
     .btn.small{padding:8px 10px;border-radius:12px;font-size:13px}
+    .btn.gold{border-color:rgba(214,179,106,.55);background:rgba(214,179,106,.08)}
+    .btn.good{border-color:rgba(69,208,122,.5);background:rgba(69,208,122,.08)}
+    .btn.bad{border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.08)}
+    .btn.active{border-color:rgba(214,179,106,.75);background:rgba(214,179,106,.15);font-weight:700}
 
-    .pill{
-      font-size:12px;color:var(--muted);
-      border:1px solid var(--stroke);background:rgba(255,255,255,.02);
-      padding:7px 10px;border-radius:999px;
-      display:inline-flex;align-items:center;gap:8px;
-      max-width:360px;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    .navIco{width:16px;height:16px;object-fit:contain;display:inline-block}
+    main{padding-top:16px}
 
-    main{padding-top:18px}
-
-    .grid{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:14px;}
+    .grid{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:12px;}
     @media (max-width: 980px){ .grid{grid-template-columns:repeat(2, minmax(0, 1fr))} }
     @media (max-width: 620px){ .grid{grid-template-columns:1fr} }
 
@@ -83,6 +88,7 @@
       box-shadow:var(--shadow);
       padding:14px;
       display:flex;gap:14px;align-items:center;justify-content:space-between;
+      min-height:86px;
     }
     .card-left{display:flex;gap:12px;align-items:center;min-width:0}
     .thumb{
@@ -90,11 +96,11 @@
       border:1px solid rgba(214,179,106,.25);
       background:rgba(214,179,106,.06);
       display:grid;place-items:center;overflow:hidden;
+      flex:0 0 auto;
     }
     .thumb img{width:100%;height:100%;object-fit:contain}
     .card h3{margin:0;font-size:15px}
     .card p{margin:3px 0 0;color:var(--muted);font-size:12px}
-    .card-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
 
     .section{
       border:1px solid var(--stroke);
@@ -102,12 +108,13 @@
       border-radius:var(--r);
       box-shadow:var(--shadow);
       padding:14px;
+      margin-bottom:12px;
     }
     .topline{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px;}
     .title{display:flex;gap:12px;align-items:center;min-width:0;}
     .title h2{margin:0;font-size:18px}
     .title .sub{margin:0;color:var(--muted);font-size:12px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     @media (max-width: 980px){ .row{grid-template-columns:1fr} }
 
     .list{display:flex;flex-direction:column;gap:10px}
@@ -130,28 +137,43 @@
     .name{min-width:0}
     .name .n{font-size:14px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .name .m{font-size:12px;margin:2px 0 0;color:var(--muted)}
-    .ctrls{display:flex;gap:8px;align-items:center}
+    .ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
     .num{
-      min-width:64px;text-align:right;
+      min-width:72px;text-align:right;
       font-variant-numeric:tabular-nums;
-      font-weight:700;
+      font-weight:800;
       padding:8px 10px;border-radius:12px;
       border:1px solid var(--stroke);
       background:rgba(0,0,0,.18);
       cursor:pointer;
     }
+    .num:hover{border-color:rgba(214,179,106,.4)}
+    .price{
+      width:120px;
+      padding:8px 10px;border-radius:12px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      outline:none;
+      font-variant-numeric:tabular-nums;
+      text-align:right;
+    }
+    .price:focus{border-color:rgba(214,179,106,.55)}
+    .muted{color:var(--muted)}
+    .mono{font-variant-numeric:tabular-nums}
 
     .summary{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:10px;margin-top:12px;}
     @media (max-width: 980px){ .summary{grid-template-columns:repeat(2, minmax(0, 1fr))} }
     .kpi{border:1px solid var(--stroke);border-radius:16px;background:rgba(255,255,255,.02);padding:10px;}
     .kpi .k{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center}
-    .kpi .k .kico{width:16px;height:16px;display:inline-grid;place-items:center}
-    .kpi .k .kico img{width:16px;height:16px;object-fit:contain}
-    .kpi .v{margin-top:6px;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+    .kpi .v{margin-top:6px;font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
     .kpi .v.gold{color:var(--gold)}
     .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.35}
 
-    /* ====== MODALS ====== */
+    .butinSelector{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+    .butinLabel{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
+
+    /* Modal keypad */
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:99;}
     .modal.open{display:flex}
     .kbd{
@@ -164,7 +186,7 @@
     }
     .kbd-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
     .kbd-top .label{color:var(--muted);font-size:12px}
-    .kbd-top .target{font-weight:800}
+    .kbd-top .target{font-weight:900}
     .kbd-display{
       border:1px solid var(--stroke);
       background:#0b0b0c;
@@ -173,7 +195,7 @@
       display:flex;align-items:center;justify-content:space-between;gap:10px;
       margin-bottom:12px;
     }
-    .kbd-display .val{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}
+    .kbd-display .val{font-size:22px;font-weight:950;font-variant-numeric:tabular-nums;user-select:all}
     .kbd-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;}
     .kbd-key{
       border:1px solid var(--stroke);
@@ -183,99 +205,56 @@
       padding:14px 10px;
       font-size:16px;
       cursor:pointer;
+      user-select:none;
     }
     .kbd-key:hover{border-color:rgba(214,179,106,.45);background:#1f1f22}
+    .kbd-key:active{transform:scale(0.97)}
     .kbd-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
     .kbd-actions .btn{flex:1}
 
-    /* ====== Mini picker intensité bribes ====== */
-    .pickerGrid{display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:10px;}
-    @media (max-width: 420px){ .pickerGrid{grid-template-columns:repeat(3, minmax(0,1fr));} }
-    .pickBtn{
-      border:1px solid var(--stroke);
-      background:#151517;
-      border-radius:18px;
-      padding:10px;
-      cursor:pointer;
-      display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;
-      min-height:92px;
-    }
-    .pickBtn:hover{border-color:rgba(214,179,106,.45);background:#1b1b1e}
-    .pickBtn img{width:38px;height:38px;object-fit:contain}
-    .pickBtn .t{font-size:12px;color:var(--muted)}
-
-    /* ====== Songes ====== */
-    .seg{display:flex;gap:8px;flex-wrap:wrap}
-    .seg .btn{padding:8px 10px;border-radius:999px}
-    .seg .btn.active{border-color:rgba(214,179,106,.65);background:rgba(214,179,106,.10)}
-    .searchRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .searchRow input{
-      flex:1;min-width:180px;
-      padding:10px 12px;border-radius:14px;
-      border:1px solid var(--stroke);
-      background:rgba(0,0,0,.18);
-      color:var(--text);
-      outline:none;
-    }
-    .searchRow input:focus{border-color:rgba(214,179,106,.55)}
-
-    /* Legends: 2 par ligne */
-    .legendGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-    @media (max-width: 980px){ .legendGrid{grid-template-columns:1fr} }
-    .legendItem .num{min-width:72px}
-
-    /* Donjons: Items grid anti-scroll (seulement items) */
-    .itemsGrid{
+    .statGrid{
       display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
+      grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
       gap:10px;
     }
-    @media (min-width: 900px){
-      .itemsGrid{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
-    }
-    @media (min-width: 1120px){
-      .itemsGrid{ grid-template-columns:repeat(4, minmax(0, 1fr)); }
-    }
-    .itemTile{
+    .statItem{
       border:1px solid var(--stroke);
+      border-radius:14px;
       background:rgba(255,255,255,.02);
-      border-radius:16px;
       padding:10px;
-      display:grid;
-      grid-template-columns:42px 1fr;
-      gap:10px;
+      display:flex;
       align-items:center;
+      gap:10px;
     }
-    .itemTile .n{margin:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .itemTile .m{margin:2px 0 0;font-size:12px;color:var(--muted)}
-    .itemTile .ctrls{grid-column:1 / -1;display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:8px}
-    .tinyStack{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-    .tinyIcon{
-      width:18px;height:18px;border-radius:6px;
-      border:1px solid rgba(214,179,106,.18);
-      background:rgba(214,179,106,.05);
-      display:grid;place-items:center;overflow:hidden;
-    }
-    .tinyIcon img{width:100%;height:100%;object-fit:contain}
-
-    /* Ne jamais afficher de messages "0 masquées" etc => on n’en met pas du tout. */
-
-    /* ton bouton auth hidden si besoin */
-    #btnAuth{ display:none !important; }
+    .statItem .ico{width:36px;height:36px;border-radius:12px;flex-shrink:0}
+    .statItem .info{min-width:0;flex:1}
+    .statItem .info .n{font-size:13px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .statItem .info .v{font-size:14px;font-weight:900;margin:2px 0 0;font-variant-numeric:tabular-nums;color:var(--gold)}
+    .statItem .right{font-variant-numeric:tabular-nums;font-weight:900}
   </style>
 
   <!-- Supabase JS v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
+
+    const supabase = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+  </script>
 </head>
+
 
 <body>
   <div class="wrap">
-    <header id="topHeader">
+    <header>
       <div class="brand">
         <div class="logo">P</div>
-        <div>
+        <div style="min-width:0">
           <h1>Picofus – Tracker</h1>
-          <p>Compteurs donjons / mobs / ressources + saisie pavé numérique</p>
+          <p>Donjons • Songes • Stats • PP • Oméga • Cloud</p>
         </div>
       </div>
 
@@ -283,48 +262,27 @@
         <span class="pill" id="pagePill">Accueil</span>
         <span class="pill" id="authPill">🔒 Local</span>
 
-        <button class="btn small" id="btnTabHome">🏠 Home</button>
-
-        <button class="btn small" id="btnTabDonjons">
-          <img class="navIco" data-file="Icône Dj.png" alt=""> Donjons
-        </button>
-
-        <button class="btn small" id="btnTabSonges">
-          <img class="navIco" data-file="Bribe de rêve.png" alt=""> Songes
-        </button>
-
-        <button class="btn small" id="btnTabStats">
-          <!-- tu peux me donner un logo plus tard si tu veux, je n’invente pas -->
-          📊 Statistiques
-        </button>
-
-        <button class="btn small" id="btnTabAnomalies">
-          <img class="navIco" data-file="Icône anomalie.png" alt=""> Anomalies
-        </button>
-
-        <button class="btn small" id="btnTabPP">
-          <!-- TA LOUPE : on garde ton fichier existant -->
-          <img class="navIco" data-file="Icône Calculateur PP.png" alt=""> Calculateur PP
-        </button>
-
-        <button class="btn small" id="btnTabOmega">
-          <img class="navIco" data-file="Icône Calculateur Omega.png" alt=""> XP Oméga
-        </button>
+        <button class="btn small" id="btnHome">🏠</button>
+        <button class="btn small" id="btnDonjons">🗝️</button>
+        <button class="btn small" id="btnSonges">🌙</button>
+        <button class="btn small" id="btnStats">📊</button>
+        <button class="btn small" id="btnPP">🍀</button>
+        <button class="btn small" id="btnOmega">📈</button>
 
         <button class="btn small good" id="btnAuth">🔑 Connexion</button>
-        <button class="btn small bad" id="btnResetAll">🧹 Reset tout</button>
+        <button class="btn small bad" id="btnResetAll">🧹 Reset</button>
       </div>
     </header>
 
     <main id="app"></main>
   </div>
 
-  <!-- Modal keypad -->
-  <div class="modal" id="modalKeypad">
+  <!-- Keypad modal -->
+  <div class="modal" id="modal">
     <div class="kbd" role="dialog" aria-modal="true">
       <div class="kbd-top">
         <div>
-          <div class="label">Saisie pavé numérique</div>
+          <div class="label">Pavé numérique</div>
           <div class="target" id="kbdTarget">—</div>
         </div>
         <button class="btn small" id="kbdClose">✖</button>
@@ -332,7 +290,7 @@
 
       <div class="kbd-display">
         <div class="label">Valeur</div>
-        <div class="val" id="kbdValue">0</div>
+        <div class="val mono" id="kbdValue">0</div>
       </div>
 
       <div class="kbd-grid" id="kbdGrid"></div>
@@ -340,76 +298,27 @@
       <div class="kbd-actions">
         <button class="btn bad" id="kbdClear">C</button>
         <button class="btn" id="kbdBack">⌫</button>
-        <button class="btn gold" id="kbdOk">Valider</button>
+        <button class="btn gold" id="kbdOk">✓ Valider</button>
       </div>
 
-      <div class="hint">Clique sur un nombre pour saisir. <b>Valider</b> applique la valeur. <b>C</b> remet à 0.</div>
-    </div>
-  </div>
-
-  <!-- Modal picker intensité bribes -->
-  <div class="modal" id="modalPick">
-    <div class="kbd" role="dialog" aria-modal="true">
-      <div class="kbd-top">
-        <div>
-          <div class="label">Bribes</div>
-          <div class="target" id="pickTitle">Choisir une intensité</div>
-        </div>
-        <button class="btn small" id="pickClose">✖</button>
+      <div class="hint">
+        Clavier : chiffres 0-9 • C ou Suppr/Delete = effacer • Backspace = retour • Entrée = valider • Échap = fermer
       </div>
-
-      <div class="hint" style="margin-top:0;margin-bottom:10px">
-        Sélectionne l’intensité pour appliquer le montant.
-      </div>
-
-      <div class="pickerGrid" id="pickGrid"></div>
     </div>
   </div>
 
 <script>
 /* =========================================================
-   SUPABASE CONFIG (tes infos)
+   Utils
    ========================================================= */
-const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_VpU8DwxA2rkt0rAgoeWwiQ_dKL_ubXL";
-const SUPABASE_TABLE = "saves";
-
-let sb = null;
-function initSupabase(){
-  try{
-    if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
-    if(!window.supabase || !window.supabase.createClient) return null;
-    return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }catch(e){
-    console.error("Supabase init error:", e);
-    return null;
-  }
-}
-sb = initSupabase();
-
-const cloud = { user:null, saving:false, saveTimer:null, lastCloudUpdatedAt:0 };
-
-/* =========================================================
-   GLOBALS / STORAGE
-   ========================================================= */
-const LS_PREFIX = "picofus:v4:";
-const CLOUD_META_KEY = `${LS_PREFIX}cloud_meta`;
 const fmt = new Intl.NumberFormat("fr-FR");
+const LS_PREFIX = "picofus:v5:";
 
-function n(v){ return Number.isFinite(v) ? v : 0; }
-function clampNonNeg(x){ x = Math.trunc(Number(x)||0); return x < 0 ? 0 : x; }
-function f2(x){ return (Number(x)||0).toFixed(2); }
+const $ = (q, el=document)=>el.querySelector(q);
 
-function resetAll(){
-  Object.keys(localStorage).forEach(k=>{
-    if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k);
-  });
-  scheduleCloudSave();
-}
-
-/* =========================================================
-   SAFE HTML
-   ========================================================= */
+function clampInt(x){ x = Math.trunc(Number(x)||0); return x<0?0:x; }
+function toNum(x){ const n = Number(String(x).replace(",", ".")); return Number.isFinite(n)?n:0; }
+function money(x){ return fmt.format(Math.round(toNum(x))); }
 function escapeHtml(s){
   return String(s ?? "")
     .replaceAll("&","&amp;")
@@ -418,1078 +327,863 @@ function escapeHtml(s){
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
 }
-function jsEscape(s){
-  return String(s ?? "").replaceAll("\\","\\\\").replaceAll("'","\\'");
-}
 
 /* =========================================================
-   IMAGE FALLBACK (robuste)
+   Image fallback (essaye plusieurs chemins)
    ========================================================= */
-function uniq(arr){
-  const seen = new Set();
-  const out = [];
-  for(const x of arr){
-    if(!x) continue;
-    if(seen.has(x)) continue;
-    seen.add(x);
-    out.push(x);
-  }
-  return out;
+function uniq(arr){ const s=new Set(); return arr.filter(x=>x && !s.has(x) && (s.add(x), true)); }
+function normDir(d){ if(!d) return ""; return d.endsWith("/")?d:(d+"/"); }
+function makeCandidates(dir, file){
+  dir = normDir(dir);
+  const f = file || "";
+  const enc = (p)=>{ try{return encodeURI(p);}catch{return p;} };
+  return uniq([
+    dir+f, "./"+dir+f,
+    enc(dir+f), enc("./"+dir+f),
+    f, "./"+f, enc(f), enc("./"+f),
+    "img/"+f, "./img/"+f,
+    "images/"+f, "./images/"+f,
+    "assets/"+f, "./assets/"+f,
+  ]);
 }
-function withDot(dir){ return dir.startsWith("./") ? dir : "./" + dir; }
-function stripDot(dir){ return dir.startsWith("./") ? dir.slice(2) : dir; }
-function encPath(p){ try { return encodeURI(p); } catch { return p; } }
-
-function makeCandidates(imgDir, file){
-  const d1 = stripDot(imgDir || "");
-  const d2 = withDot(imgDir || "");
-  const f1 = file || "";
-  const base = [
-    d1 + f1, d2 + f1,
-    encPath(d1 + f1), encPath(d2 + f1),
-    f1, "./" + f1, encPath(f1), encPath("./" + f1),
-    "img/" + f1, "./img/" + f1,
-    "images/" + f1, "./images/" + f1,
-    "assets/" + f1, "./assets/" + f1,
-  ];
-
-  // sécurité: si on reçoit "png.png" ou mauvaise casse, on tente quelques variantes
-  const extra = [];
-  if(f1.toLowerCase().endsWith(".png.png")){
-    extra.push(f1.replace(/\.png\.png$/i, ".png"));
-  }
-  if(!f1.toLowerCase().endsWith(".png") && !f1.toLowerCase().endsWith(".webp") && !f1.toLowerCase().endsWith(".jpg")){
-    extra.push(f1 + ".png");
-  }
-  return uniq([...base, ...extra]);
-}
-
-function attachFallback(imgEl, imgDir, file){
-  const list = makeCandidates(imgDir, file);
-  imgEl.dataset.candidates = JSON.stringify(list);
+function setImgWithFallback(imgEl, dir, file){
+  const list = makeCandidates(dir, file);
+  imgEl.dataset.cands = JSON.stringify(list);
   imgEl.dataset.idx = "0";
-  imgEl.src = list[0];
-  imgEl.onerror = () => {
-    const candidates = JSON.parse(imgEl.dataset.candidates || "[]");
-    let idx = parseInt(imgEl.dataset.idx || "0", 10) + 1;
-    imgEl.dataset.idx = String(idx);
-    if(idx < candidates.length) imgEl.src = candidates[idx];
+  imgEl.src = list[0] || "";
+  imgEl.onerror = ()=>{
+    const cands = JSON.parse(imgEl.dataset.cands||"[]");
+    let i = parseInt(imgEl.dataset.idx||"0",10)+1;
+    imgEl.dataset.idx = String(i);
+    if(i < cands.length) imgEl.src = cands[i];
     else imgEl.onerror = null;
   };
 }
-function activateFallbackIn(containerEl, defaultDir){
-  if(!containerEl) return;
-  containerEl.querySelectorAll("img").forEach(img=>{
-    const file = img.getAttribute("data-file") || (img.getAttribute("src")||"").split("/").pop();
-    const dir  = img.getAttribute("data-dir") || defaultDir || "";
-    if(file) attachFallback(img, dir, file);
+function activateImages(container, defaultDir){
+  container.querySelectorAll("img[data-file]").forEach(img=>{
+    setImgWithFallback(img, img.dataset.dir || defaultDir || "", img.dataset.file || "");
   });
 }
 
 /* =========================================================
-   CLOUD HELPERS
+   Supabase Cloud
    ========================================================= */
-function getLocalCloudMeta(){
-  try{ return JSON.parse(localStorage.getItem(CLOUD_META_KEY) || "null"); }
-  catch{ return null; }
-}
-function setLocalCloudMeta(meta){
-  localStorage.setItem(CLOUD_META_KEY, JSON.stringify(meta));
-}
-function collectPrefixedLocalStorage(){
-  const ls = {};
-  for(const k of Object.keys(localStorage)){
-    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY){
-      ls[k] = localStorage.getItem(k);
-    }
-  }
-  return ls;
-}
-function replacePrefixedLocalStorage(lsMap){
-  for(const k of Object.keys(localStorage)){
-    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY){
-      localStorage.removeItem(k);
-    }
-  }
-  for(const [k,v] of Object.entries(lsMap || {})){
-    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY){
-      localStorage.setItem(k, v);
-    }
-  }
-}
+const SUPABASE_URL = "https://pktrtwqavqbhdhtzkocy.supabase.co";
+const SUPABASE_ANON_KEY = "PUT_YOUR_ANON_KEY_HERE"; // <-- IMPORTANT: colle ta vraie anon key ici
+const SUPABASE_TABLE = "saves";
 
-async function loadFromCloudIntoLocal(){
+let sb = null;
+try{
+  if(window.supabase?.createClient && SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes("PUT_YOUR")){
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+}catch(e){ sb=null; }
+
+const cloud = { user:null, saving:false, saveTimer:null };
+const CLOUD_META_KEY = `${LS_PREFIX}cloud_meta`;
+
+function getCloudMeta(){ try{return JSON.parse(localStorage.getItem(CLOUD_META_KEY)||"null")}catch{return null} }
+function setCloudMeta(meta){ localStorage.setItem(CLOUD_META_KEY, JSON.stringify(meta)); }
+
+function collectLS(){
+  const out = {};
+  for(const k of Object.keys(localStorage)){
+    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY) out[k]=localStorage.getItem(k);
+  }
+  return out;
+}
+function replaceLS(map){
+  for(const k of Object.keys(localStorage)){
+    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY) localStorage.removeItem(k);
+  }
+  for(const [k,v] of Object.entries(map||{})){
+    if(k.startsWith(LS_PREFIX) && k !== CLOUD_META_KEY) localStorage.setItem(k, v);
+  }
+}
+async function cloudLoad(){
   if(!sb || !cloud.user) return false;
-  try{
-    const { data, error } = await sb
-      .from(SUPABASE_TABLE)
-      .select("data, updated_at")
-      .eq("user_id", cloud.user.id)
-      .maybeSingle();
+  const { data, error } = await sb.from(SUPABASE_TABLE).select("data, updated_at").eq("user_id", cloud.user.id).maybeSingle();
+  if(error || !data?.data) return false;
 
-    if(error){ console.error("Cloud load error:", error); return false; }
-    if(!data || !data.data) return false;
+  const cloudTs = data.updated_at ? new Date(data.updated_at).getTime() : Date.now();
+  const meta = getCloudMeta();
+  const localTs = meta?.localUpdatedAt ? Number(meta.localUpdatedAt) : 0;
 
-    const payload = data.data;
-    const cloudUpdatedAt = data.updated_at ? new Date(data.updated_at).getTime() : Date.now();
-
-    const localMeta = getLocalCloudMeta();
-    const localUpdatedAt = localMeta?.localUpdatedAt ? Number(localMeta.localUpdatedAt) : 0;
-
-    if(cloudUpdatedAt >= localUpdatedAt){
-      replacePrefixedLocalStorage(payload.ls || {});
-      setLocalCloudMeta({ localUpdatedAt: cloudUpdatedAt, lastCloudUpdatedAt: cloudUpdatedAt });
-      cloud.lastCloudUpdatedAt = cloudUpdatedAt;
-      return true;
-    }else{
-      cloud.lastCloudUpdatedAt = cloudUpdatedAt;
-      return false;
-    }
-  }catch(e){
-    console.error("Cloud load exception:", e);
-    return false;
+  if(cloudTs >= localTs){
+    replaceLS(data.data.ls || {});
+    setCloudMeta({ localUpdatedAt: cloudTs, lastCloudUpdatedAt: cloudTs });
+    return true;
   }
+  return false;
 }
-
-async function saveLocalToCloudNow(){
+async function cloudSaveNow(){
   if(!sb || !cloud.user) return;
-  try{
-    cloud.saving = true;
-    updateAuthUI();
+  cloud.saving = true; updateAuthUI();
 
-    const ls = collectPrefixedLocalStorage();
-    const payload = { version: 1, savedAt: new Date().toISOString(), ls };
+  const payload = { version: 1, savedAt: new Date().toISOString(), ls: collectLS() };
+  const { error } = await sb.from(SUPABASE_TABLE).upsert({
+    user_id: cloud.user.id,
+    data: payload,
+    updated_at: new Date().toISOString(),
+  }, { onConflict:"user_id" });
 
-    const { error } = await sb
-      .from(SUPABASE_TABLE)
-      .upsert({
-        user_id: cloud.user.id,
-        data: payload,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "user_id" });
+  cloud.saving = false; updateAuthUI();
+  if(error) return;
 
-    if(error){ console.error("Cloud save error:", error); return; }
-    const now = Date.now();
-    setLocalCloudMeta({ localUpdatedAt: now, lastCloudUpdatedAt: cloud.lastCloudUpdatedAt || now });
-  }catch(e){
-    console.error("Cloud save exception:", e);
-  }finally{
-    cloud.saving = false;
-    updateAuthUI();
-  }
+  setCloudMeta({ localUpdatedAt: Date.now(), lastCloudUpdatedAt: Date.now() });
 }
-function scheduleCloudSave(){
+function cloudScheduleSave(){
   if(!sb || !cloud.user) return;
   if(cloud.saveTimer) clearTimeout(cloud.saveTimer);
-  cloud.saveTimer = setTimeout(()=>saveLocalToCloudNow(), 900);
-}
-
-/* Auth UI */
-const authPill = document.getElementById("authPill");
-const btnAuth = document.getElementById("btnAuth");
-
-function updateAuthUI(){
-  if(!sb){
-    authPill.textContent = "⚠️ sb OFF";
-    btnAuth.textContent = "🔑 Connexion";
-    btnAuth.classList.remove("bad");
-    btnAuth.classList.add("good");
-    return;
-  }
-  if(cloud.user){
-    const email = cloud.user.email || "connecté";
-    authPill.textContent = cloud.saving ? `☁️ Sync… ${email}` : `☁️ Cloud ${email}`;
-    btnAuth.textContent = "🚪 Déconnexion";
-    btnAuth.classList.remove("good");
-    btnAuth.classList.add("bad");
-  }else{
-    authPill.textContent = "🔒 Local";
-    btnAuth.textContent = "🔑 Connexion";
-    btnAuth.classList.remove("bad");
-    btnAuth.classList.add("good");
-  }
-}
-
-async function doLogin(){
-  if(!sb) return alert("sb non initialisé (URL/Key manquantes).");
-  const email = prompt("Email pour connexion (magic link) :");
-  if(!email) return;
-
-  const redirectTo = window.location.origin + window.location.pathname;
-  const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: redirectTo } });
-
-  if(error){
-    console.error(error);
-    alert("Erreur connexion: " + (error.message || "unknown"));
-    return;
-  }
-  alert("✅ Lien envoyé par email. Ouvre-le pour te connecter (retour sur le site).");
-}
-async function doLogout(){
-  if(!sb) return;
-  const { error } = await sb.auth.signOut();
-  if(error){ console.error(error); alert("Erreur déconnexion: " + (error.message || "unknown")); }
-}
-btnAuth.addEventListener("click", ()=>{ if(cloud.user) doLogout(); else doLogin(); });
-
-async function handleAuthCallback(){
-  if(!sb) return;
-  const hasCode = window.location.search.includes("code=");
-  if(!hasCode) return;
-
-  const { error } = await sb.auth.exchangeCodeForSession(window.location.href);
-  if(error) console.error("exchangeCodeForSession error:", error);
-
-  const cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
-  window.history.replaceState({}, document.title, cleanUrl);
-}
-
-async function initAuth(){
-  if(!sb){ updateAuthUI(); return; }
-  const { data } = await sb.auth.getSession();
-  cloud.user = data?.session?.user || null;
-  updateAuthUI();
-
-  if(cloud.user){
-    await loadFromCloudIntoLocal();
-  }
-
-  sb.auth.onAuthStateChange(async (_event, session)=>{
-    cloud.user = session?.user || null;
-    updateAuthUI();
-    if(cloud.user){
-      await loadFromCloudIntoLocal();
-      render();
-      scheduleCloudSave();
-    }else{
-      render();
-    }
-  });
+  cloud.saveTimer = setTimeout(cloudSaveNow, 800);
 }
 
 /* =========================================================
-   KEYPAD
+   Keypad
    ========================================================= */
-const modalKeypad = document.getElementById("modalKeypad");
-const kbdTarget = document.getElementById("kbdTarget");
-const kbdValue  = document.getElementById("kbdValue");
-const kbdGrid   = document.getElementById("kbdGrid");
-const btnClose  = document.getElementById("kbdClose");
-const btnClear  = document.getElementById("kbdClear");
-const btnBack   = document.getElementById("kbdBack");
-const btnOk     = document.getElementById("kbdOk");
+const modal = $("#modal");
+const kbdTarget = $("#kbdTarget");
+const kbdValue = $("#kbdValue");
+const kbdGrid = $("#kbdGrid");
+const btnClose = $("#kbdClose");
+const btnClear = $("#kbdClear");
+const btnBack = $("#kbdBack");
+const btnOk = $("#kbdOk");
 
 let keypad = { open:false, buffer:"0", onApply:null, title:"" };
 
 function openKeypad(title, currentValue, onApply){
   keypad.open = true;
   keypad.title = title;
-  keypad.buffer = String(clampNonNeg(currentValue));
+  keypad.buffer = String(clampInt(currentValue));
   keypad.onApply = onApply;
   kbdTarget.textContent = title;
   kbdValue.textContent = keypad.buffer;
-  modalKeypad.classList.add("open");
+  modal.classList.add("open");
+
+  // auto-select
+  setTimeout(()=>{
+    const sel = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(kbdValue);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }, 30);
 }
-function closeKeypad(){ keypad.open = false; modalKeypad.classList.remove("open"); }
-function setBuffer(next){ keypad.buffer = next; kbdValue.textContent = keypad.buffer; }
-function pushDigit(d){ if(keypad.buffer === "0") setBuffer(String(d)); else setBuffer(keypad.buffer + String(d)); }
-function backspace(){ if(keypad.buffer.length <= 1) setBuffer("0"); else setBuffer(keypad.buffer.slice(0,-1)); }
+function closeKeypad(){
+  keypad.open = false;
+  modal.classList.remove("open");
+}
+function setBuffer(v){
+  keypad.buffer = v;
+  kbdValue.textContent = keypad.buffer;
+}
+function pushDigit(d){
+  if(keypad.buffer === "0") setBuffer(String(d));
+  else setBuffer(keypad.buffer + String(d));
+}
+function backspace(){
+  if(keypad.buffer.length <= 1) setBuffer("0");
+  else setBuffer(keypad.buffer.slice(0,-1));
+}
 function clearBuf(){ setBuffer("0"); }
 function applyBuf(){
-  const val = clampNonNeg(parseInt(keypad.buffer,10));
-  if(typeof keypad.onApply === "function") keypad.onApply(val);
+  const v = clampInt(parseInt(keypad.buffer,10));
+  if(typeof keypad.onApply === "function") keypad.onApply(v);
   closeKeypad();
 }
-(function buildKeypad(){
+
+// build keypad buttons
+(function(){
   kbdGrid.innerHTML = "";
   for(let i=1;i<=9;i++){
     const b = document.createElement("button");
     b.className = "kbd-key";
     b.textContent = String(i);
-    b.addEventListener("click", ()=>pushDigit(i));
+    b.onclick = ()=>pushDigit(i);
     kbdGrid.appendChild(b);
   }
   const blank1 = document.createElement("div");
   const zero = document.createElement("button");
-  zero.className = "kbd-key";
-  zero.textContent = "0";
-  zero.addEventListener("click", ()=>pushDigit(0));
+  zero.className="kbd-key"; zero.textContent="0"; zero.onclick=()=>pushDigit(0);
   const blank2 = document.createElement("div");
-  kbdGrid.appendChild(blank1);
-  kbdGrid.appendChild(zero);
-  kbdGrid.appendChild(blank2);
+  kbdGrid.append(blank1, zero, blank2);
 })();
-btnClose.addEventListener("click", closeKeypad);
-modalKeypad.addEventListener("click", (e)=>{ if(e.target === modalKeypad) closeKeypad(); });
-btnClear.addEventListener("click", clearBuf);
-btnBack.addEventListener("click", backspace);
-btnOk.addEventListener("click", applyBuf);
+
+btnClose.onclick = closeKeypad;
+btnClear.onclick = clearBuf;
+btnBack.onclick = backspace;
+btnOk.onclick = applyBuf;
+modal.addEventListener("click", (e)=>{ if(e.target === modal) closeKeypad(); });
+
 window.addEventListener("keydown", (e)=>{
   if(!keypad.open) return;
-  if(e.key >= "0" && e.key <= "9") pushDigit(e.key);
-  else if(e.key === "Backspace") backspace();
-  else if(e.key === "Escape") closeKeypad();
-  else if(e.key === "Enter") applyBuf();
+
+  if(e.key>="0" && e.key<="9"){ e.preventDefault(); pushDigit(e.key); return; }
+  if(e.key==="Backspace"){ e.preventDefault(); backspace(); return; }
+  if(e.key==="Delete"){ e.preventDefault(); clearBuf(); return; }        // Suppr = clear
+  if(e.key.toLowerCase()==="c"){ e.preventDefault(); clearBuf(); return; }
+  if(e.key==="Escape"){ e.preventDefault(); closeKeypad(); return; }
+  if(e.key==="Enter"){ e.preventDefault(); applyBuf(); return; }
 });
 
 /* =========================================================
-   MINI PICKER INTENSITÉ (bribes)
+   Data: Donjons (BUTINS + mobs + resources + equipments)
+   IMPORTANT: imgDir = nom de dossier
    ========================================================= */
-const modalPick = document.getElementById("modalPick");
-const pickGrid  = document.getElementById("pickGrid");
-const pickClose = document.getElementById("pickClose");
-const pickTitle = document.getElementById("pickTitle");
+const DUNGEONS = [
+  {
+    id:"dechireuse",
+    name:"Déchireuse",
+    imgDir:"Déchireuse/",
+    thumb:"Déchireuse.png",
+    mobs:[
+      {key:"Déchireuse", img:"Déchireuse.png"},
+      {key:"Domptueuse", img:"Domptueuse.png"},
+      {key:"Ébourifauve", img:"Ébourifauve.png"},
+      {key:"Voracle", img:"Voracle.png"},
+    ],
+    butins:{
+      b4: {"Déchireuse":1,"Domptueuse":7,"Ébourifauve":6,"Voracle":6},
+      b5: {"Déchireuse":1,"Domptueuse":8,"Ébourifauve":8,"Voracle":8},
+      b6: {"Déchireuse":1,"Domptueuse":10,"Ébourifauve":10,"Voracle":9},
+      b7: {"Déchireuse":1,"Domptueuse":12,"Ébourifauve":11,"Voracle":11},
+      b8: {"Déchireuse":1,"Domptueuse":13,"Ébourifauve":13,"Voracle":13},
+    },
+    resources:[
+      {key:"Viande Goûtue", img:"Viande Goûtue.png"},
+      {key:"Bidoche Goûtue", img:"Bidoche Goûtue.png"},
+      {key:"Éklâme suprême", img:"Éklâme suprême.png"},
+      {key:"Peigne de Rhoarim", img:"Peigne de Rhoarim.png"},
+      {key:"Squame du Graogarm", img:"Squame du Graogarm.png"},
+    ],
+    equipments:[
+      {key:"Crinière de la Déchireuse", img:"Crinière de la Déchireuse.png"},
+      {key:"Trophée de la Déchireuse", img:"Trophée de la Déchireuse.png"},
+      {key:"Hachoir de la Déchireuse", img:"Hachoir de la Déchireuse.png"},
+      {key:"Griffes de la Déchireuse", img:"Griffes de la Déchireuse.png"},
+      {key:"Masse Osseuse", img:"Masse Osseuse.png"},
+      {key:"Collier Rhoarim", img:"Collier Rhoarim.png"},
+      {key:"Pagne Rhoarim", img:"Pagne Rhoarim.png"},
+      {key:"Faux've", img:"Faux've.png"},
+    ]
+  },
 
-let pickState = { onPick:null };
+  {
+    id:"comte",
+    name:"Comte Harebourg",
+    imgDir:"Comte/",
+    thumb:"comte.png",
+    mobs:[
+      {key:"Comte Harebourg", img:"comte.png"},
+      {key:"Granduk", img:"granduk.png"},
+      {key:"Strigide", img:"strigide.png"},
+      {key:"Sinistrofu", img:"sinistrofu.png"},
+      {key:"Noctu", img:"noctu.png"},
+      {key:"Cyclo", img:"cyclo.png"},
+    ],
+    butins:{
+      b4: {"Comte Harebourg":1,"Cyclo":5,"Noctu":5,"Sinistrofu":2,"Strigide":4,"Granduk":3},
+      b5: {"Comte Harebourg":1,"Cyclo":5,"Noctu":6,"Sinistrofu":2,"Strigide":6,"Granduk":5},
+      b6: {"Comte Harebourg":1,"Cyclo":6,"Noctu":7,"Sinistrofu":5,"Strigide":6,"Granduk":5},
+      b7: {"Comte Harebourg":1,"Cyclo":9,"Noctu":8,"Sinistrofu":5,"Strigide":7,"Granduk":5},
+      b8: {"Comte Harebourg":1,"Granduk":8,"Strigide":7,"Sinistrofu":6,"Noctu":9,"Cyclo":9},
+    },
+    resources:[
+      {key:"Viande Goûtue", img:"viande goutue.png"},
+      {key:"Bidoche Goûtue", img:"bidoche goutue.png"},
+      {key:"Bandelette de Comte", img:"bandelette comte.png"},
+      {key:"Scapula du Comte", img:"scapu comte.png"},
+      {key:"Plume Cyclo", img:"plume cyclo.png"},
+      {key:"Pic de Noctu", img:"pic de noctu.png"},
+      {key:"Bec de Granduk", img:"bec de granduk.png"},
+      {key:"Bec de Strigide", img:"bec de strigide.png"},
+      {key:"Aile de Sinistrofu", img:"aille de sinistrofu.png"},
+      {key:"Aile de Noctu", img:"aille de noctu.png"},
+    ],
+    equipments:[
+      {key:"Coiffe du Comte Harebourg", img:"Coiffe du Comte Harebourg.png"},
+      {key:"Anneau du Comte Harebourg", img:"Anneau du Comte Harebourg.png"},
+      {key:"Bottes du Comte Harebourg", img:"Bottes du Comte Harebourg.png"},
+      {key:"Coiffe Séculaire", img:"Coiffe Séculaire.png"},
+      {key:"Amulette Séculaire", img:"Amulette Séculaire.png"},
+      {key:"Ceinture Séculaire", img:"Ceinture Séculaire.png"},
+      {key:"Coiffe Cryochrone", img:"Coiffe Cryochrone.png"},
+      {key:"Anneau Cryochrone", img:"Anneau Cryochrone.png"},
+      {key:"Amulette Cryochrone", img:"Amulette Cryochrone.png"},
+      {key:"Amulette du Nocturlabe", img:"Amulette du Nocturlabe.png"},
+      {key:"Ceinture du Nocturlabe", img:"Ceinture du Nocturlabe.png"},
+      {key:"Bottes du Nocturlabe", img:"Bottes du Nocturlabe.png"},
+      {key:"Cape du Sinistrofu", img:"Cape du Sinistrofu.png"},
+      {key:"Amulette du Sinistrofu", img:"Amulette du Sinistrofu.png"},
+      {key:"Bottes du Sinistrofu", img:"Bottes du Sinistrofu.png"},
+      {key:"Amulette du Cycloïde", img:"Amulette du Cycloïde.png"},
+      {key:"Anneau du Cycloïde", img:"Anneau du Cycloïde.png"},
+      {key:"Bottes du Cycloïde", img:"Bottes du Cycloïde.png"},
+      {key:"Bouclier du Cycloïde", img:"Bouclier du Cycloïde.png"},
+      {key:"Amulette du Strigide", img:"Amulette du Strigide.png"},
+      {key:"Ceinture du Strigide", img:"Ceinture du Strigide.png"},
+      {key:"Bottes du Strigide", img:"Bottes du Strigide.png"},
+      {key:"Masque du Granduk", img:"Masque du Granduk.png"},
+      {key:"Amulette du Granduk", img:"Amulette du Granduk.png"},
+      {key:"Épée du Granduk", img:"Épée du Granduk.png"},
+    ]
+  },
 
-function openPick(title, onPick){
-  pickTitle.textContent = title || "Choisir une intensité";
-  pickState.onPick = onPick;
-  modalPick.classList.add("open");
-}
-function closePick(){
-  pickState.onPick = null;
-  modalPick.classList.remove("open");
-}
-pickClose.addEventListener("click", closePick);
-modalPick.addEventListener("click", (e)=>{ if(e.target === modalPick) closePick(); });
+  {
+    id:"tempetes",
+    name:"Tempêtes Éliocalypse",
+    imgDir:"4 cavaliers/",
+    thumb:"servitude.png",
+    mobs:[
+      {key:"Servitude", img:"servitude.png"},
+      {key:"Guerre", img:"guerre.png"},
+      {key:"Corruption", img:"Corruption.png"},
+      {key:"Misère", img:"Misère.png"},
+      {key:"Ferailleur", img:"ferrailleur.png"},
+      {key:"Olgoth", img:"Olgoth.png"},
+      {key:"Pistilangue", img:"Langue de Pistilangue.png"},
+      {key:"Armécréante", img:"Armécréante.png"},
+    ],
+    butins:{
+      b4: {"Servitude":1,"Guerre":1,"Corruption":1,"Misère":1},
+      b5: {"Servitude":1,"Guerre":1,"Corruption":1,"Misère":1,"Ferailleur":1},
+      b6: {"Servitude":1,"Guerre":1,"Corruption":1,"Misère":1,"Ferailleur":1,"Olgoth":1},
+      b7: {"Servitude":1,"Guerre":1,"Corruption":1,"Misère":1,"Ferailleur":1,"Olgoth":1,"Pistilangue":1},
+      b8: {"Servitude":1,"Guerre":1,"Corruption":1,"Misère":1,"Ferailleur":1,"Olgoth":1,"Pistilangue":1,"Armécréante":1},
+    },
+    resources:[
+      {key:"Viande Goûtue", img:"Viande Goûtue.png"},
+      {key:"Bidoche Goûtue", img:"Bidoche Goûtue.png"},
+      {key:"Éklâme suprême", img:"Éklâme suprême.png"},
+      {key:"Langue de Pistilangue", img:"Langue de Pistilangue.png"},
+    ],
+    equipments:[
+      {key:"Écharpe de Servitude", img:"Écharpe de Servitude.png"},
+      {key:"Dora de Servitude", img:"Dora de Servitude.png"},
+      {key:"Manteau de Servitude", img:"Manteau de Servitude.png"},
+      {key:"Heaume de Guerre", img:"Heaume de Guerre.png"},
+      {key:"Solerets de Guerre", img:"Solerets de Guerre.png"},
+      {key:"Forteresse de Guerre", img:"Forteresse de Guerre.png"},
+      {key:"Ceste de Guerre", img:"Ceste de Guerre.png"},
+      {key:"Bague de Corruption", img:"Bague de Corruption.png"},
+      {key:"Alliance de Corruption", img:"Alliance de Corruption.png"},
+      {key:"Ceinturonce de Corruption", img:"Ceinturonce de Corruption.png"},
+      {key:"Convoitise de Misère", img:"Convoitise de Misère.png"},
+      {key:"Solerets de Misère", img:"Solerets de Misère.png"},
+      {key:"Corset de Misère", img:"Corset de Misère.png"},
+    ]
+  },
+
+  {
+    id:"bethel",
+    name:"Bethel Akarna",
+    imgDir:"Bethel/",
+    thumb:"Bethel Akarna.png",
+    mobs:[
+      {key:"Bethel", img:"Bethel Akarna.png"},
+      {key:"Crânonier", img:"Crânonier.png"},
+      {key:"Tournoyé", img:"Tournoyé.png"},
+      {key:"Macrab", img:"Macrab.png"},
+      {key:"Zombruth", img:"Zombruth.png"},
+      {key:"Funespadon", img:"Funespadon.png"},
+    ],
+    butins:{
+      b4: {"Bethel":1,"Crânonier":3,"Tournoyé":4,"Macrab":5,"Zombruth":4,"Funespadon":3},
+      b5: {"Bethel":1,"Crânonier":6,"Tournoyé":4,"Macrab":6,"Zombruth":4,"Funespadon":4},
+      b6: {"Bethel":1,"Crânonier":7,"Tournoyé":4,"Macrab":7,"Zombruth":5,"Funespadon":6},
+      b7: {"Bethel":1,"Crânonier":7,"Tournoyé":5,"Macrab":11,"Zombruth":5,"Funespadon":6},
+      b8: {"Bethel":1,"Crânonier":7,"Tournoyé":7,"Macrab":11,"Zombruth":7,"Funespadon":7},
+    },
+    resources:[
+      {key:"Viande Goûtue", img:"Viande Goûtue.png"},
+      {key:"Bidoche Goûtue", img:"Bidoche Goûtue.png"},
+      {key:"Éklâme suprême", img:"Éklâme suprême.png"},
+    ],
+    equipments:[
+      {key:"Sangle Oriole", img:"Sangle Oriole.png"},
+      {key:"Chapeau de Tournoyé", img:"Chapeau de Tournoyé.png"},
+      {key:"Cape de Crânonier", img:"Cape de Crânonier.png"},
+      {key:"Culotte de Bethel", img:"Culotte de Bethel.png"},
+      {key:"Chaussons de Macrab", img:"Chaussons de Macrab.png"},
+      {key:"Masque de Funespadon", img:"Masque de Funespadon.png"},
+      {key:"Baguette Héroclite", img:"Baguette Héroclite.png"},
+      {key:"Lance Horselé", img:"Lance Horselé.png"},
+      {key:"Cape Solution", img:"Cape Solution.png"},
+      {key:"Anneau Toriété", img:"Anneau Toriété.png"},
+      {key:"Collier Rophante", img:"Collier Rophante.png"},
+    ]
+  },
+
+  {
+    id:"eternel",
+    name:"Éternel Conflit",
+    imgDir:"Eternel conflit/",
+    thumb:"L'Éternel Conflit.png",
+    mobs:[
+      {key:"Éternel Conflit", img:"L'Éternel Conflit.png"},
+      {key:"Maléphisto", img:"Maléphisto.png"},
+      {key:"Brutasmodan", img:"Brutasmodan.png"},
+      {key:"Typhomet", img:"Typhomet.png"},
+      {key:"Diabélial", img:"Diabélial.png"},
+      {key:"Démoloch", img:"Démoloch.png"},
+    ],
+    butins:{
+      b4: {"Éternel Conflit":1,"Maléphisto":4,"Brutasmodan":4,"Typhomet":3,"Diabélial":4,"Démoloch":4},
+      b5: {"Éternel Conflit":1,"Maléphisto":5,"Brutasmodan":5,"Typhomet":4,"Diabélial":5,"Démoloch":5},
+      b6: {"Éternel Conflit":1,"Maléphisto":6,"Brutasmodan":6,"Typhomet":5,"Diabélial":6,"Démoloch":6},
+      b7: {"Éternel Conflit":1,"Maléphisto":7,"Brutasmodan":7,"Typhomet":6,"Diabélial":7,"Démoloch":7},
+      b8: {"Éternel Conflit":1,"Maléphisto":8,"Brutasmodan":8,"Typhomet":7,"Diabélial":8,"Démoloch":8},
+    },
+    resources:[
+      {key:"Viande Goûtue", img:"Viande Goûtue.png"},
+      {key:"Bidoche Goûtue", img:"Bidoche Goûtue.png"},
+      {key:"Éklâme suprême", img:"Éklâme suprême.png"},
+    ],
+    equipments:[
+      {key:"Torque de Ravageur", img:"Torque de Ravageur.png"},
+      {key:"Ceste de Ravageur", img:"Ceste de Ravageur.png"},
+      {key:"Hachoir de Ravageur", img:"Hachoir de Ravageur.png"},
+      {key:"Dernière Aube", img:"Dernière Aube.png"},
+      {key:"Chant du Nécromant", img:"Chant du Nécromant.png"},
+      {key:"Portes de Bonta", img:"Portes de Bonta.png"},
+      {key:"Mort du Centoror", img:"Mort du Centoror.png"},
+      {key:"Ciel de Foudre Noire", img:"Ciel de Foudre Noire.png"},
+      {key:"Bois de la Liche", img:"Bois de la Liche.png"},
+    ]
+  },
+
+  {
+    id:"torke",
+    name:"Torkélonia",
+    imgDir:"Torkélonia/",
+    thumb:"Torkélonia.png",
+    mobs:[
+      {key:"Torkélonia", img:"Torkélonia.png"},
+      {key:"Cronnibal", img:"Cronnibal.png"},
+      {key:"Caïguille", img:"Caïguille.png"},
+      {key:"Voapah", img:"Voapah.png"},
+      {key:"Kashkaille", img:"Kashkaille.png"},
+      {key:"Alashasss", img:"Alashasss.png"},
+    ],
+    butins:{
+      b4: {"Torkélonia":1,"Cronnibal":4,"Caïguille":5,"Voapah":3,"Kashkaille":4,"Alashasss":3},
+      b5: {"Torkélonia":1,"Cronnibal":6,"Caïguille":8,"Voapah":4,"Kashkaille":5,"Alashasss":3},
+      b6: {"Torkélonia":1,"Cronnibal":8,"Caïguille":7,"Voapah":6,"Kashkaille":5,"Alashasss":5},
+      b7: {"Torkélonia":1,"Cronnibal":7,"Caïguille":9,"Voapah":7,"Kashkaille":5,"Alashasss":6},
+      b8: {"Torkélonia":1,"Cronnibal":8,"Caïguille":9,"Voapah":7,"Kashkaille":8,"Alashasss":7},
+    },
+    resources:[
+      {key:"Viande Goûtue", img:"Viande Goûtue.png"},
+      {key:"Bidoche Goûtue", img:"Bidoche Goûtue.png"},
+      {key:"Éklâme suprême", img:"Éklâme suprême.png"},
+    ],
+    equipments:[
+      {key:"Baguette de Torkélonia", img:"Baguette de Torkélonia.png"},
+      {key:"Corne de Torkélonia", img:"Corne de Torkélonia.png"},
+      {key:"Carapace de Torkélonia", img:"Carapace de Torkélonia.png"},
+      {key:"Crocanneau", img:"Crocanneau.png"},
+      {key:"Croclier", img:"Croclier.png"},
+      {key:"Bottes Lunaires", img:"Bottes Lunaires.png"},
+      {key:"Collier Lunaire", img:"Collier Lunaire.png"},
+      {key:"Anneau Lunaire", img:"Anneau Lunaire.png"},
+    ]
+  },
+
+  {
+    id:"venerable",
+    name:"Vénérable Endormi",
+    imgDir:"Vénérable endormi/",
+    thumb:"Vénérable Endormi.png",
+    mobs:[
+      {key:"Vénérable Endormi", img:"Vénérable Endormi.png"},
+      {key:"Brutapir", img:"Brutapir.png"},
+      {key:"Lapilope", img:"Lapilope.png"},
+      {key:"Gyrafor", img:"Gyrafor.png"},
+      {key:"Gropotam", img:"Gropotam.png"},
+      {key:"Amphibouc", img:"Amphibouc.png"},
+    ],
+    butins:{
+      b4: {"Vénérable Endormi":1,"Brutapir":4,"Lapilope":4,"Gyrafor":4,"Gropotam":4,"Amphibouc":3},
+      b5: {"Vénérable Endormi":1,"Brutapir":5,"Lapilope":5,"Gyrafor":7,"Gropotam":4,"Amphibouc":3},
+      b6: {"Vénérable Endormi":1,"Brutapir":6,"Lapilope":6,"Gyrafor":10,"Gropotam":4,"Amphibouc":3},
+      b7: {"Vénérable Endormi":1,"Brutapir":6,"Lapilope":8,"Gyrafor":13,"Gropotam":4,"Amphibouc":3},
+      b8: {"Vénérable Endormi":1,"Brutapir":8,"Lapilope":8,"Gyrafor":10,"Gropotam":7,"Amphibouc":6},
+    },
+    resources:[
+      {key:"Viande Goûtue", img:"Viande Goûtue.png"},
+      {key:"Bidoche Goûtue", img:"Bidoche Goûtue.png"},
+      {key:"Éklâme suprême", img:"Éklâme suprême.png"},
+    ],
+    equipments:[
+      {key:"Zarbappeau", img:"Zarbappeau.png"},
+      {key:"Zarbottes", img:"Zarbottes.png"},
+      {key:"Zarbaudrier", img:"Zarbaudrier.png"},
+      {key:"Zarbouclier", img:"Zarbouclier.png"},
+      {key:"Manteau du Vénérable Endormi", img:"Manteau du Vénérable Endormi.png"},
+      {key:"Cornes du Vénérable Endormi", img:"Cornes du Vénérable Endormi.png"},
+      {key:"Malédiction du Vénérable Endormi", img:"Malédiction du Vénérable Endormi.png"},
+      {key:"Arc du Vénérable Endormi", img:"Arc du Vénérable Endormi.png"},
+    ]
+  },
+];
 
 /* =========================================================
-   ROUTER
+   Storage per dungeon
    ========================================================= */
-const app = document.getElementById("app");
-const pagePill = document.getElementById("pagePill");
+const kDungeon = (id)=>`${LS_PREFIX}d:${id}`;
+const kButin = (id)=>`${LS_PREFIX}butin:${id}`;
 
-document.getElementById("btnTabHome").addEventListener("click", ()=>{ location.hash = "#/"; });
-document.getElementById("btnTabDonjons").addEventListener("click", ()=>{ location.hash = "#/donjons"; });
-document.getElementById("btnTabSonges").addEventListener("click", ()=>{ location.hash = "#/songes"; });
-document.getElementById("btnTabStats").addEventListener("click", ()=>{ location.hash = "#/stats"; });
-document.getElementById("btnTabAnomalies").addEventListener("click", ()=>{ location.hash = "#/anomalies"; });
-document.getElementById("btnTabPP").addEventListener("click", ()=>{ location.hash = "#/pp"; });
-document.getElementById("btnTabOmega").addEventListener("click", ()=>{ location.hash = "#/omega"; });
-
-document.getElementById("btnResetAll").addEventListener("click", ()=>{
-  if(confirm("Reset TOUTES les données (tous les donjons + Songes + calculateurs) ?")){
-    resetAll();
-    render();
+function loadDungeon(id){
+  try{
+    const raw = localStorage.getItem(kDungeon(id));
+    if(!raw) return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{} };
+    const p = JSON.parse(raw);
+    return {
+      mobs: p.mobs||{},
+      res: p.res||{},
+      resP: p.resP||{},
+      eq: p.eq||{},
+      eqP: p.eqP||{},
+    };
+  }catch{
+    return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{} };
   }
-});
+}
+function saveDungeon(id, st){
+  localStorage.setItem(kDungeon(id), JSON.stringify(st));
+  cloudScheduleSave();
+}
+function ensureDungeonShape(d, st){
+  const out = st || { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{} };
+  out.mobs ||= {}; out.res ||= {}; out.resP ||= {}; out.eq ||= {}; out.eqP ||= {};
+  (d.mobs||[]).forEach(m=>{ if(!(m.key in out.mobs)) out.mobs[m.key]=0; });
+  (d.resources||[]).forEach(r=>{ if(!(r.key in out.res)) out.res[r.key]=0; if(!(r.key in out.resP)) out.resP[r.key]=0; });
+  (d.equipments||[]).forEach(e=>{ if(!(e.key in out.eq)) out.eq[e.key]=0; if(!(e.key in out.eqP)) out.eqP[e.key]=0; });
+  return out;
+}
+function loadButin(id){ return localStorage.getItem(kButin(id)) || "b8"; }
+function saveButin(id, b){ localStorage.setItem(kButin(id), b); cloudScheduleSave(); }
 
-function getRoute(){
-  const h = location.hash.replace("#","").trim();
-  if(!h || h === "/") return { page:"home" };
-  if(h === "/donjons") return { page:"donjons" };
-  if(h === "/songes") return { page:"songes" };
-  if(h === "/stats") return { page:"stats" };
-  if(h === "/anomalies") return { page:"anomalies" };
-  if(h === "/pp") return { page:"pp" };
-  if(h === "/omega") return { page:"omega" };
-  const m = h.match(/^\/d\/([^\/]+)$/);
-  if(m) return { page:"dungeon", id:decodeURIComponent(m[1]) };
-  return { page:"home" };
+/* =========================================================
+   Songes (simple + legends masquées si 0)
+   ========================================================= */
+const kSonges = `${LS_PREFIX}songes`;
+const SONGES = {
+  intensities: [
+    { id:"r1", label:"Rêve 1", img:"Reve 1.png", dir:"Songes/" },
+    { id:"r2", label:"Rêve 2", img:"Reve 2.png", dir:"Songes/" },
+    { id:"r3", label:"Rêve 3", img:"Reve 3.png", dir:"Songes/" },
+    { id:"p1", label:"Paradoxe 1", img:"Paradox 1.png", dir:"Songes/" },
+    { id:"p2", label:"Paradoxe 2", img:"Paradox 2.png", dir:"Songes/" },
+    { id:"p3", label:"Paradoxe 3", img:"Paradox 3.png", dir:"Songes/" },
+    { id:"p4", label:"Paradoxe 4", img:"Paradox 4.png", dir:"Songes/" },
+    { id:"c1", label:"Cauchemar 1", img:"Cauchemar 1.png", dir:"Songes/" },
+    { id:"c2", label:"Cauchemar 2", img:"Cauchemar 2.png", dir:"Songes/" },
+    { id:"c3", label:"Cauchemar 3", img:"Cauchemar 3.png", dir:"Songes/" },
+  ],
+  legends: [
+    { key:"Oto Mustam", img:"Légende d'Oto Mustam.png", dir:"Songes/" },
+    { key:"Menalt", img:"Légende de Menalt.png", dir:"Songes/" },
+    { key:"Mériana", img:"Légende de Mériana.png", dir:"Songes/" },
+    { key:"Jahash", img:"Légende de Jahash Jurgen.png", dir:"Songes/" },
+    { key:"Amayiro", img:"Légende d'Amayiro.png", dir:"Songes/" },
+    { key:"Servitude", img:"Légende de Servitude.png", dir:"Songes/" },
+    { key:"Guerre", img:"Légende de Guerre.png", dir:"Songes/" },
+    { key:"Misère", img:"Légende de Misère.png", dir:"Songes/" },
+    { key:"Corruption", img:"Légende de Corruption.png", dir:"Songes/" },
+  ],
+  bribesIcon: { key:"Bribes", img:"Bribe de rêve.png", dir:"Songes/" }
+};
+
+function blankSonges(){
+  const s = { bribes:0, runs:{}, legends:{} };
+  SONGES.intensities.forEach(i=>s.runs[i.id]=0);
+  SONGES.legends.forEach(l=>s.legends[l.key]=0);
+  return s;
+}
+function loadSonges(){
+  try{
+    const raw = localStorage.getItem(kSonges);
+    if(!raw) return blankSonges();
+    const p = JSON.parse(raw);
+    const s = blankSonges();
+    s.bribes = clampInt(p.bribes ?? 0);
+    for(const i of SONGES.intensities) s.runs[i.id] = clampInt(p.runs?.[i.id] ?? 0);
+    for(const l of SONGES.legends) s.legends[l.key] = clampInt(p.legends?.[l.key] ?? 0);
+    return s;
+  }catch{ return blankSonges(); }
+}
+function saveSonges(s){ localStorage.setItem(kSonges, JSON.stringify(s)); cloudScheduleSave(); }
+
+/* =========================================================
+   PP (valeurs vides par défaut)
+   ========================================================= */
+const kPP = `${LS_PREFIX}pp`;
+function blankPP(){ return { prospection:"", base:"", challenges:"", anomalie:"", shield:"", almanax:"" }; }
+function loadPP(){
+  try{
+    const raw = localStorage.getItem(kPP);
+    if(!raw) return blankPP();
+    const p = JSON.parse(raw);
+    return {
+      prospection: (p.prospection ?? ""),
+      base: (p.base ?? ""),
+      challenges: (p.challenges ?? ""),
+      anomalie: (p.anomalie ?? ""),
+      shield: (p.shield ?? ""),
+      almanax: (p.almanax ?? ""),
+    };
+  }catch{ return blankPP(); }
+}
+function savePP(s){ localStorage.setItem(kPP, JSON.stringify(s)); cloudScheduleSave(); }
+function ppMultiplier(pp){
+  pp = toNum(pp);
+  const m = 0.74 + (1.755 / (1 + Math.exp((250 - pp) / 85)));
+  return Math.min(2.5, m);
+}
+function ppFinal(s){
+  const base = toNum(s.base);
+  const mult = ppMultiplier(s.prospection);
+  const final =
+    base * mult *
+    (1 + toNum(s.challenges)/100) *
+    (1 + toNum(s.anomalie)/100) *
+    (1 + toNum(s.shield)/100) *
+    (1 + toNum(s.almanax)/100);
+  return { mult, final };
+}
+
+/* =========================================================
+   Omega (reset => 0/0)
+   ========================================================= */
+const kOmega = `${LS_PREFIX}omega`;
+function loadOmega(){
+  try{
+    const raw = localStorage.getItem(kOmega);
+    if(!raw) return { cur:0, target:0 };
+    const p = JSON.parse(raw);
+    return { cur: clampInt(p.cur??0), target: clampInt(p.target??0) };
+  }catch{ return { cur:0, target:0 }; }
+}
+function saveOmega(s){ localStorage.setItem(kOmega, JSON.stringify(s)); cloudScheduleSave(); }
+function omegaXpToNext(i){ return Math.round(50000000 * Math.pow(1.01, i)); }
+function omegaXpRequired(cur, target){
+  cur = clampInt(cur); target = clampInt(target);
+  if(target<=cur) return 0;
+  let sum=0; for(let i=cur;i<target;i++) sum += omegaXpToNext(i);
+  return sum;
+}
+
+/* =========================================================
+   Router
+   ========================================================= */
+const app = $("#app");
+const pagePill = $("#pagePill");
+const authPill = $("#authPill");
+const btnAuth = $("#btnAuth");
+
+$("#btnHome").onclick = ()=>location.hash = "#/";
+$("#btnDonjons").onclick = ()=>location.hash = "#/donjons";
+$("#btnSonges").onclick = ()=>location.hash = "#/songes";
+$("#btnStats").onclick = ()=>location.hash = "#/stats";
+$("#btnPP").onclick = ()=>location.hash = "#/pp";
+$("#btnOmega").onclick = ()=>location.hash = "#/omega";
+
+$("#btnResetAll").onclick = ()=>{
+  if(!confirm("Reset TOUT (donjons + songes + stats + PP + oméga) ?")) return;
+  for(const k of Object.keys(localStorage)){
+    if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k);
+  }
+  // defaults voulus
+  saveOmega({cur:0,target:0});
+  savePP(blankPP());
+  render();
+};
+
+function route(){
+  const h = (location.hash || "#/").slice(1);
+  if(h==="/") return {page:"home"};
+  if(h==="/donjons") return {page:"donjons"};
+  if(h==="/songes") return {page:"songes"};
+  if(h==="/stats") return {page:"stats"};
+  if(h==="/pp") return {page:"pp"};
+  if(h==="/omega") return {page:"omega"};
+  const m = h.match(/^\/d\/(.+)$/);
+  if(m) return {page:"dungeon", id: decodeURIComponent(m[1])};
+  return {page:"home"};
 }
 window.addEventListener("hashchange", render);
 
 /* =========================================================
-   DONJONS DATA (repris de ton ancien HTML)
-   + ajout structure items: []
+   Auth UI + login/logout
    ========================================================= */
-const ICONS = {
-  mobs: "monster.png",
-  resources: "Ressource.png",
-  items: "inventory_equipment.png",
-  kamas: "Kamas.png",
-};
-
-const DUNGEONS = [
-  {
-    id: "dechireuse",
-    name: "Déchireuse",
-    thumb: "Déchireuse.png",
-    imgDir: "Déchireuse/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Déchireuse": 1, "Domptueuse": 13, "Ébourifauve": 13, "Voracle": 13 },
-    mobs: [
-      { key:"Déchireuse", img:"Déchireuse.png" },
-      { key:"Domptueuse", img:"Domptueuse.png" },
-      { key:"Ébourifauve", img:"Ébourifauve.png" },
-      { key:"Voracle", img:"Voracle.png" },
-    ],
-    resources: [
-      { key:"Toison de la Déchireuse", img:"Toison de la Déchireuse.png" },
-      { key:"Griffe de la Déchireuse", img:"Griffe de la Déchireuse.png" },
-      { key:"Tresse de Domptueuse", img:"Tresse de Domptueuse.png" },
-      { key:"Frange d'Ébourifauve", img:"Frange d'Ébourifauve.png" },
-      { key:"Mise en plis de Voracle", img:"Mise en plis de Voracle.png" },
-      { key:"Daguosseuse de Domptueuse", img:"Daguosseuse de Domptueuse.png" },
-      { key:"Bandeau d'Ébourifauve", img:"Bandeau d'Ébourifauve.png" },
-      { key:"Os Divinatoire de Voracle", img:"Os Divinatoire de Voracle.png" },
-      { key:"Squame du Graogarm", img:"Squame du Graogarm.png" },
-      { key:"Peigne de Rhoarim", img:"Peigne de Rhoarim.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Uniforme de chasseur-mangeur", img:"Uniforme de chasseur-mangeur.png" },
-    ],
-    items: [],
-  },
-  {
-    id: "tempetes",
-    name: "Tempêtes Éliocalypse",
-    thumb: "servitude.png",
-    imgDir: "4 cavaliers/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: {
-      "Servitude": 1, "Guerre": 1, "Corruption": 1, "Misère": 1,
-      "Armécréante": 1, "Olgoth": 1, "Pistilangue": 1, "Ferailleur": 1
-    },
-    mobs: [
-      { key:"Servitude", img:"servitude.png" },
-      { key:"Guerre", img:"guerre.png" },
-      { key:"Corruption", img:"Corruption.png" },
-      { key:"Misère", img:"Misère.png" },
-      { key:"Armécréante", img:"Armécréante.png" },
-      { key:"Olgoth", img:"Olgoth.png" },
-      { key:"Pistilangue", img:"Langue de Pistilangue.png" },
-      { key:"Ferailleur", img:"ferrailleur.png" },
-    ],
-    resources: [
-      { key:"Verrou de Servitude", img:"Verrou de Servitude.png" },
-      { key:"Bonnet de Guerre", img:"Bonnet de Guerre.png" },
-      { key:"Corne de Corruption", img:"Corne de Corruption.png" },
-      { key:"Plume de Misère", img:"Plume de Misère.png" },
-      { key:"Capuche d'Armécréante", img:"Capuche d'Armécréante.png" },
-      { key:"Fragment d'armure", img:"Fragment d'armure.png" },
-      { key:"Langue de Pistilangue", img:"Langue de Pistilangue.png" },
-      { key:"Épaulière de Ferrailleur", img:"Épaulière de Ferrailleur.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-    ],
-    items: [],
-  },
-  {
-    id: "bethel",
-    name: "Bethel Akarna",
-    thumb: "Bethel Akarna.png",
-    imgDir: "Bethel/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Bethel": 1, "Crânonier": 7, "Funespadon": 7, "Macrab": 11, "Tournoyé": 7, "Zombruth": 7 },
-    mobs: [
-      { key:"Bethel", img:"Bethel Akarna.png" },
-      { key:"Crânonier", img:"Crânonier.png" },
-      { key:"Funespadon", img:"Funespadon.png" },
-      { key:"Macrab", img:"Macrab.png" },
-      { key:"Tournoyé", img:"Tournoyé.png" },
-      { key:"Zombruth", img:"Zombruth.png" },
-    ],
-    resources: [
-      { key:"Queue de Bethel Akarna", img:"Queue de Bethel Akarna.png" },
-      { key:"Coquille de Submergé", img:"Coquille de Submergé.png" },
-      { key:"Aquarakne de Crânonier", img:"Aquarakne de Crânonier.png" },
-      { key:"Protection de Funespadon", img:"Protection de Funespadon.png" },
-      { key:"Bout d'Armure de Macrab", img:"Bout d'Armure de Macrab.png" },
-      { key:"Pointe de Lance de Tournoyé", img:"Pointe de Lance de Tournoyé.png" },
-      { key:"Chair de Zombruth", img:"Chair de Zombruth.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-    ],
-    items: [],
-  },
-  {
-    id: "eternel",
-    name: "Éternel Conflit",
-    thumb: "L'Éternel Conflit.png",
-    imgDir: "Eternel conflit/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Éternel Conflit": 1, "Brutasmodan": 8, "Démoloch": 8, "Diabélial": 8, "Maléphisto": 8, "Typhomet": 7 },
-    mobs: [
-      { key:"Éternel Conflit", img:"L'Éternel Conflit.png" },
-      { key:"Brutasmodan", img:"Brutasmodan.png" },
-      { key:"Démoloch", img:"Démoloch.png" },
-      { key:"Diabélial", img:"Diabélial.png" },
-      { key:"Maléphisto", img:"Maléphisto.png" },
-      { key:"Typhomet", img:"Typhomet.png" },
-    ],
-    resources: [
-      { key:"Masque cauchemardesque de l'Éternel Conflit", img:"Masque cauchemardesque de l'Éternel Conflit.png" },
-      { key:"Pic de Ravageur", img:"Pic de Ravageur.png" },
-      { key:"Mâchoire de Brutasmodan", img:"Mâchoire de Brutasmodan.png" },
-      { key:"Tentacule de Démoloch", img:"Tentacule de Démoloch.png" },
-      { key:"Langue de Diabélial", img:"Langue de Diabélial.png" },
-      { key:"Épaule de Maléphisto", img:"Épaule de Maléphisto.png" },
-      { key:"Corne de Typhomet", img:"Corne de Typhomet.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Shuclier", img:"Shuclier.png" },
-    ],
-    items: [],
-  },
-  {
-    id: "torke",
-    name: "Torkélonia",
-    thumb: "Torkélonia.png",
-    imgDir: "Torkélonia/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Torkélonia": 1, "Alashasss": 7, "Cronnibal": 8, "Caïguille": 9, "Voapah": 7, "Kashkaille": 8 },
-    mobs: [
-      { key:"Torkélonia", img:"Torkélonia.png" },
-      { key:"Alashasss", img:"Alashasss.png" },
-      { key:"Cronnibal", img:"Cronnibal.png" },
-      { key:"Caïguille", img:"Caïguille.png" },
-      { key:"Voapah", img:"Voapah.png" },
-      { key:"Kashkaille", img:"Kashkaille.png" },
-    ],
-    resources: [
-      { key:"Écaille de Torkélonia", img:"Écaille de Torkélonia.png" },
-      { key:"Œil de Crocodaille albinos", img:"Œil de Crocodaille albinos.png" },
-      { key:"Pagne d'Alashasss", img:"Pagne d'Alashasss.png" },
-      { key:"Canine de Cronnibal", img:"Canine de Cronnibal.png" },
-      { key:"Poupée de Caïguille", img:"Poupée de Caïguille.png" },
-      { key:"Bandeau de Voapah", img:"Bandeau de Voapah.png" },
-      { key:"Langue de Kashkaille", img:"Langue de Kashkaille.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Torvil", img:"Torvil.png" },
-    ],
-    items: [],
-  },
-  {
-    id: "venerable",
-    name: "Vénérable Endormi",
-    thumb: "Vénérable Endormi.png",
-    imgDir: "Vénérable endormi/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Vénérable Endormi": 1, "Brutapir": 8, "Lapilope": 8, "Gyrafor": 10, "Gropotam": 7, "Amphibouc": 6 },
-    mobs: [
-      { key:"Vénérable Endormi", img:"Vénérable Endormi.png" },
-      { key:"Brutapir", img:"Brutapir.png" },
-      { key:"Lapilope", img:"Lapilope.png" },
-      { key:"Gyrafor", img:"Gyrafor.png" },
-      { key:"Gropotam", img:"Gropotam.png" },
-      { key:"Amphibouc", img:"Amphibouc.png" },
-    ],
-    resources: [
-      { key:"Corne du Vénérable Endormi", img:"Corne du Vénérable Endormi.png" },
-      { key:"Crinière du Vénérable Endormi", img:"Crinière du Vénérable Endormi.png" },
-      { key:"Défense de Brutapir", img:"Défense de Brutapir.png" },
-      { key:"Corne de Lapilope", img:"Corne de Lapilope.png" },
-      { key:"Corne de Gyrafor", img:"Corne de Gyrafor.png" },
-      { key:"Front osseux de Gropotam", img:"Front osseux de Gropotam.png" },
-      { key:"Corne d'Amphibouc", img:"Corne d'Amphibouc.png" },
-      { key:"Groin de Brutapir", img:"Groin de Brutapir.png" },
-      { key:"Oreille de Lapilope", img:"Oreille de Lapilope.png" },
-      { key:"Lampe de Gyrafor", img:"Lampe de Gyrafor.png" },
-      { key:"Mâchoire de Gropotam", img:"Mâchoire de Gropotam.png" },
-      { key:"Langue d'Amphibouc", img:"Langue d'Amphibouc.png" },
-      { key:"Squame du Graogarm", img:"Squame du Graogarm.png" },
-      { key:"Peau de zarbivore", img:"Peau de zarbivore.png" },
-      { key:"Viande Goûtue", img:"Viande Goûtue.png" },
-      { key:"Bidoche Goûtue", img:"Bidoche Goûtue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Uniforme de chasseur-mangeur", img:"Uniforme de chasseur-mangeur.png" },
-    ],
-    items: [],
-  },
-  {
-    id: "comte",
-    name: "Comte Harebourg",
-    thumb: "comte.png",
-    imgDir: "Comte/",
-    totalButtonLabel: "Total donjon (+1 run)",
-    totalIncrements: { "Comte Harebourg": 1, "Sinistrofu": 6, "Noctu": 9, "Cyclo": 9, "Granduk": 8, "Strigide": 7 },
-    mobs: [
-      { key:"Comte Harebourg", img:"comte.png" },
-      { key:"Granduk", img:"granduk.png" },
-      { key:"Strigide", img:"strigide.png" },
-      { key:"Sinistrofu", img:"sinistrofu.png" },
-      { key:"Noctu", img:"noctu.png" },
-      { key:"Cyclo", img:"cyclo.png" },
-    ],
-    resources: [
-      { key:"Bandelette de Comte", img:"bandelette comte.png" },
-      { key:"Scapula du Comte", img:"scapu comte.png" },
-      { key:"Pic de Noctu", img:"pic de noctu.png" },
-      { key:"Bec de Granduk", img:"bec de granduk.png" },
-      { key:"Bec de Strigide", img:"bec de strigide.png" },
-      { key:"Plume Cyclo", img:"plume cyclo.png" },
-      { key:"Aile de Noctu", img:"aille de noctu.png" },
-      { key:"Aile de Sinistrofu", img:"aille de sinistrofu.png" },
-      { key:"Queue de Sini", img:"queue de sini.png" },
-      { key:"Œil de Cyclo", img:"oeil de cyclo.png" },
-      { key:"Plume de Granduk", img:"plume de granduk.png" },
-      { key:"Griffe de Strigide", img:"griffe de strigide.png" },
-      { key:"Viande Goûtue", img:"viande goutue.png" },
-      { key:"Bidoche Goûtue", img:"bidoche goutue.png" },
-      { key:"Éklâme suprême", img:"Éklâme suprême.png" },
-      { key:"Ceinture de Glourdorak", img:"ceinture glourdorak.png" },
-    ],
-    items: [], // tu me donneras la liste, l’UI est prête
-  },
-];
-
-/* =========================================================
-   STORAGE DONJONS
-   ========================================================= */
-const kDungeon = (id) => `${LS_PREFIX}${id}`;
-function loadDungeonState(id){
-  try{
-    const raw = localStorage.getItem(kDungeon(id));
-    if(!raw) return { mobs:{}, resources:{}, prices:{}, items:{} };
-    const p = JSON.parse(raw);
-    return { mobs:p.mobs||{}, resources:p.resources||{}, prices:p.prices||{}, items:p.items||{} };
-  }catch(e){ return { mobs:{}, resources:{}, prices:{}, items:{} }; }
+function updateAuthUI(){
+  if(!sb){
+    authPill.textContent = "⚠️ Supabase OFF";
+    btnAuth.textContent = "🔑 Connexion";
+    btnAuth.classList.remove("bad"); btnAuth.classList.add("good");
+    return;
+  }
+  if(cloud.user){
+    const email = cloud.user.email || "connecté";
+    const short = email.length>22 ? email.slice(0,20)+"…" : email;
+    authPill.textContent = cloud.saving ? "☁️ Sync…" : `☁️ ${short}`;
+    btnAuth.textContent = "🚪 Déco";
+    btnAuth.classList.remove("good"); btnAuth.classList.add("bad");
+  }else{
+    authPill.textContent = "🔒 Local";
+    btnAuth.textContent = "🔑 Connexion";
+    btnAuth.classList.remove("bad"); btnAuth.classList.add("good");
+  }
 }
-function saveDungeonState(id, state){
-  localStorage.setItem(kDungeon(id), JSON.stringify(state));
-  scheduleCloudSave();
+async function doLogin(){
+  if(!sb) return alert("Supabase OFF (mets ton ANON KEY dans le code).");
+  const email = prompt("Email (magic link) :");
+  if(!email) return;
+  const redirectTo = window.location.origin + window.location.pathname;
+  const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: redirectTo }});
+  if(error) return alert("Erreur login: "+(error.message||"unknown"));
+  alert("✅ Lien envoyé. Ouvre-le pour te connecter.");
 }
-function ensureDungeonStateShape(d, st){
-  st = st || { mobs:{}, resources:{}, prices:{}, items:{} };
-  st.mobs = st.mobs || {};
-  st.resources = st.resources || {};
-  st.prices = st.prices || {};
-  st.items = st.items || {};
+async function doLogout(){
+  if(!sb) return;
+  const { error } = await sb.auth.signOut();
+  if(error) alert("Erreur logout: "+(error.message||"unknown"));
+}
+btnAuth.onclick = ()=> cloud.user ? doLogout() : doLogin();
 
-  (d.mobs||[]).forEach(m=>{ if(!(m.key in st.mobs)) st.mobs[m.key]=0; });
-  (d.resources||[]).forEach(r=>{
-    if(!(r.key in st.resources)) st.resources[r.key]=0;
-    if(!(r.key in st.prices)) st.prices[r.key]=0;
+async function initAuth(){
+  updateAuthUI();
+  if(!sb) return;
+
+  // callback magic link
+  if(window.location.search.includes("code=")){
+    try{ await sb.auth.exchangeCodeForSession(window.location.href); }catch{}
+    const clean = window.location.origin + window.location.pathname + window.location.hash;
+    history.replaceState({}, document.title, clean);
+  }
+
+  const { data } = await sb.auth.getSession();
+  cloud.user = data?.session?.user || null;
+  updateAuthUI();
+  if(cloud.user){ await cloudLoad(); }
+
+  sb.auth.onAuthStateChange(async (_evt, session)=>{
+    cloud.user = session?.user || null;
+    updateAuthUI();
+    if(cloud.user){ await cloudLoad(); }
+    render();
   });
-  (d.items||[]).forEach(it=>{ if(!(it.key in st.items)) st.items[it.key]=0; });
-
-  return st;
 }
 
 /* =========================================================
-   SONGES
+   Helpers: totals
    ========================================================= */
-const kSonges = `${LS_PREFIX}songes`;
-const SONGES_IMG_DIR = "Songes/";
-const BRIBES_ICON_FILE = "Bribe de rêve.png";
-
-const SONGE_INTENSITIES = [
-  { id:"reve1",     num:1,  label:"Rêve 1",     group:"Rêve",     img:"Reve 1.png" },
-  { id:"reve2",     num:2,  label:"Rêve 2",     group:"Rêve",     img:"Reve 2.png" },
-  { id:"reve3",     num:3,  label:"Rêve 3",     group:"Rêve",     img:"Reve 3.png" },
-  { id:"paradoxe1", num:4,  label:"Paradoxe 1", group:"Paradoxe", img:"Paradox 1.png" },
-  { id:"paradoxe2", num:5,  label:"Paradoxe 2", group:"Paradoxe", img:"Paradox 2.png" },
-  { id:"paradoxe3", num:6,  label:"Paradoxe 3", group:"Paradoxe", img:"Paradox 3.png" },
-  { id:"paradoxe4", num:7,  label:"Paradoxe 4", group:"Paradoxe", img:"Paradox 4.png" },
-  { id:"cauchemar1",num:8,  label:"Cauchemar 1",group:"Cauchemar",img:"Cauchemar 1.png" },
-  { id:"cauchemar2",num:9,  label:"Cauchemar 2",group:"Cauchemar",img:"Cauchemar 2.png" },
-  { id:"cauchemar3",num:10, label:"Cauchemar 3",group:"Cauchemar",img:"Cauchemar 3.png" },
-];
-
-const SONGE_LEGENDS = [
-  { key:"Oto Mustam",      img:"Légende d'Oto Mustam.png" },
-  { key:"Menalt",         img:"Légende de Menalt.png" },
-  { key:"Mériana",        img:"Légende de Mériana.png" },
-  { key:"Jahash",         img:"Légende de Jahash Jurgen.png" },
-  { key:"Amayiro",        img:"Légende d'Amayiro.png" },
-  { key:"Dame Jhessica",  img:"Légende de Dame Jhessica.png" },
-  { key:"Thanatena",      img:"Légende de Thanatena.png" },
-  { key:"Helséphine",     img:"Légende d'Helséphine.png" },
-  { key:"Henual",         img:"Légende d'Henual.png" },
-  { key:"Servitude",      img:"Légende de Servitude.png" },
-  { key:"Guerre",         img:"Légende de Guerre.png" },
-  { key:"Misère",         img:"Légende de Misère.png" },
-  { key:"Corruption",     img:"Légende de Corruption.png" },
-  { key:"Mille Lieues",   img:"Légende de Mille Lieues.png" },
-  { key:"Rykke Errel",    img:"Légende de Rykke Errel.png" },
-  { key:"Ganymède",       img:"Légende de Ganymède.png" },
-  { key:"Fallanster",     img:"Légende de Fallanster.png" },
-  { key:"Crocobur",       img:"Légende de Crocobur.png" },
-  { key:"Dodge",          img:"Légende de Dodge.png" },
-  { key:"Brâm Barbe-Monde",img:"Légende de Brâm Barbe-Monde.png" },
-  { key:"Brumaire",       img:"Légende de Brumaire.png" },
-  { key:"Buhorado",       img:"Légende de Buhorado.png" },
-  { key:"Cul Botté",      img:"Légende du Cul Botté.png" },
-  { key:"Destin",         img:"Légende du Destin.png" },
-  { key:"Miroir",         img:"Légende du Miroir.png" },
-  { key:"Trompe-la-Mort", img:"Légende du Trompe-la-Mort.png" },
-  { key:"Kwakarticho",    img:"Légende animale de Kwakarticho.png" },
-  { key:"Poukachi",       img:"Légende animale de Poukachi.png" },
-  { key:"Bakushana",      img:"Légende animale de Bakushana.png" },
-  { key:"Magicrabe",      img:"Légende animale de Magicrabe.png" },
-];
-
-function blankSongesState(){
-  const init = {
-    ui: { tab:"runs", search:"" },
-    bribesTotal: 0,
-    runs: {},
-    bribesByIntensity: {},
-    legends: {},
-  };
-  SONGE_INTENSITIES.forEach(x=>{
-    init.runs[x.id] = 0;
-    init.bribesByIntensity[String(x.num)] = 0;
-  });
-  SONGE_LEGENDS.forEach(x=>init.legends[x.key]=0);
-  return init;
-}
-function loadSongesState(){
-  try{
-    const raw = localStorage.getItem(kSonges);
-    if(!raw) return blankSongesState();
-    const p = JSON.parse(raw);
-    const out = blankSongesState();
-    out.ui = p.ui || out.ui;
-    out.bribesTotal = clampNonNeg(p.bribesTotal ?? 0);
-
-    if(p.runs) for(const it of SONGE_INTENSITIES) out.runs[it.id] = clampNonNeg(p.runs[it.id] ?? 0);
-    if(p.bribesByIntensity) for(const it of SONGE_INTENSITIES) out.bribesByIntensity[String(it.num)] = clampNonNeg(p.bribesByIntensity[String(it.num)] ?? 0);
-    if(p.legends) for(const l of SONGE_LEGENDS) out.legends[l.key] = clampNonNeg(p.legends[l.key] ?? 0);
-
-    return out;
-  }catch(e){
-    return blankSongesState();
-  }
-}
-function saveSongesState(s){
-  localStorage.setItem(kSonges, JSON.stringify(s));
-  scheduleCloudSave();
-}
-
-function setSongesTab(tab){
-  const s = loadSongesState();
-  s.ui.tab = tab;
-  saveSongesState(s);
-  renderSonges();
-}
-function setSongesSearch(value){
-  const s = loadSongesState();
-  s.ui.search = String(value||"");
-  saveSongesState(s);
-  renderSonges();
-}
-
-function openSongesBribesTotalPad(){
-  const s = loadSongesState();
-  openKeypad("Bribes (global) — définir total", clampNonNeg(s.bribesTotal), (v)=>{
-    const st = loadSongesState();
-    st.bribesTotal = clampNonNeg(v);
-    saveSongesState(st);
-    renderSonges();
-  });
-}
-
-function buildPickGrid(){
-  pickGrid.innerHTML = "";
-  for(const it of SONGE_INTENSITIES){
-    const b = document.createElement("button");
-    b.className = "pickBtn";
-    b.innerHTML = `
-      <img data-file="${escapeHtml(it.img)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt="">
-      <div class="t">${escapeHtml(it.label)}</div>
-    `;
-    b.addEventListener("click", ()=>{
-      const fn = pickState.onPick;
-      closePick();
-      if(typeof fn === "function") fn(it);
-    });
-    pickGrid.appendChild(b);
-  }
-  activateFallbackIn(pickGrid, SONGES_IMG_DIR);
-}
-buildPickGrid();
-
-/* Ajout / retrait bribes => keypad montant => picker intensité */
-function songesAddOrSubBribes(sign){
-  openKeypad(sign > 0 ? "Ajouter des bribes" : "Retirer des bribes", 0, (amount)=>{
-    const delta = clampNonNeg(amount);
-    if(delta === 0) return;
-
-    openPick("Choisir une intensité", (it)=>{
-      const st = loadSongesState();
-      const key = String(it.num);
-      const nextTotal = sign > 0 ? (st.bribesTotal + delta) : (st.bribesTotal - delta);
-      st.bribesTotal = clampNonNeg(nextTotal);
-      const nextBy = sign > 0 ? (st.bribesByIntensity[key] + delta) : (st.bribesByIntensity[key] - delta);
-      st.bribesByIntensity[key] = clampNonNeg(nextBy);
-      saveSongesState(st);
-      renderSonges();
-    });
-  });
-}
-
-function openSongesRunPad(intensityId, label){
-  const s = loadSongesState();
-  openKeypad(`Nombres de runs • ${label}`, clampNonNeg(s.runs[intensityId] ?? 0), (v)=>{
-    const st = loadSongesState();
-    st.runs[intensityId] = clampNonNeg(v);
-    saveSongesState(st);
-    renderSonges();
-  });
-}
-function songeIncRun(intensityId){
-  const st = loadSongesState();
-  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) + 1);
-  saveSongesState(st);
-  renderSonges();
-}
-function songeDecRun(intensityId){
-  const st = loadSongesState();
-  st.runs[intensityId] = clampNonNeg((st.runs[intensityId] ?? 0) - 1);
-  saveSongesState(st);
-  renderSonges();
-}
-
-function songeIncLegend(key){
-  const st = loadSongesState();
-  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) + 1);
-  saveSongesState(st);
-  renderSonges();
-}
-function songeDecLegend(key){
-  const st = loadSongesState();
-  st.legends[key] = clampNonNeg((st.legends[key] ?? 0) - 1);
-  saveSongesState(st);
-  renderSonges();
-}
-function openLegendPad(key){
-  const s = loadSongesState();
-  openKeypad(`Légende • ${key}`, clampNonNeg(s.legends[key] ?? 0), (v)=>{
-    const st = loadSongesState();
-    st.legends[key] = clampNonNeg(v);
-    saveSongesState(st);
-    renderSonges();
-  });
-}
-function resetSonges(){
-  if(!confirm("Reset Songes (runs + bribes + légendes) ?")) return;
-  localStorage.removeItem(kSonges);
-  scheduleCloudSave();
-  renderSonges();
-}
-
-function renderSonges(){
-  const s = loadSongesState();
-  pagePill.textContent = "Songes";
-
-  const tab = s.ui?.tab || "runs";
-  const totalRuns = Object.values(s.runs||{}).reduce((a,b)=>a+n(b),0);
-  const bribesTotal = clampNonNeg(s.bribesTotal ?? 0);
-
-  const header = `
-    <div class="topline">
-      <div class="title">
-        <div class="logo" style="width:42px;height:42px;border-radius:16px">🌙</div>
-        <div>
-          <h2>Songes</h2>
-          <p class="sub">Nombres de runs par intensité • Bribes globales • Bribes par intensité • Légendes.</p>
-        </div>
-      </div>
-      <div class="nav">
-        <button class="btn gold" onclick="songesAddOrSubBribes(1)">➕ Ajouter des bribes</button>
-        <button class="btn" onclick="songesAddOrSubBribes(-1)">➖ Retirer des bribes</button>
-        <button class="btn bad" onclick="resetSonges()">🧹 Reset Songes</button>
-      </div>
-    </div>
-  `;
-
-  const tabs = `
-    <div class="seg" style="margin-bottom:12px">
-      <button class="btn small ${tab==='runs'?'active':''}" onclick="setSongesTab('runs')">📊 Nombres de runs</button>
-      <button class="btn small ${tab==='legends'?'active':''}" onclick="setSongesTab('legends')">🏷️ Légendes</button>
-    </div>
-  `;
-
-  const bribesKpiIcon = `
-    <span class="kico"><img data-file="${escapeHtml(BRIBES_ICON_FILE)}" data-dir="" alt=""></span>
-  `;
-
-  const topKpis = `
-    <div class="summary" style="margin-top:0">
-      <div class="kpi">
-        <div class="k">Bribes (global) ${bribesKpiIcon}</div>
-        <div class="v gold" style="cursor:pointer" onclick="openSongesBribesTotalPad()">${fmt.format(bribesTotal)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Nombres de runs (total)</div>
-        <div class="v">${fmt.format(totalRuns)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Astuce</div>
-        <div class="v">+ / − / pavé</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Bribes/intensité</div>
-        <div class="v">via mini-fenêtre</div>
-      </div>
-    </div>
-  `;
-
-  let body = "";
-
-  if(tab === "runs"){
-    const byGroup = (group) => SONGE_INTENSITIES.filter(x=>x.group===group);
-
-    const groupBlock = (groupName) => {
-      const rows = byGroup(groupName).map(it=>{
-        const count = clampNonNeg(s.runs[it.id] ?? 0);
-        const bsum = clampNonNeg(s.bribesByIntensity[String(it.num)] ?? 0);
-        return `
-          <div class="item">
-            <div class="ico">
-              <img data-file="${escapeHtml(it.img)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt="">
-            </div>
-            <div class="name">
-              <p class="n">${escapeHtml(it.label)}</p>
-              <p class="m"><span class="mono">${fmt.format(bsum)}</span> bribes générées</p>
-            </div>
-            <div class="ctrls">
-              <button class="btn small" onclick="songeDecRun('${it.id}')">−</button>
-              <div class="num" onclick="openSongesRunPad('${it.id}','${jsEscape(it.label)}')">${fmt.format(count)}</div>
-              <button class="btn small gold" onclick="songeIncRun('${it.id}')">+</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      return `
-        <div class="section" style="margin-bottom:14px">
-          <div class="topline" style="margin-bottom:8px">
-            <div class="pill">Nombres de runs — ${escapeHtml(groupName)}</div>
-            <div class="pill">bribes affichées par ligne</div>
-          </div>
-          <div class="list">${rows}</div>
-        </div>
-      `;
-    };
-
-    body = `
-      <div class="row">
-        <div>
-          ${groupBlock("Rêve")}
-          ${groupBlock("Paradoxe")}
-        </div>
-        <div>
-          <div class="section" style="margin-bottom:14px">
-            <div class="topline" style="margin-bottom:8px">
-              <div class="pill">Bribes globales</div>
-              <div class="pill">clique pour définir total</div>
-            </div>
-            <div class="item">
-              <div class="ico">
-                <img data-file="${escapeHtml(BRIBES_ICON_FILE)}" data-dir="" alt="">
-              </div>
-              <div class="name">
-                <p class="n">Bribes (total)</p>
-                <p class="m">Définir le total global</p>
-              </div>
-              <div class="ctrls">
-                <div class="num" onclick="openSongesBribesTotalPad()">${fmt.format(bribesTotal)}</div>
-              </div>
-            </div>
-          </div>
-          ${groupBlock("Cauchemar")}
-        </div>
-      </div>
-    `;
-  }
-
-  if(tab === "legends"){
-    const q = (s.ui?.search || "").toLowerCase().trim();
-    const tiles = SONGE_LEGENDS
-      .filter(l => !q || l.key.toLowerCase().includes(q))
-      .map(l=>{
-        const val = clampNonNeg(s.legends[l.key] ?? 0);
-        return `
-          <div class="item legendItem">
-            <div class="ico">
-              <img data-file="${escapeHtml(l.img)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt="">
-            </div>
-            <div class="name">
-              <p class="n">${escapeHtml(l.key)}</p>
-              <p class="m">Compteur de drop</p>
-            </div>
-            <div class="ctrls">
-              <button class="btn small" onclick="songeDecLegend('${jsEscape(l.key)}')">−</button>
-              <div class="num" onclick="openLegendPad('${jsEscape(l.key)}')">${fmt.format(val)}</div>
-              <button class="btn small gold" onclick="songeIncLegend('${jsEscape(l.key)}')">+</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-    body = `
-      <div class="section">
-        <div class="topline" style="margin-bottom:10px">
-          <div class="title">
-            <div>
-              <h2>Légendes</h2>
-              <p class="sub">Toutes les légendes (ordre conservé) • clique le nombre pour saisir</p>
-            </div>
-          </div>
-          <div class="searchRow">
-            <input value="${escapeHtml(s.ui?.search || "")}" oninput="setSongesSearch(this.value)" placeholder="Rechercher une légende…" />
-            <button class="btn bad" onclick="setSongesSearch('')">✖</button>
-          </div>
-        </div>
-        <div class="legendGrid">
-          ${tiles || `<div class="pill">Aucun résultat</div>`}
-        </div>
-      </div>
-    `;
-  }
-
-  app.innerHTML = header + tabs + topKpis + body;
-  activateFallbackIn(app, SONGES_IMG_DIR);
-}
-
-/* =========================================================
-   DONJONS UI
-   ========================================================= */
-function dungeonTotals(d){
-  const st = ensureDungeonStateShape(d, loadDungeonState(d.id));
-  const mobsTotal = Object.values(st.mobs||{}).reduce((a,b)=>a+n(b),0);
-  const resTotal  = Object.values(st.resources||{}).reduce((a,b)=>a+n(b),0);
-  const itemsTotal = Object.values(st.items||{}).reduce((a,b)=>a+n(b),0);
-  return { mobsTotal, resTotal, itemsTotal };
-}
-function dungeonSumKamas(d, st){
+function sumKamasFromDungeon(d, st){
   let total = 0;
-  for(const r of (d.resources||[])){
-    const q = clampNonNeg(st.resources?.[r.key] ?? 0);
-    const p = clampNonNeg(st.prices?.[r.key] ?? 0);
-    total += q * p;
+  for(const r of d.resources||[]){
+    const q = clampInt(st.res[r.key]||0);
+    const p = toNum(st.resP[r.key]||0);
+    total += q*p;
+  }
+  for(const e of d.equipments||[]){
+    const q = clampInt(st.eq[e.key]||0);
+    const p = toNum(st.eqP[e.key]||0);
+    total += q*p;
   }
   return total;
 }
+function sumQty(mapObj){
+  let s=0;
+  for(const v of Object.values(mapObj||{})) s += clampInt(v);
+  return s;
+}
 
+/* =========================================================
+   UI: shared item render
+   ========================================================= */
+function renderCounterRow({dir, img, name, sub, value, onMinus, onPlus, onPick}){
+  return `
+    <div class="item">
+      <div class="ico"><img data-dir="${escapeHtml(dir)}" data-file="${escapeHtml(img)}" alt=""></div>
+      <div class="name">
+        <p class="n">${escapeHtml(name)}</p>
+        ${sub?`<p class="m">${sub}</p>`:""}
+      </div>
+      <div class="ctrls">
+        <button class="btn small" data-act="${onMinus}">-</button>
+        <div class="num mono" data-act="${onPick}">${fmt.format(value)}</div>
+        <button class="btn small" data-act="${onPlus}">+</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderPricedRow({dir, img, name, qty, price, subtotal, onMinus, onPlus, onPickQty, onPickPrice}){
+  return `
+    <div class="item">
+      <div class="ico"><img data-dir="${escapeHtml(dir)}" data-file="${escapeHtml(img)}" alt=""></div>
+      <div class="name">
+        <p class="n">${escapeHtml(name)}</p>
+        <p class="m">Sous-total: <b class="mono">${money(subtotal)}</b> k</p>
+      </div>
+      <div class="ctrls">
+        <button class="btn small" data-act="${onMinus}">-</button>
+        <div class="num mono" data-act="${onPickQty}">${fmt.format(qty)}</div>
+        <button class="btn small" data-act="${onPlus}">+</button>
+
+        <input class="price mono" data-act="${onPickPrice}" inputmode="decimal"
+          value="${price?String(price).replace(".", ","):""}" placeholder="prix/u">
+      </div>
+    </div>
+  `;
+}
+
+function bindActions(container, handlers){
+  container.querySelectorAll("[data-act]").forEach(el=>{
+    const act = el.dataset.act;
+    if(!act || !handlers[act]) return;
+    if(el.tagName === "INPUT"){
+      el.addEventListener("focus", ()=>el.select());
+      el.addEventListener("change", ()=>handlers[act](el.value));
+      el.addEventListener("keydown", (e)=>{
+        if(e.key==="Enter"){ e.preventDefault(); el.blur(); }
+      });
+    }else{
+      el.addEventListener("click", ()=>handlers[act]());
+    }
+  });
+  activateImages(container);
+}
+
+/* =========================================================
+   Pages
+   ========================================================= */
 function renderHome(){
   pagePill.textContent = "Accueil";
   app.innerHTML = `
     <div class="grid">
       <div class="card">
         <div class="card-left">
-          <div class="thumb"><img data-file="Icône Dj.png" alt=""></div>
+          <div class="thumb">🗝️</div>
           <div style="min-width:0">
             <h3>Donjons</h3>
-            <p>Compteurs mobs/ressources + prix + items anti-scroll</p>
+            <p>Butins B4→B8 • + runs • mobs • ressources • équipements</p>
           </div>
         </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/donjons'">Ouvrir</button>
-        </div>
+        <div><button class="btn gold" onclick="location.hash='#/donjons'">Ouvrir</button></div>
       </div>
 
       <div class="card">
         <div class="card-left">
-          <div class="thumb"><img data-file="Bribe de rêve.png" alt=""></div>
+          <div class="thumb">🌙</div>
           <div style="min-width:0">
             <h3>Songes</h3>
-            <p>Nombres de runs, bribes par intensité, légendes</p>
+            <p>Runs, bribes, légendes (masquées si 0)</p>
           </div>
         </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/songes'">Ouvrir</button>
-        </div>
+        <div><button class="btn gold" onclick="location.hash='#/songes'">Ouvrir</button></div>
       </div>
 
       <div class="card">
@@ -1497,658 +1191,720 @@ function renderHome(){
           <div class="thumb">📊</div>
           <div style="min-width:0">
             <h3>Statistiques</h3>
-            <p>Récap + drops légendes (icônes only)</p>
+            <p>Vue globale : totals mobs/ressources/items + kamas</p>
           </div>
         </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/stats'">Ouvrir</button>
-        </div>
+        <div><button class="btn gold" onclick="location.hash='#/stats'">Ouvrir</button></div>
       </div>
 
       <div class="card">
         <div class="card-left">
-          <div class="thumb"><img data-file="Icône Calculateur PP.png" alt=""></div>
+          <div class="thumb">🍀</div>
           <div style="min-width:0">
-            <h3>Calculateur PP</h3>
-            <p>Ta loupe + calcul drop final</p>
+            <h3>Calcul PP</h3>
+            <p>Champs vides par défaut + pavé num</p>
           </div>
         </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/pp'">Ouvrir</button>
-        </div>
+        <div><button class="btn gold" onclick="location.hash='#/pp'">Ouvrir</button></div>
       </div>
 
       <div class="card">
         <div class="card-left">
-          <div class="thumb"><img data-file="Icône Calculateur Omega.png" alt=""></div>
+          <div class="thumb">📈</div>
           <div style="min-width:0">
-            <h3>XP Oméga</h3>
-            <p>0/0 par défaut, reset clean</p>
+            <h3>Oméga</h3>
+            <p>Reset -> 0 • calcul XP</p>
           </div>
         </div>
-        <div class="card-right">
-          <button class="btn gold" onclick="location.hash='#/omega'">Ouvrir</button>
+        <div><button class="btn gold" onclick="location.hash='#/omega'">Ouvrir</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-left">
+          <div class="thumb">☁️</div>
+          <div style="min-width:0">
+            <h3>Cloud</h3>
+            <p>Connexion Supabase (magic link) + sync auto</p>
+          </div>
         </div>
+        <div><button class="btn" onclick="alert('Pour activer Supabase: colle ta ANON KEY dans le code (SUPABASE_ANON_KEY).')">Infos</button></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb" style="width:44px;height:44px">⚙️</div>
+          <div>
+            <h2>Notes rapides</h2>
+            <p class="sub">Si une image ne s’affiche pas, le site essaye plusieurs chemins automatiquement.</p>
+          </div>
+        </div>
+      </div>
+      <div class="hint">
+        ✅ Pour que toutes les images marchent : garde tes dossiers au même niveau que index.html (ex: <b>Comte/</b>, <b>Bethel/</b>, <b>Songes/</b> etc.).<br>
+        ✅ Si tu veux activer le Cloud : colle ta <b>SUPABASE_ANON_KEY</b> dans le code (ligne en haut).
       </div>
     </div>
   `;
-  activateFallbackIn(app, "");
 }
 
 function renderDonjons(){
   pagePill.textContent = "Donjons";
-  const cards = DUNGEONS.map(d=>{
-    const { mobsTotal, resTotal, itemsTotal } = dungeonTotals(d);
+  const cards = DUNGEONS.map(d=>`
+    <div class="card">
+      <div class="card-left">
+        <div class="thumb"><img data-dir="${escapeHtml(d.imgDir)}" data-file="${escapeHtml(d.thumb)}" alt=""></div>
+        <div style="min-width:0">
+          <h3>${escapeHtml(d.name)}</h3>
+          <p>Mobs + ressources + équipements (avec prix)</p>
+        </div>
+      </div>
+      <div>
+        <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(d.id)}'">Ouvrir</button>
+      </div>
+    </div>
+  `).join("");
+
+  app.innerHTML = `<div class="grid">${cards}</div>`;
+  activateImages(app);
+}
+
+function renderDungeon(d){
+  const st = ensureDungeonShape(d, loadDungeon(d.id));
+  const butin = loadButin(d.id);
+
+  const mobList = (d.mobs||[]).map(m=>{
+    const v = clampInt(st.mobs[m.key]||0);
+    return renderCounterRow({
+      dir:d.imgDir, img:m.img, name:m.key,
+      value:v,
+      onMinus:`mob:-:${m.key}`,
+      onPlus:`mob:+:${m.key}`,
+      onPick:`mob:pick:${m.key}`,
+    });
+  }).join("");
+
+  const resList = (d.resources||[]).map(r=>{
+    const q = clampInt(st.res[r.key]||0);
+    const p = toNum(st.resP[r.key]||0);
+    return renderPricedRow({
+      dir:d.imgDir, img:r.img, name:r.key,
+      qty:q,
+      price: (st.resP[r.key] ? st.resP[r.key] : ""),
+      subtotal: q*p,
+      onMinus:`res:-:${r.key}`,
+      onPlus:`res:+:${r.key}`,
+      onPickQty:`res:pick:${r.key}`,
+      onPickPrice:`res:price:${r.key}`,
+    });
+  }).join("");
+
+  const eqList = (d.equipments||[]).map(e=>{
+    const q = clampInt(st.eq[e.key]||0);
+    const p = toNum(st.eqP[e.key]||0);
+    return renderPricedRow({
+      dir:d.imgDir, img:e.img, name:e.key,
+      qty:q,
+      price: (st.eqP[e.key] ? st.eqP[e.key] : ""),
+      subtotal: q*p,
+      onMinus:`eq:-:${e.key}`,
+      onPlus:`eq:+:${e.key}`,
+      onPickQty:`eq:pick:${e.key}`,
+      onPickPrice:`eq:price:${e.key}`,
+    });
+  }).join("");
+
+  const totalMobs = sumQty(st.mobs);
+  const totalResQty = sumQty(st.res);
+  const totalEqQty = sumQty(st.eq);
+  const totalK = sumKamasFromDungeon(d, st);
+
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb"><img data-dir="${escapeHtml(d.imgDir)}" data-file="${escapeHtml(d.thumb)}" alt=""></div>
+          <div>
+            <h2>${escapeHtml(d.name)}</h2>
+            <p class="sub">Choisis le butin, puis ajoute tes runs (saisie rapide possible).</p>
+          </div>
+        </div>
+        <div class="seg">
+          <button class="btn" onclick="location.hash='#/donjons'">← Retour</button>
+          <button class="btn bad" id="btnResetDungeon">Reset donjon</button>
+        </div>
+      </div>
+
+      <div class="butinSelector">
+        <span class="butinLabel">Butin</span>
+        ${["b4","b5","b6","b7","b8"].map(b=>`
+          <button class="btn small ${butin===b?'active':''}" data-act="butin:${b}">${b.toUpperCase()}</button>
+        `).join("")}
+        <span class="pill">Tip: clique “+ runs” → tu peux entrer 10, 50, 500…</span>
+      </div>
+
+      <div class="seg">
+        <button class="btn gold" data-act="runs:add">+ runs</button>
+        <button class="btn" data-act="runs:pick">Saisir runs</button>
+      </div>
+
+      <div class="summary">
+        <div class="kpi"><div class="k">Mobs total</div><div class="v mono">${fmt.format(totalMobs)}</div></div>
+        <div class="kpi"><div class="k">Ressources total</div><div class="v mono">${fmt.format(totalResQty)}</div></div>
+        <div class="kpi"><div class="k">Équipements total</div><div class="v mono">${fmt.format(totalEqQty)}</div></div>
+        <div class="kpi"><div class="k">Kamas total</div><div class="v mono gold">${money(totalK)} k</div></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="section">
+        <div class="topline">
+          <div class="title">
+            <div class="thumb" style="width:44px;height:44px">👹</div>
+            <div><h2>Mobs</h2><p class="sub">+/- ou pavé numérique</p></div>
+          </div>
+        </div>
+        <div class="list">${mobList}</div>
+      </div>
+
+      <div class="section">
+        <div class="topline">
+          <div class="title">
+            <div class="thumb" style="width:44px;height:44px">📦</div>
+            <div><h2>Ressources</h2><p class="sub">Quantité + prix/u + sous-total</p></div>
+          </div>
+        </div>
+        <div class="list">${resList}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb" style="width:44px;height:44px">🧰</div>
+          <div><h2>Équipements</h2><p class="sub">Comme ressources : quantité + prix/u</p></div>
+        </div>
+      </div>
+      <div class="list">${eqList}</div>
+    </div>
+  `;
+
+  const handlers = {};
+
+  // butin select
+  ["b4","b5","b6","b7","b8"].forEach(b=>{
+    handlers[`butin:${b}`] = ()=>{
+      saveButin(d.id, b);
+      render();
+    };
+  });
+
+  // reset dungeon
+  $("#btnResetDungeon").onclick = ()=>{
+    if(!confirm(`Reset ${d.name} ?`)) return;
+    localStorage.removeItem(kDungeon(d.id));
+    render();
+  };
+
+  // +runs / saisir runs
+  let lastRuns = 1;
+  handlers["runs:pick"] = ()=>{
+    openKeypad("Nombre de runs", lastRuns, (v)=>{
+      lastRuns = v||1;
+      applyRuns(d, st, lastRuns);
+    });
+  };
+  handlers["runs:add"] = ()=>{
+    // +1 run direct = utilise lastRuns (1 par défaut)
+    applyRuns(d, st, lastRuns || 1);
+  };
+
+  // mobs
+  for(const m of d.mobs){
+    handlers[`mob:+:${m.key}`] = ()=>{ st.mobs[m.key]=clampInt((st.mobs[m.key]||0)+1); saveDungeon(d.id, st); render(); };
+    handlers[`mob:-:${m.key}`] = ()=>{ st.mobs[m.key]=clampInt((st.mobs[m.key]||0)-1); saveDungeon(d.id, st); render(); };
+    handlers[`mob:pick:${m.key}`] = ()=> openKeypad(m.key, st.mobs[m.key]||0, (v)=>{ st.mobs[m.key]=clampInt(v); saveDungeon(d.id, st); render(); });
+  }
+
+  // resources
+  for(const r of d.resources){
+    handlers[`res:+:${r.key}`] = ()=>{ st.res[r.key]=clampInt((st.res[r.key]||0)+1); saveDungeon(d.id, st); render(); };
+    handlers[`res:-:${r.key}`] = ()=>{ st.res[r.key]=clampInt((st.res[r.key]||0)-1); saveDungeon(d.id, st); render(); };
+    handlers[`res:pick:${r.key}`] = ()=> openKeypad(r.key, st.res[r.key]||0, (v)=>{ st.res[r.key]=clampInt(v); saveDungeon(d.id, st); render(); });
+    handlers[`res:price:${r.key}`] = (val)=>{
+      const n = toNum(val);
+      st.resP[r.key] = n>0 ? n : 0;
+      saveDungeon(d.id, st);
+      render();
+    };
+  }
+
+  // equipments
+  for(const e of d.equipments){
+    handlers[`eq:+:${e.key}`] = ()=>{ st.eq[e.key]=clampInt((st.eq[e.key]||0)+1); saveDungeon(d.id, st); render(); };
+    handlers[`eq:-:${e.key}`] = ()=>{ st.eq[e.key]=clampInt((st.eq[e.key]||0)-1); saveDungeon(d.id, st); render(); };
+    handlers[`eq:pick:${e.key}`] = ()=> openKeypad(e.key, st.eq[e.key]||0, (v)=>{ st.eq[e.key]=clampInt(v); saveDungeon(d.id, st); render(); });
+    handlers[`eq:price:${e.key}`] = (val)=>{
+      const n = toNum(val);
+      st.eqP[e.key] = n>0 ? n : 0;
+      saveDungeon(d.id, st);
+      render();
+    };
+  }
+
+  bindActions(app, handlers);
+}
+
+function applyRuns(d, st, runs){
+  runs = clampInt(runs);
+  if(runs<=0) return;
+
+  const b = loadButin(d.id);
+  const inc = d.butins?.[b] || {};
+  for(const [k,v] of Object.entries(inc)){
+    st.mobs[k] = clampInt((st.mobs[k]||0) + v*runs);
+  }
+  saveDungeon(d.id, st);
+  render();
+}
+
+function renderSonges(){
+  pagePill.textContent = "Songes";
+  const s = loadSonges();
+
+  const runsList = SONGES.intensities.map(it=>{
+    const v = clampInt(s.runs[it.id]||0);
+    return renderCounterRow({
+      dir:it.dir, img:it.img, name:it.label, sub:"",
+      value:v,
+      onMinus:`run:-:${it.id}`, onPlus:`run:+:${it.id}`, onPick:`run:pick:${it.id}`
+    });
+  }).join("");
+
+  const bribesRow = `
+    <div class="item">
+      <div class="ico"><img data-dir="${escapeHtml(SONGES.bribesIcon.dir)}" data-file="${escapeHtml(SONGES.bribesIcon.img)}" alt=""></div>
+      <div class="name">
+        <p class="n">Bribes</p>
+        <p class="m">Total</p>
+      </div>
+      <div class="ctrls">
+        <button class="btn small" data-act="bribes:-">-</button>
+        <div class="num mono" data-act="bribes:pick">${fmt.format(s.bribes)}</div>
+        <button class="btn small" data-act="bribes:+">+</button>
+      </div>
+    </div>
+  `;
+
+  const legendsShown = SONGES.legends.filter(l => clampInt(s.legends[l.key]||0) > 0);
+  const legendsList = legendsShown.length
+    ? legendsShown.map(l=>{
+        const v = clampInt(s.legends[l.key]||0);
+        return renderCounterRow({
+          dir:l.dir, img:l.img, name:l.key, sub:"",
+          value:v,
+          onMinus:`leg:-:${l.key}`, onPlus:`leg:+:${l.key}`, onPick:`leg:pick:${l.key}`
+        });
+      }).join("")
+    : `<div class="hint">Aucune légende (tout est à 0) → interface clean ✅</div>`;
+
+  const totalRuns = Object.values(s.runs).reduce((a,b)=>a+clampInt(b),0);
+
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb" style="width:44px;height:44px">🌙</div>
+          <div><h2>Songes</h2><p class="sub">Runs • bribes • légendes</p></div>
+        </div>
+        <div class="seg">
+          <button class="btn bad" id="btnResetSonges">Reset songes</button>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="kpi"><div class="k">Runs total</div><div class="v mono">${fmt.format(totalRuns)}</div></div>
+        <div class="kpi"><div class="k">Bribes</div><div class="v mono gold">${fmt.format(s.bribes)}</div></div>
+        <div class="kpi"><div class="k">Légendes</div><div class="v mono">${fmt.format(legendsShown.reduce((a,l)=>a+clampInt(s.legends[l.key]||0),0))}</div></div>
+        <div class="kpi"><div class="k">Types légendes</div><div class="v mono">${fmt.format(legendsShown.length)}</div></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="section">
+        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🏃</div><div><h2>Runs</h2><p class="sub">par intensité</p></div></div></div>
+        <div class="list">${runsList}</div>
+      </div>
+
+      <div class="section">
+        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🧩</div><div><h2>Bribes & légendes</h2><p class="sub">les légendes à 0 sont cachées</p></div></div></div>
+        <div class="list">${bribesRow}</div>
+        <div style="height:10px"></div>
+        <div class="list">${legendsList}</div>
+      </div>
+    </div>
+  `;
+
+  const handlers = {};
+
+  // runs
+  for(const it of SONGES.intensities){
+    handlers[`run:+:${it.id}`] = ()=>{ s.runs[it.id]=clampInt((s.runs[it.id]||0)+1); saveSonges(s); render(); };
+    handlers[`run:-:${it.id}`] = ()=>{ s.runs[it.id]=clampInt((s.runs[it.id]||0)-1); saveSonges(s); render(); };
+    handlers[`run:pick:${it.id}`] = ()=> openKeypad(it.label, s.runs[it.id]||0, (v)=>{ s.runs[it.id]=clampInt(v); saveSonges(s); render(); });
+  }
+
+  // bribes
+  handlers["bribes:+"] = ()=>{ s.bribes=clampInt(s.bribes+1); saveSonges(s); render(); };
+  handlers["bribes:-"] = ()=>{ s.bribes=clampInt(s.bribes-1); saveSonges(s); render(); };
+  handlers["bribes:pick"] = ()=> openKeypad("Bribes", s.bribes, (v)=>{ s.bribes=clampInt(v); saveSonges(s); render(); });
+
+  // legends
+  for(const l of SONGES.legends){
+    handlers[`leg:+:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)+1); saveSonges(s); render(); };
+    handlers[`leg:-:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)-1); saveSonges(s); render(); };
+    handlers[`leg:pick:${l.key}`] = ()=> openKeypad(l.key, s.legends[l.key]||0, (v)=>{ s.legends[l.key]=clampInt(v); saveSonges(s); render(); });
+  }
+
+  $("#btnResetSonges").onclick = ()=>{
+    if(!confirm("Reset songes ?")) return;
+    localStorage.removeItem(kSonges);
+    render();
+  };
+
+  bindActions(app, handlers);
+}
+
+function renderStats(){
+  pagePill.textContent = "Stats";
+
+  // totals global
+  let mobsTotal=0, resQty=0, eqQty=0, kamasTotal=0;
+
+  const mobAgg = new Map();
+  const resAgg = new Map();
+  const eqAgg = new Map();
+
+  for(const d of DUNGEONS){
+    const st = ensureDungeonShape(d, loadDungeon(d.id));
+    kamasTotal += sumKamasFromDungeon(d, st);
+
+    for(const m of d.mobs){
+      const v = clampInt(st.mobs[m.key]||0);
+      mobsTotal += v;
+      const key = `${d.id}::mob::${m.key}`;
+      mobAgg.set(key, {d, name:m.key, img:m.img, v});
+    }
+    for(const r of d.resources){
+      const q = clampInt(st.res[r.key]||0);
+      const p = toNum(st.resP[r.key]||0);
+      resQty += q;
+      const key = `${d.id}::res::${r.key}`;
+      resAgg.set(key, {d, name:r.key, img:r.img, q, p, subtotal:q*p});
+    }
+    for(const e of d.equipments){
+      const q = clampInt(st.eq[e.key]||0);
+      const p = toNum(st.eqP[e.key]||0);
+      eqQty += q;
+      const key = `${d.id}::eq::${e.key}`;
+      eqAgg.set(key, {d, name:e.key, img:e.img, q, p, subtotal:q*p});
+    }
+  }
+
+  // songes stats
+  const s = loadSonges();
+  const runsTotal = Object.values(s.runs).reduce((a,b)=>a+clampInt(b),0);
+  const legendsShown = SONGES.legends.filter(l => clampInt(s.legends[l.key]||0)>0);
+
+  function statCard(title, sub, value){
+    return `
+      <div class="kpi">
+        <div class="k">${escapeHtml(title)}</div>
+        <div class="v mono ${title.includes("kamas")?'gold':''}">${value}</div>
+        ${sub?`<div class="hint" style="margin:8px 0 0">${sub}</div>`:""}
+      </div>
+    `;
+  }
+
+  const topItems = [...resAgg.values(), ...eqAgg.values()]
+    .filter(x=>x.q>0 && x.subtotal>0)
+    .sort((a,b)=>b.subtotal-a.subtotal)
+    .slice(0, 18);
+
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb" style="width:44px;height:44px">📊</div>
+          <div><h2>Statistiques</h2><p class="sub">Récap global propre en 1 page</p></div>
+        </div>
+      </div>
+
+      <div class="summary">
+        ${statCard("Mobs total", "", fmt.format(mobsTotal))}
+        ${statCard("Ressources total", "", fmt.format(resQty))}
+        ${statCard("Équipements total", "", fmt.format(eqQty))}
+        ${statCard("kamas total", "", money(kamasTotal)+" k")}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="section">
+        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🌙</div><div><h2>Songes</h2><p class="sub">Stats rapides</p></div></div></div>
+        <div class="summary">
+          ${statCard("Runs total", "", fmt.format(runsTotal))}
+          ${statCard("Bribes", "", fmt.format(s.bribes))}
+          ${statCard("Types légendes", "Légendes à 0 masquées", fmt.format(legendsShown.length))}
+          ${statCard("Total légendes", "", fmt.format(legendsShown.reduce((a,l)=>a+clampInt(s.legends[l.key]||0),0)))}
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">💰</div><div><h2>Top sous-totaux</h2><p class="sub">Ce qui te rapporte le plus</p></div></div></div>
+        <div class="statGrid" id="topGrid">
+          ${topItems.length ? topItems.map(x=>`
+            <div class="statItem">
+              <div class="ico"><img data-dir="${escapeHtml(x.d.imgDir)}" data-file="${escapeHtml(x.img)}" alt=""></div>
+              <div class="info">
+                <p class="n">${escapeHtml(x.name)}</p>
+                <p class="v">${money(x.subtotal)} k</p>
+              </div>
+              <div class="right mono">x${fmt.format(x.q)}</div>
+            </div>
+          `).join("") : `<div class="hint">Rien à afficher (mets des quantités + prix sur des ressources/items).</div>`}
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🗝️</div><div><h2>Récap par donjon</h2><p class="sub">Mobs / ressources / items / kamas</p></div></div></div>
+      <div class="grid" id="donjonRecap"></div>
+    </div>
+  `;
+
+  // recap cards
+  const recap = $("#donjonRecap");
+  recap.innerHTML = DUNGEONS.map(d=>{
+    const st = ensureDungeonShape(d, loadDungeon(d.id));
+    const km = sumKamasFromDungeon(d, st);
     return `
       <div class="card">
         <div class="card-left">
-          <div class="thumb">
-            <img data-file="${escapeHtml(d.thumb)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
-          </div>
+          <div class="thumb"><img data-dir="${escapeHtml(d.imgDir)}" data-file="${escapeHtml(d.thumb)}" alt=""></div>
           <div style="min-width:0">
             <h3>${escapeHtml(d.name)}</h3>
-            <p>Mobs: <b>${fmt.format(mobsTotal)}</b> • Ressources: <b>${fmt.format(resTotal)}</b> • Items: <b>${fmt.format(itemsTotal)}</b></p>
+            <p>Mobs: <b class="mono">${fmt.format(sumQty(st.mobs))}</b> • Ress: <b class="mono">${fmt.format(sumQty(st.res))}</b> • Items: <b class="mono">${fmt.format(sumQty(st.eq))}</b></p>
           </div>
         </div>
-        <div class="card-right">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="pill"><b class="mono">${money(km)} k</b></div>
           <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(d.id)}'">Ouvrir</button>
         </div>
       </div>
     `;
   }).join("");
 
-  app.innerHTML = `
-    <div class="topline">
-      <div class="title">
-        <div class="logo" style="width:42px;height:42px;border-radius:16px">🗝️</div>
-        <div>
-          <h2>Liste des donjons</h2>
-          <p class="sub">Chaque donjon : Mobs / Ressources / Items (anti-scroll)</p>
-        </div>
-      </div>
-    </div>
-    <div class="grid">${cards}</div>
-  `;
-  activateFallbackIn(app, "");
+  activateImages(app);
 }
 
-function dInc(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  st.mobs[key] = clampNonNeg((st.mobs[key]||0) + 1);
-  saveDungeonState(did, st);
-  renderDungeon(did);
-}
-function dDec(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  st.mobs[key] = clampNonNeg((st.mobs[key]||0) - 1);
-  saveDungeonState(did, st);
-  renderDungeon(did);
-}
-function rInc(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  st.resources[key] = clampNonNeg((st.resources[key]||0) + 1);
-  saveDungeonState(did, st);
-  renderDungeon(did);
-}
-function rDec(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  st.resources[key] = clampNonNeg((st.resources[key]||0) - 1);
-  saveDungeonState(did, st);
-  renderDungeon(did);
-}
-function iInc(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  st.items[key] = clampNonNeg((st.items[key]||0) + 1);
-  saveDungeonState(did, st);
-  renderDungeon(did);
-}
-function iDec(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  st.items[key] = clampNonNeg((st.items[key]||0) - 1);
-  saveDungeonState(did, st);
-  renderDungeon(did);
-}
+function renderPP(){
+  pagePill.textContent = "PP";
+  const s = loadPP();
+  const { mult, final } = ppFinal(s);
 
-function openMobPad(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  openKeypad(`Mob • ${key}`, clampNonNeg(st.mobs[key] ?? 0), (v)=>{
-    const st2 = ensureDungeonStateShape(d, loadDungeonState(did));
-    st2.mobs[key] = clampNonNeg(v);
-    saveDungeonState(did, st2);
-    renderDungeon(did);
-  });
-}
-function openResPad(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  openKeypad(`Ressource • ${key}`, clampNonNeg(st.resources[key] ?? 0), (v)=>{
-    const st2 = ensureDungeonStateShape(d, loadDungeonState(did));
-    st2.resources[key] = clampNonNeg(v);
-    saveDungeonState(did, st2);
-    renderDungeon(did);
-  });
-}
-function openItemPad(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  openKeypad(`Item • ${key}`, clampNonNeg(st.items[key] ?? 0), (v)=>{
-    const st2 = ensureDungeonStateShape(d, loadDungeonState(did));
-    st2.items[key] = clampNonNeg(v);
-    saveDungeonState(did, st2);
-    renderDungeon(did);
-  });
-}
-function openPricePad(did, key){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  openKeypad(`Prix/u • ${key}`, clampNonNeg(st.prices[key] ?? 0), (v)=>{
-    const st2 = ensureDungeonStateShape(d, loadDungeonState(did));
-    st2.prices[key] = clampNonNeg(v);
-    saveDungeonState(did, st2);
-    renderDungeon(did);
-  });
-}
-function resetDungeon(did){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  if(!confirm(`Reset ${d.name} (mobs + ressources + prix + items) ?`)) return;
-  localStorage.removeItem(kDungeon(did));
-  scheduleCloudSave();
-  renderDungeon(did);
-}
-function totalRun(did){
-  const d = DUNGEONS.find(x=>x.id===did); if(!d) return;
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  const inc = d.totalIncrements || {};
-  for(const [k,v] of Object.entries(inc)){
-    if((d.resources||[]).some(r=>r.key===k)) st.resources[k] = clampNonNeg((st.resources[k]||0) + clampNonNeg(v));
-    else st.mobs[k] = clampNonNeg((st.mobs[k]||0) + clampNonNeg(v));
-  }
-  saveDungeonState(did, st);
-  renderDungeon(did);
-}
-
-function renderDungeon(did){
-  const d = DUNGEONS.find(x=>x.id===did);
-  if(!d){ location.hash="#/donjons"; return; }
-
-  pagePill.textContent = d.name;
-
-  const st = ensureDungeonStateShape(d, loadDungeonState(did));
-  saveDungeonState(did, st);
-
-  const mobsRows = (d.mobs||[]).map(m=>{
-    const val = clampNonNeg(st.mobs[m.key] ?? 0);
-    return `
-      <div class="item">
-        <div class="ico">
-          <img data-file="${escapeHtml(m.img)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
-        </div>
-        <div class="name">
-          <p class="n">${escapeHtml(m.key)}</p>
-          <p class="m">Compteur mob / boss</p>
-        </div>
-        <div class="ctrls">
-          <button class="btn small" onclick="dDec('${did}','${jsEscape(m.key)}')">−</button>
-          <div class="num" onclick="openMobPad('${did}','${jsEscape(m.key)}')">${fmt.format(val)}</div>
-          <button class="btn small gold" onclick="dInc('${did}','${jsEscape(m.key)}')">+</button>
-        </div>
+  const field = (label, key)=>`
+    <div class="item">
+      <div class="ico">🍀</div>
+      <div class="name">
+        <p class="n">${label}</p>
+        <p class="m">Clique le nombre pour pavé numérique</p>
       </div>
-    `;
-  }).join("");
-
-  const resRows = (d.resources||[]).map(r=>{
-    const q = clampNonNeg(st.resources[r.key] ?? 0);
-    const p = clampNonNeg(st.prices[r.key] ?? 0);
-    const sub = q * p;
-    return `
-      <div class="item">
-        <div class="ico">
-          <img data-file="${escapeHtml(r.img)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
-        </div>
-        <div class="name">
-          <p class="n">${escapeHtml(r.key)}</p>
-          <p class="m">
-            <img style="width:14px;height:14px;vertical-align:-2px;opacity:.95" data-file="${escapeHtml(ICONS.kamas)}" data-dir="" alt="">
-            Sous-total : <b>${fmt.format(sub)}</b>
-          </p>
-        </div>
-        <div class="ctrls">
-          <button class="btn small" onclick="rDec('${did}','${jsEscape(r.key)}')">−</button>
-          <div class="num" onclick="openResPad('${did}','${jsEscape(r.key)}')">${fmt.format(q)}</div>
-          <button class="btn small gold" onclick="rInc('${did}','${jsEscape(r.key)}')">+</button>
-          <div class="num" style="min-width:90px" onclick="openPricePad('${did}','${jsEscape(r.key)}')">${fmt.format(p)}</div>
-        </div>
+      <div class="ctrls">
+        <div class="num mono" data-act="pp:pick:${key}">${s[key]==="" ? "—" : String(s[key]).replace(".", ",")}</div>
       </div>
-    `;
-  }).join("");
-
-  const itemTiles = (d.items||[]).map(it=>{
-    const v = clampNonNeg(st.items[it.key] ?? 0);
-    return `
-      <div class="itemTile">
-        <div class="ico">
-          <img data-file="${escapeHtml(it.img)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
-        </div>
-        <div class="name">
-          <p class="n">${escapeHtml(it.key)}</p>
-          <p class="m">Item</p>
-        </div>
-        <div class="ctrls">
-          <button class="btn small" onclick="iDec('${did}','${jsEscape(it.key)}')">−</button>
-          <div class="num" onclick="openItemPad('${did}','${jsEscape(it.key)}')">${fmt.format(v)}</div>
-          <button class="btn small gold" onclick="iInc('${did}','${jsEscape(it.key)}')">+</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  const mobsTotal = Object.values(st.mobs||{}).reduce((a,b)=>a+n(b),0);
-  const resTotal  = Object.values(st.resources||{}).reduce((a,b)=>a+n(b),0);
-  const itemsTotal = Object.values(st.items||{}).reduce((a,b)=>a+n(b),0);
-  const kamasTotal = dungeonSumKamas(d, st);
-
-  app.innerHTML = `
-    <div class="topline">
-      <div class="title">
-        <div class="thumb" style="width:42px;height:42px;border-radius:16px">
-          <img data-file="${escapeHtml(d.thumb)}" data-dir="${escapeHtml(d.imgDir||'')}" alt="">
-        </div>
-        <div>
-          <h2>${escapeHtml(d.name)}</h2>
-          <p class="sub">Clique sur les nombres pour saisir au pavé numérique</p>
-        </div>
-      </div>
-      <div class="nav">
-        <button class="btn" onclick="location.hash='#/donjons'">⬅ Retour</button>
-        <button class="btn gold" onclick="totalRun('${did}')">➕ ${escapeHtml(d.totalButtonLabel || 'Total run')}</button>
-        <button class="btn bad" onclick="resetDungeon('${did}')">🧹 Reset</button>
-      </div>
-    </div>
-
-    <div class="summary" style="margin-top:0">
-      <div class="kpi">
-        <div class="k"><span class="kico"><img data-file="${escapeHtml(ICONS.mobs)}" data-dir="" alt=""></span> Total mobs/boss</div>
-        <div class="v">${fmt.format(mobsTotal)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k"><span class="kico"><img data-file="${escapeHtml(ICONS.resources)}" data-dir="" alt=""></span> Total ressources</div>
-        <div class="v">${fmt.format(resTotal)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k"><span class="kico"><img data-file="${escapeHtml(ICONS.items)}" data-dir="" alt=""></span> Total items</div>
-        <div class="v">${fmt.format(itemsTotal)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k"><span class="kico"><img data-file="${escapeHtml(ICONS.kamas)}" data-dir="" alt=""></span> Kamas estimés</div>
-        <div class="v gold">${fmt.format(kamasTotal)}</div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="section">
-        <div class="topline" style="margin-bottom:8px">
-          <div class="pill"><img class="navIco" data-file="${escapeHtml(ICONS.mobs)}" alt=""> Mobs / Boss</div>
-          <div class="pill">− / +</div>
-        </div>
-        <div class="list">${mobsRows}</div>
-      </div>
-
-      <div class="section">
-        <div class="topline" style="margin-bottom:8px">
-          <div class="pill"><img class="navIco" data-file="${escapeHtml(ICONS.resources)}" alt=""> Ressources</div>
-          <div class="pill">Prix/u à droite</div>
-        </div>
-        <div class="list">${resRows}</div>
-      </div>
-    </div>
-
-    <div class="section" style="margin-top:14px">
-      <div class="topline" style="margin-bottom:8px">
-        <div class="pill"><img class="navIco" data-file="${escapeHtml(ICONS.items)}" alt=""> Items (anti-scroll)</div>
-        <div class="pill">auto 2→4 colonnes</div>
-      </div>
-      ${itemTiles ? `<div class="itemsGrid">${itemTiles}</div>` : `<div class="hint" style="margin-top:0">Aucun item configuré pour ce donjon (UI prête).</div>`}
     </div>
   `;
 
-  activateFallbackIn(app, d.imgDir || "");
-}
-
-/* =========================================================
-   STATS (icônes only pour drops légendes)
-   ========================================================= */
-function renderStats(){
-  pagePill.textContent = "Statistiques";
-
-  const s = loadSongesState();
-
-  // icônes only : on répète l’icône selon la valeur
-  const legendIcons = SONGE_LEGENDS.map(l=>{
-    const count = clampNonNeg(s.legends[l.key] ?? 0);
-    if(count <= 0) return "";
-    const icons = Array.from({length: Math.min(count, 40)}).map(()=>`
-      <span class="tinyIcon"><img data-file="${escapeHtml(l.img)}" data-dir="${escapeHtml(SONGES_IMG_DIR)}" alt=""></span>
-    `).join("");
-
-    const more = count > 40 ? `<span class="pill">+${count-40}</span>` : "";
-    return `
-      <div class="section" style="padding:12px">
-        <div class="topline" style="margin-bottom:8px">
-          <div class="pill">${escapeHtml(l.key)}</div>
-          <div class="pill">${fmt.format(count)}x</div>
-        </div>
-        <div class="tinyStack">${icons} ${more}</div>
-      </div>
-    `;
-  }).join("");
-
-  const totalLeg = Object.values(s.legends||{}).reduce((a,b)=>a+n(b),0);
-  const totalRuns = Object.values(s.runs||{}).reduce((a,b)=>a+n(b),0);
-
-  app.innerHTML = `
-    <div class="topline">
-      <div class="title">
-        <div class="logo" style="width:42px;height:42px;border-radius:16px">📊</div>
-        <div>
-          <h2>Statistiques</h2>
-          <p class="sub">Drops légendes = icônes only • multi-drop = plusieurs icônes</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="summary" style="margin-top:0">
-      <div class="kpi">
-        <div class="k">Légendes droppées (total)</div>
-        <div class="v">${fmt.format(totalLeg)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Runs Songes (total)</div>
-        <div class="v">${fmt.format(totalRuns)}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Bribes (global)</div>
-        <div class="v gold">${fmt.format(clampNonNeg(s.bribesTotal||0))}</div>
-      </div>
-      <div class="kpi">
-        <div class="k">Affichage</div>
-        <div class="v">icônes only</div>
-      </div>
-    </div>
-
-    <div class="grid" style="margin-top:14px">
-      ${legendIcons || `<div class="section"><div class="hint" style="margin-top:0">Aucune légende droppée pour l’instant.</div></div>`}
-    </div>
-  `;
-  activateFallbackIn(app, SONGES_IMG_DIR);
-}
-
-/* =========================================================
-   ANOMALIES (placeholder)
-   ========================================================= */
-function renderAnomalies(){
-  pagePill.textContent = "Anomalies";
   app.innerHTML = `
     <div class="section">
       <div class="topline">
         <div class="title">
-          <div class="logo" style="width:42px;height:42px;border-radius:16px">🌀</div>
-          <div>
-            <h2>Anomalies</h2>
-            <p class="sub">Placeholder</p>
+          <div class="thumb" style="width:44px;height:44px">🍀</div>
+          <div><h2>Calcul PP</h2><p class="sub">Champs vides par défaut (clean)</p></div>
+        </div>
+        <div class="seg">
+          <button class="btn bad" id="btnResetPP">Reset PP</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="section" style="margin:0">
+          <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">⚙️</div><div><h2>Entrées</h2><p class="sub">PP / base / bonus</p></div></div></div>
+          <div class="list">
+            ${field("Prospection", "prospection")}
+            ${field("Base drop (%)", "base")}
+            ${field("Challenges (%)", "challenges")}
+            ${field("Anomalie (%)", "anomalie")}
+            ${field("Bouclier (%)", "shield")}
+            ${field("Almanax (%)", "almanax")}
+          </div>
+        </div>
+
+        <div class="section" style="margin:0">
+          <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">📌</div><div><h2>Résultat</h2><p class="sub">Indication</p></div></div></div>
+          <div class="summary">
+            <div class="kpi">
+              <div class="k">Multiplicateur PP</div>
+              <div class="v mono gold">${mult.toFixed(3)}</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Drop final (%)</div>
+              <div class="v mono gold">${Number.isFinite(final)?final.toFixed(3):"0.000"}</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Astuce</div>
+              <div class="v mono">${s.base==="" ? "Mets une base %" : "OK"}</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Raccourcis</div>
+              <div class="v mono">C / Suppr</div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="hint" style="margin-top:0">
-        Dis-moi ce que tu veux tracker ici et je te le code comme Donjons.
-      </div>
     </div>
   `;
-}
 
-/* =========================================================
-   PP / OMEGA (simple, 0/0 par défaut)
-   ========================================================= */
-const kPP = `${LS_PREFIX}pp`;
-function loadPPState(){
-  try{
-    const raw = localStorage.getItem(kPP);
-    if(!raw) return { prospection:0, base:0, challenges:0, anomalie:0, shield:0, almanax:0 };
-    const p = JSON.parse(raw);
-    return {
-      prospection: clampNonNeg(p.prospection ?? 0),
-      base: clampNonNeg(p.base ?? 0),
-      challenges: clampNonNeg(p.challenges ?? 0),
-      anomalie: clampNonNeg(p.anomalie ?? 0),
-      shield: clampNonNeg(p.shield ?? 0),
-      almanax: clampNonNeg(p.almanax ?? 0),
+  const handlers = {};
+  const labels = {
+    prospection:"Prospection",
+    base:"Base drop (%)",
+    challenges:"Challenges (%)",
+    anomalie:"Anomalie (%)",
+    shield:"Bouclier (%)",
+    almanax:"Almanax (%)",
+  };
+
+  for(const key of Object.keys(labels)){
+    handlers[`pp:pick:${key}`] = ()=>{
+      // keypad veut un int -> on laisse int (tu peux mettre % sans décimales)
+      const cur = s[key]==="" ? 0 : clampInt(toNum(s[key]));
+      openKeypad(labels[key], cur, (v)=>{
+        s[key] = (v===0 ? "" : String(v));
+        savePP(s);
+        render();
+      });
     };
-  }catch(e){
-    return { prospection:0, base:0, challenges:0, anomalie:0, shield:0, almanax:0 };
   }
-}
-function savePPState(s){ localStorage.setItem(kPP, JSON.stringify(s)); scheduleCloudSave(); }
-function ppMultiplier(prospection){
-  const pp = Number(prospection)||0;
-  const m = 0.74 + (1.755 / (1 + Math.exp((250 - pp) / 85)));
-  return Math.min(2.5, m);
-}
-function ppFinalDrop(s){
-  const mult = ppMultiplier(s.prospection);
-  const base = Number(s.base)||0;
-  const final = base
-    * mult
-    * (1 + (Number(s.challenges)||0)/100)
-    * (1 + (Number(s.anomalie)||0)/100)
-    * (1 + (Number(s.shield)||0)/100)
-    * (1 + (Number(s.almanax)||0)/100);
-  return { mult, final };
-}
-function openPPPad(field, label){
-  const s = loadPPState();
-  openKeypad(label, clampNonNeg(s[field] ?? 0), (v)=>{
-    const st = loadPPState();
-    st[field] = clampNonNeg(v);
-    savePPState(st);
-    renderPP();
-  });
-}
-function renderPP(){
-  pagePill.textContent = "Calculateur PP";
-  const s = loadPPState();
-  const { mult, final } = ppFinalDrop(s);
 
-  app.innerHTML = `
-    <div class="topline">
-      <div class="title">
-        <div class="logo" style="width:42px;height:42px;border-radius:16px">🍀</div>
-        <div>
-          <h2>Calculateur Prospection</h2>
-          <p class="sub">Ta loupe est gardée (icône onglet). Clique les valeurs pour saisir.</p>
-        </div>
-      </div>
-      <div class="nav">
-        <button class="btn bad" onclick="localStorage.removeItem('${kPP}'); scheduleCloudSave(); renderPP();">🧹 Reset</button>
-      </div>
-    </div>
+  $("#btnResetPP").onclick = ()=>{
+    if(!confirm("Reset PP ? (remet vide)")) return;
+    savePP(blankPP());
+    render();
+  };
 
-    <div class="row">
-      <div class="section">
-        <div class="topline" style="margin-bottom:8px">
-          <div class="pill">Entrées</div>
-        </div>
-
-        <div class="list">
-          <div class="item">
-            <div class="ico">PP</div>
-            <div class="name"><p class="n">Prospection</p><p class="m">Valeur PP</p></div>
-            <div class="ctrls"><div class="num" onclick="openPPPad('prospection','Prospection')">${fmt.format(s.prospection)}</div></div>
-          </div>
-
-          <div class="item">
-            <div class="ico">%</div>
-            <div class="name"><p class="n">Base (%)</p><p class="m">Drop base</p></div>
-            <div class="ctrls"><div class="num" onclick="openPPPad('base','Base (%)')">${fmt.format(s.base)}</div></div>
-          </div>
-
-          <div class="item">
-            <div class="ico">+</div>
-            <div class="name"><p class="n">Challenges (%)</p><p class="m">Bonus</p></div>
-            <div class="ctrls"><div class="num" onclick="openPPPad('challenges','Challenges (%)')">${fmt.format(s.challenges)}</div></div>
-          </div>
-
-          <div class="item">
-            <div class="ico">🌀</div>
-            <div class="name"><p class="n">Anomalie (%)</p><p class="m">Bonus</p></div>
-            <div class="ctrls"><div class="num" onclick="openPPPad('anomalie','Anomalie (%)')">${fmt.format(s.anomalie)}</div></div>
-          </div>
-
-          <div class="item">
-            <div class="ico">🛡️</div>
-            <div class="name"><p class="n">Bouclier (%)</p><p class="m">Bonus</p></div>
-            <div class="ctrls"><div class="num" onclick="openPPPad('shield','Bouclier (%)')">${fmt.format(s.shield)}</div></div>
-          </div>
-
-          <div class="item">
-            <div class="ico">📅</div>
-            <div class="name"><p class="n">Almanax (%)</p><p class="m">Bonus</p></div>
-            <div class="ctrls"><div class="num" onclick="openPPPad('almanax','Almanax (%)')">${fmt.format(s.almanax)}</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="topline" style="margin-bottom:8px">
-          <div class="pill">Résultats</div>
-        </div>
-        <div class="item">
-          <div class="ico">x</div>
-          <div class="name"><p class="n">Multiplicateur PP</p><p class="m">cap 2.5</p></div>
-          <div class="ctrls"><div class="num">${f2(mult)}</div></div>
-        </div>
-        <div class="item">
-          <div class="ico">🎯</div>
-          <div class="name"><p class="n">Chance finale</p><p class="m">théorique</p></div>
-          <div class="ctrls"><div class="num">${f2(final)}%</div></div>
-        </div>
-      </div>
-    </div>
-  `;
+  bindActions(app, handlers);
 }
 
-const kOmega = `${LS_PREFIX}omega`;
-function loadOmegaState(){
-  try{
-    const raw = localStorage.getItem(kOmega);
-    if(!raw) return { cur:0, target:0 };
-    const p = JSON.parse(raw);
-    return { cur: clampNonNeg(p.cur ?? 0), target: clampNonNeg(p.target ?? 0) };
-  }catch{ return { cur:0, target:0 }; }
-}
-function saveOmegaState(s){ localStorage.setItem(kOmega, JSON.stringify(s)); scheduleCloudSave(); }
-function omegaXpToNext(i){ return Math.round(50000000 * Math.pow(1.01, i)); }
-function omegaXpRequired(cur, target){
-  cur = clampNonNeg(cur); target = clampNonNeg(target);
-  if(target <= cur) return 0;
-  let sum = 0;
-  for(let i=cur; i<target; i++) sum += omegaXpToNext(i);
-  return sum;
-}
-function openOmegaPad(field, label){
-  const s = loadOmegaState();
-  openKeypad(label, clampNonNeg(s[field]), (v)=>{
-    const st = loadOmegaState();
-    st[field] = clampNonNeg(v);
-    saveOmegaState(st);
-    renderOmega();
-  });
-}
 function renderOmega(){
-  pagePill.textContent = "XP Oméga";
-  const s = loadOmegaState();
+  pagePill.textContent = "Oméga";
+  const s = loadOmega();
   const xp = omegaXpRequired(s.cur, s.target);
 
   app.innerHTML = `
-    <div class="topline">
-      <div class="title">
-        <div class="logo" style="width:42px;height:42px;border-radius:16px">📈</div>
-        <div>
-          <h2>Calculateur XP Oméga</h2>
-          <p class="sub">0/0 par défaut • clique pour saisir</p>
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb" style="width:44px;height:44px">📈</div>
+          <div><h2>Calcul Oméga</h2><p class="sub">Reset met 0 partout</p></div>
         </div>
-      </div>
-      <div class="nav">
-        <button class="btn bad" onclick="localStorage.removeItem('${kOmega}'); scheduleCloudSave(); renderOmega();">🧹 Reset</button>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="section">
-        <div class="list">
-          <div class="item">
-            <div class="ico">🎯</div>
-            <div class="name"><p class="n">Oméga actuel</p><p class="m">Départ</p></div>
-            <div class="ctrls"><div class="num" onclick="openOmegaPad('cur','Oméga actuel')">${fmt.format(s.cur)}</div></div>
-          </div>
-          <div class="item">
-            <div class="ico">🚀</div>
-            <div class="name"><p class="n">Oméga cible</p><p class="m">Objectif</p></div>
-            <div class="ctrls"><div class="num" onclick="openOmegaPad('target','Oméga cible')">${fmt.format(s.target)}</div></div>
-          </div>
+        <div class="seg">
+          <button class="btn bad" id="btnResetOmega">Reset Oméga</button>
         </div>
       </div>
 
-      <div class="section">
-        <div class="topline" style="margin-bottom:8px">
-          <div class="pill">XP requise</div>
+      <div class="row">
+        <div class="section" style="margin:0">
+          <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🎯</div><div><h2>Niveaux</h2><p class="sub">Clique pour saisir</p></div></div></div>
+          <div class="list">
+            <div class="item">
+              <div class="ico">📌</div>
+              <div class="name"><p class="n">Oméga actuel</p><p class="m">ton niveau</p></div>
+              <div class="ctrls"><div class="num mono" data-act="om:cur">${fmt.format(s.cur)}</div></div>
+            </div>
+            <div class="item">
+              <div class="ico">🏁</div>
+              <div class="name"><p class="n">Oméga objectif</p><p class="m">cible</p></div>
+              <div class="ctrls"><div class="num mono" data-act="om:tar">${fmt.format(s.target)}</div></div>
+            </div>
+          </div>
         </div>
-        <div class="item">
-          <div class="ico">XP</div>
-          <div class="name"><p class="n">Total</p><p class="m">Si cible ≤ actuel : 0</p></div>
-          <div class="ctrls"><div class="num">${fmt.format(xp)}</div></div>
+
+        <div class="section" style="margin:0">
+          <div class="topline"><div class="title"><div class="thumb" style="width:44px;height:44px">🧮</div><div><h2>XP requise</h2><p class="sub">entre actuel et objectif</p></div></div></div>
+          <div class="summary">
+            <div class="kpi">
+              <div class="k">XP totale</div>
+              <div class="v mono gold">${money(xp)}</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Delta niveaux</div>
+              <div class="v mono">${fmt.format(Math.max(0, s.target - s.cur))}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   `;
+
+  const handlers = {};
+  handlers["om:cur"] = ()=> openKeypad("Oméga actuel", s.cur, (v)=>{ s.cur=clampInt(v); saveOmega(s); render(); });
+  handlers["om:tar"] = ()=> openKeypad("Oméga objectif", s.target, (v)=>{ s.target=clampInt(v); saveOmega(s); render(); });
+
+  $("#btnResetOmega").onclick = ()=>{
+    if(!confirm("Reset Oméga ? (0/0)")) return;
+    saveOmega({cur:0,target:0});
+    render();
+  };
+
+  bindActions(app, handlers);
 }
 
 /* =========================================================
-   RENDER
+   Render dispatcher
    ========================================================= */
 function render(){
   updateAuthUI();
-  const r = getRoute();
-  if(r.page === "home") return renderHome();
-  if(r.page === "donjons") return renderDonjons();
-  if(r.page === "dungeon") return renderDungeon(r.id);
-  if(r.page === "songes") return renderSonges();
-  if(r.page === "stats") return renderStats();
-  if(r.page === "anomalies") return renderAnomalies();
-  if(r.page === "pp") return renderPP();
-  if(r.page === "omega") return renderOmega();
-  return renderHome();
+  const r = route();
+
+  if(r.page==="home") return renderHome();
+  if(r.page==="donjons") return renderDonjons();
+  if(r.page==="songes") return renderSonges();
+  if(r.page==="stats") return renderStats();
+  if(r.page==="pp") return renderPP();
+  if(r.page==="omega") return renderOmega();
+  if(r.page==="dungeon"){
+    const d = DUNGEONS.find(x=>x.id===r.id);
+    if(!d) { location.hash="#/donjons"; return; }
+    pagePill.textContent = d.name;
+    return renderDungeon(d);
+  }
+  renderHome();
 }
 
 /* =========================================================
-   INIT
+   Boot
    ========================================================= */
 (async function boot(){
-  try{
-    await handleAuthCallback();
-    await initAuth();
-    render();
-    activateFallbackIn(document.getElementById("topHeader"), "");
-  }catch(e){
-    console.error(e);
-  }
+  // defaults demandés
+  if(!localStorage.getItem(kOmega)) saveOmega({cur:0,target:0});
+  if(!localStorage.getItem(kPP)) savePP(blankPP());
+
+  await initAuth();
+  if(!location.hash) location.hash="#/";
+  render();
 })();
 </script>
-
 </body>
 </html>
