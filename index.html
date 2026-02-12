@@ -1215,6 +1215,7 @@ const SONGES = {
   ],
   
   bribesIcon: { key:"Bribes", img:"Bribe de rêve.png", dir:"Songes/" },
+  legends: [],
   legendItems: [
     "Légende animale de Bakushana.png",
     "Légende animale de Kwakarticho.png",
@@ -1416,10 +1417,10 @@ function renderCounterRow({dir, img, name, sub, value, onMinus, onPlus, onPick})
       </div>
 
       <div class="ctrls">
-        <button class="btn small" data-act="${onMinus}">-</button>
-        <div class="num mono" data-act="${onPick}">${fmt.format(value)}</div>
-        <button class="btn small" data-act="${onPlus}">+</button>
-      </div>
+  <button class="btn small" data-act="${onMinus}">-</button>
+  <div class="num mono" data-act="${onPickQty}">${fmt.format(qty)}</div>
+  <button class="btn small" data-act="${onPlus}">+</button>
+</div>
     </div>
   `;
 }
