@@ -2397,6 +2397,325 @@ function render(){
   }
   renderHome();
 }
+/* =========================================================
+   ✅ PATCH STATS V1 (1 seul copier-coller)
+   - Compteur global runs donjons
+   - Rentabilité globale (kamas/run)
+   - Rentabilité par donjon + Top donjons
+   - Taux drop Songes (légendes/run + bribes/run)
+   - Historique activité (1ère/dernière)
+   ========================================================= */
+
+// --- Meta activité (timestamps)
+const kMeta = `${LS_PREFIX}meta`;
+function loadMeta(){
+  try{
+    const raw = localStorage.getItem(kMeta);
+    if(!raw) return { first:0, last:0 };
+    const p = JSON.parse(raw);
+    return { first: clampInt(p.first||0), last: clampInt(p.last||0) };
+  }catch{ return { first:0, last:0 }; }
+}
+function saveMeta(m){ localStorage.setItem(kMeta, JSON.stringify(m)); }
+function touchActivity(){
+  const now = Date.now();
+  const m = loadMeta();
+  if(!m.first) m.first = now;
+  m.last = now;
+  saveMeta(m);
+}
+function fmtDate(ms){
+  if(!ms) return "—";
+  try{
+    return new Intl.DateTimeFormat("fr-FR", { dateStyle:"medium", timeStyle:"short" }).format(new Date(ms));
+  }catch{
+    const d = new Date(ms);
+    return d.toLocaleString();
+  }
+}
+
+// --- Wrap des saves (zéro modif ailleurs)
+(function wrapSaves(){
+  if(typeof saveDungeon === "function" && !saveDungeon.__wrapped){
+    const _saveDungeon = saveDungeon;
+    saveDungeon = function(id, st){
+      touchActivity();
+      return _saveDungeon(id, st);
+    };
+    saveDungeon.__wrapped = true;
+  }
+  if(typeof saveSonges === "function" && !saveSonges.__wrapped){
+    const _saveSonges = saveSonges;
+    saveSonges = function(s){
+      touchActivity();
+      return _saveSonges(s);
+    };
+    saveSonges.__wrapped = true;
+  }
+  if(typeof savePP === "function" && !savePP.__wrapped){
+    const _savePP = savePP;
+    savePP = function(s){
+      touchActivity();
+      return _savePP(s);
+    };
+    savePP.__wrapped = true;
+  }
+  if(typeof saveOmega === "function" && !saveOmega.__wrapped){
+    const _saveOmega = saveOmega;
+    saveOmega = function(s){
+      touchActivity();
+      return _saveOmega(s);
+    };
+    saveOmega.__wrapped = true;
+  }
+})();
+
+// --- Helpers pour stats rentabilité
+function getDungeonStats(d){
+  const st = ensureDungeonShape(d, loadDungeon(d.id));
+  const runs = clampInt(st.runs||0);
+  const km = sumKamasFromDungeon(d, st);
+  const kmPerRun = runs>0 ? (km / runs) : 0;
+  return { d, st, runs, km, kmPerRun };
+}
+
+function getGlobalDungeonStats(){
+  let runsTotal = 0;
+  let kmTotal = 0;
+  const per = [];
+
+  for(const d of DUNGEONS){
+    const s = getDungeonStats(d);
+    runsTotal += s.runs;
+    kmTotal += s.km;
+    per.push(s);
+  }
+  const kmPerRun = runsTotal>0 ? (kmTotal / runsTotal) : 0;
+  return { runsTotal, kmTotal, kmPerRun, per };
+}
+
+// --- Override propre de renderStats (1 seul endroit)
+const _renderStats_original = renderStats;
+renderStats = function renderStatsPatched(){
+  pagePill.textContent = "Stats";
+
+  // Totaux classiques (comme avant)
+  let mobsTotal=0, resQty=0, eqQty=0, kamasTotal=0;
+  const resAgg = [];
+  const eqAgg = [];
+
+  for(const d of DUNGEONS){
+    const st = ensureDungeonShape(d, loadDungeon(d.id));
+    kamasTotal += sumKamasFromDungeon(d, st);
+
+    for(const m of d.mobs) mobsTotal += clampInt(st.mobs[m.key]||0);
+
+    for(const r of d.resources){
+      const q = clampInt(st.res[r.key]||0);
+      const p = toNum(st.resP[r.key]||0);
+      resQty += q;
+      resAgg.push({dir:d.imgDir, name:r.key, img:r.img, q, p, total:q*p});
+    }
+    for(const e of d.equipments){
+      const q = clampInt(st.eq[e.key]||0);
+      const p = toNum(st.eqP[e.key]||0);
+      eqQty += q;
+      eqAgg.push({dir:(e.dir||d.imgDir), name:e.key, img:e.img, q, p, total:q*p});
+    }
+  }
+
+  // Songes rates
+  const s = loadSonges();
+  const runsSonges = SONGES.intensities.reduce((sum,it)=>sum + clampInt(s.runs[it.id]||0), 0);
+  const totalLegends = Object.values(s.legendItems).reduce((a,b)=>a+clampInt(b),0);
+  const legendsPerRun = runsSonges>0 ? (totalLegends / runsSonges) : 0;
+  const bribesPerRun = runsSonges>0 ? (clampInt(s.bribes||0) / runsSonges) : 0;
+
+  // Donjons global + top
+  const G = getGlobalDungeonStats();
+  const topByKPR = [...G.per].filter(x=>x.runs>0).sort((a,b)=>b.kmPerRun-a.kmPerRun).slice(0,3);
+  const topByKm  = [...G.per].filter(x=>x.km>0).sort((a,b)=>b.km-a.km).slice(0,3);
+
+  // Historique
+  const meta = loadMeta();
+
+  function statCard(title, value, isGold=false){
+    return `
+      <div class="kpi">
+        <div class="k">${escapeHtml(title)}</div>
+        <div class="v mono ${isGold?'gold':''}">${value}</div>
+      </div>
+    `;
+  }
+
+  // Top ressources par valeur (comme ton code actuel)
+  const topRes = resAgg.filter(x => x.total > 0).sort((a,b)=>b.total - a.total).slice(0, 10);
+  const hero = topRes[0] || null;
+  const others = topRes.slice(1);
+
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb" style="width:44px;height:44px"><img class="navIcon" src="./Carac.png" alt=""></div>
+          <div>
+            <h2>Statistiques</h2>
+            <p class="sub">Global • rentabilité • songes • historique</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary">
+        ${statCard("Runs donjons (total)", fmt.format(G.runsTotal))}
+        ${statCard("Kamas / run (moyenne)", G.runsTotal>0 ? money(G.kmPerRun) + " " + kamasInlineHtml("") : "—", true)}
+        ${statCard("Songes : légendes / run", runsSonges>0 ? legendsPerRun.toFixed(3) : "—")}
+        ${statCard("Songes : bribes / run", runsSonges>0 ? bribesPerRun.toFixed(3) : "—")}
+      </div>
+
+      <div class="summary" style="margin-top:10px">
+        ${statCard("1ère activité", fmtDate(meta.first))}
+        ${statCard("Dernière activité", fmtDate(meta.last))}
+        ${
+          topByKPR[0]
+            ? statCard("Top donjon (kamas/run)", `${escapeHtml(topByKPR[0].d.name)} • ${money(topByKPR[0].kmPerRun)} ${kamasInlineHtml("")}`, true)
+            : statCard("Top donjon (kamas/run)", "—")
+        }
+        ${
+          topByKm[0]
+            ? statCard("Top donjon (kamas total)", `${escapeHtml(topByKm[0].d.name)} • ${money(topByKm[0].km)} ${kamasInlineHtml("")}`, true)
+            : statCard("Top donjon (kamas total)", "—")
+        }
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="section">
+        <div class="topline">
+          <div class="title">
+            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.donjons)}" alt=""></div>
+            <div><h2>Top donjons</h2><p class="sub">rentabilité</p></div>
+          </div>
+        </div>
+
+        <div class="hint"><b>Top 3 kamas/run</b></div>
+        <div class="list">
+          ${
+            topByKPR.length ? topByKPR.map(x=>`
+              <div class="item">
+                <div class="ico"><img data-dir="${escapeHtml(x.d.imgDir)}" data-file="${escapeHtml(x.d.thumb)}" alt=""></div>
+                <div class="name">
+                  <p class="n">${escapeHtml(x.d.name)}</p>
+                  <p class="m">Runs: <b class="mono">${fmt.format(x.runs)}</b> • Total: <b class="mono">${money(x.km)}</b></p>
+                </div>
+                <div class="ctrls">
+                  <div class="pill">${kamasInlineHtml(money(x.kmPerRun))} / run</div>
+                  <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(x.d.id)}'">Ouvrir</button>
+                </div>
+              </div>
+            `).join("") : `<div class="hint">Fais au moins 1 run + mets des prix/u pour voir la rentabilité.</div>`
+          }
+        </div>
+
+        <div class="hint" style="margin-top:10px"><b>Top 3 kamas total</b></div>
+        <div class="list">
+          ${
+            topByKm.length ? topByKm.map(x=>`
+              <div class="item">
+                <div class="ico"><img data-dir="${escapeHtml(x.d.imgDir)}" data-file="${escapeHtml(x.d.thumb)}" alt=""></div>
+                <div class="name">
+                  <p class="n">${escapeHtml(x.d.name)}</p>
+                  <p class="m">Runs: <b class="mono">${fmt.format(x.runs)}</b> • /run: <b class="mono">${money(x.kmPerRun)}</b></p>
+                </div>
+                <div class="ctrls">
+                  <div class="pill">${kamasInlineHtml(money(x.km))}</div>
+                  <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(x.d.id)}'">Ouvrir</button>
+                </div>
+              </div>
+            `).join("") : `<div class="hint">Aucune valeur : mets des quantités + prix/u.</div>`
+          }
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="topline">
+          <div class="title">
+            <div class="thumb" style="width:44px;height:44px">🏆</div>
+            <div><h2>Top ressources</h2><p class="sub">par valeur totale (quantité × prix/u)</p></div>
+          </div>
+        </div>
+
+        <div class="topResWrap">
+          ${
+            hero ? `
+              <div class="topResHero">
+                <div class="L">
+                  <div class="ico"><img data-dir="${escapeHtml(hero.dir)}" data-file="${escapeHtml(hero.img)}" alt=""></div>
+                  <div class="name">
+                    <p class="n">${escapeHtml(hero.name)}</p>
+                    <p class="m">Valeur totale</p>
+                  </div>
+                </div>
+                <div class="price">${kamasInlineHtml(money(hero.total))}</div>
+              </div>
+            ` : `<div class="hint">Aucune valeur (mets des quantités + prix/u sur des ressources).</div>`
+          }
+
+          ${
+            others.length ? `
+              <div class="topResRow">
+                ${others.map(x=>`
+                  <div class="topResMini">
+                    <div class="ico"><img data-dir="${escapeHtml(x.dir)}" data-file="${escapeHtml(x.img)}" alt=""></div>
+                    <div class="p">${kamasInlineHtml(money(x.total))}</div>
+                  </div>
+                `).join("")}
+              </div>
+            ` : ``
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.donjons)}" alt=""></div>
+          <div><h2>Récap par donjon</h2><p class="sub">mobs / ressources / items / kamas</p></div>
+        </div>
+      </div>
+      <div class="grid" id="donjonRecap"></div>
+    </div>
+  `;
+
+  // Recap (comme ton code actuel)
+  const recap = $("#donjonRecap");
+  recap.innerHTML = DUNGEONS.map(d=>{
+    const st = ensureDungeonShape(d, loadDungeon(d.id));
+    const km = sumKamasFromDungeon(d, st);
+    return `
+      <div class="card">
+        <div class="card-left">
+          <div class="thumb"><img data-dir="${escapeHtml(d.imgDir)}" data-file="${escapeHtml(d.thumb)}" alt=""></div>
+          <div style="min-width:0">
+            <h3>${escapeHtml(d.name)}</h3>
+            <p>
+              Runs: <b class="mono">${fmt.format(clampInt(st.runs||0))}</b> •
+              Mobs: <b class="mono">${fmt.format(sumQty(st.mobs))}</b> •
+              Ress: <b class="mono">${fmt.format(sumQty(st.res))}</b> •
+              Items: <b class="mono">${fmt.format(sumQty(st.eq))}</b>
+            </p>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="pill">${kamasInlineHtml(money(km))}</div>
+          <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(d.id)}'">Ouvrir</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  activateImages(app);
+};
 
 /* =========================================================
    Boot
