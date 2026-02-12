@@ -1417,31 +1417,33 @@ function renderCounterRow({dir, img, name, sub, value, onMinus, onPlus, onPick})
       </div>
 
       <div class="ctrls">
-  <button class="btn small" data-act="${onMinus}">-</button>
-  <div class="num mono" data-act="${onPickQty}">${fmt.format(qty)}</div>
-  <button class="btn small" data-act="${onPlus}">+</button>
-</div>
+        <button class="btn small" data-act="${onMinus}">-</button>
+        <div class="num mono" data-act="${onPick}">${fmt.format(value)}</div>
+        <button class="btn small" data-act="${onPlus}">+</button>
+      </div>
     </div>
   `;
 }
 
-
 function renderPricedRow({dir, img, name, qty, price, subtotal, onMinus, onPlus, onPickQty, onPickPrice}){
   return `
     <div class="item">
-      <div class="ico"><img data-dir="${escapeHtml(dir)}" data-file="${escapeHtml(img)}" alt=""></div>
+      <div class="ico">
+        <img data-dir="${escapeHtml(dir)}" data-file="${escapeHtml(img)}" alt="">
+      </div>
+
       <div class="name">
         <p class="n">${escapeHtml(name)}</p>
         <p class="m">Sous-total: ${kamasInlineHtml(money(subtotal))}</p>
       </div>
-<div class="ctrls">
-  <button class="btn small" data-act="li:-:${escapeHtml(k)}">-</button>
-  <div class="num mono" data-act="li:pick:${escapeHtml(k)}">${fmt.format(v)}</div>
-  <button class="btn small" data-act="li:+:${escapeHtml(k)}">+</button>
-</div>
+
+      <div class="ctrls">
+        <button class="btn small" data-act="${onMinus}">-</button>
+        <div class="num mono" data-act="${onPickQty}">${fmt.format(qty)}</div>
+        <button class="btn small" data-act="${onPlus}">+</button>
 
         <input class="price mono" data-act="${onPickPrice}" inputmode="decimal"
-          value="${price?String(price).replace(".", ","):""}" placeholder="prix/u">
+          value="${price ? String(price).replace(".", ",") : ""}" placeholder="prix/u">
       </div>
     </div>
   `;
