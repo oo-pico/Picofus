@@ -297,7 +297,7 @@
     .statItem .info .v{font-size:14px;font-weight:900;margin:2px 0 0;font-variant-numeric:tabular-nums;color:var(--gold)}
     .statItem .right{font-variant-numeric:tabular-nums;font-weight:900}
 
-    /* TOP RESSOURCES (prix moyen) */
+    /* TOP RESSOURCES */
     .topResWrap{display:flex;flex-direction:column;gap:10px}
     .topResHero{
       border:1px solid rgba(214,179,106,.35);
@@ -327,6 +327,12 @@
     }
     .topResMini .ico{width:40px;height:40px;border-radius:14px}
     .topResMini .p{font-weight:950}
+
+    /* ✅ Omega: XP totale plus large */
+    .omegaSummary .kpi:first-child{ grid-column: 1 / -1; }
+    @media (max-width: 980px){
+      .omegaSummary .kpi:first-child{ grid-column: 1 / -1; }
+    }
   </style>
 </head>
 
@@ -344,7 +350,10 @@
       <div class="nav">
         <span class="pill" id="pagePill">Accueil</span>
 
-        <button class="btn small" id="btnHome" title="Accueil">🏠</button>
+        <!-- ✅ Home picto -->
+        <button class="btn small" id="btnHome" title="Accueil">
+          <img class="navIcon" src="./Maison.png" alt="Accueil">
+        </button>
 
         <!-- ✅ Donjons picto -->
         <button class="btn small" id="btnDonjons" title="Donjons">
@@ -356,7 +365,10 @@
           <img class="navIcon" src="./Baguette%20Range.png" alt="Songes">
         </button>
 
-        <button class="btn small" id="btnStats" title="Stats">📊</button>
+        <!-- ✅ Stats picto -->
+        <button class="btn small" id="btnStats" title="Stats">
+          <img class="navIcon" src="./Carac.png" alt="Stats">
+        </button>
 
         <button class="btn small" id="btnPP" title="Calcul PP">
           <img class="navIcon" src="./Ic%C3%B4ne%20Calculateur%20PP.png" alt="PP">
@@ -471,7 +483,7 @@ const ICONS = {
   omegaXp: "ornement omega.png",
 
   ppBase: "icon_bonus_reward.png",
-  ppChallenges: "Blitzkrieg.png",
+  ppChallenges: "Blitz.png", /* ✅ demandé */
   ppAnomaly: "icon_anomaly.png",
   ppShield: "Shield.png",
   ppAlmanax: "Page de Calendrier.png",
@@ -486,8 +498,6 @@ function kamasInlineHtml(text){
 
 /* =========================================================
    Images: fallback (essaie plusieurs chemins + variantes)
-   - FIX: gère œ -> oe
-   - FIX: gère variantes "Goûtue" / "goutue" / "goutteue" / "goutte"
    ========================================================= */
 const DIR_ALIASES = {
   "Vénérable endormi/": ["véné/", "Véné/", "Vene/", "vene/"],
@@ -526,17 +536,14 @@ function fileVariants(file){
   const apos1 = base.replaceAll("’", "'");
   const apos2 = base.replaceAll("'", "’");
 
-  // ✅ ligatures: œ / Œ -> oe / OE
   const lig1 = base.replaceAll("œ", "oe").replaceAll("Œ", "OE");
   const lig2 = lower.replaceAll("œ", "oe");
   const lig3 = noAcc.replaceAll("œ", "oe").replaceAll("Œ", "OE");
   const lig4 = noAccLower.replaceAll("œ", "oe");
 
-  // ✅ variantes goûtue / goutue / goutteue / goutte
   const goutFix = (s)=>{
-    const t = stripAccents(s); // Goûtue -> Goutue
+    const t = stripAccents(s);
     const out = [s, t];
-
     if(t.toLowerCase().includes("goutue")){
       out.push(
         s.replaceAll("Goûtue","Goutteue").replaceAll("goûtue","goutteue").replaceAll("Goutue","Goutteue").replaceAll("goutue","goutteue"),
@@ -614,7 +621,7 @@ function activateImages(container, defaultDir){
 }
 
 /* =========================================================
-   Keypad
+   Keypad (int + decimal mode ONLY when needed)
    ========================================================= */
 const modal = $("#modal");
 const kbdTarget = $("#kbdTarget");
@@ -625,51 +632,117 @@ const btnClear = $("#kbdClear");
 const btnBack = $("#kbdBack");
 const btnOk = $("#kbdOk");
 
-let keypad = { open:false, buffer:"0", onApply:null, title:"" };
+let keypad = { open:false, buffer:"0", onApply:null, title:"", mode:"int" };
 
-function openKeypad(title, currentValue, onApply){
-  keypad.open = true;
-  keypad.title = title;
-  keypad.buffer = String(clampInt(currentValue));
-  keypad.onApply = onApply;
-  kbdTarget.textContent = title;
-  kbdValue.textContent = keypad.buffer;
-  modal.classList.add("open");
-
-  setTimeout(()=>{
-    const sel = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(kbdValue);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }, 30);
-}
-function closeKeypad(){ keypad.open = false; modal.classList.remove("open"); }
-function setBuffer(v){ keypad.buffer = v; kbdValue.textContent = keypad.buffer; }
-function pushDigit(d){ if(keypad.buffer === "0") setBuffer(String(d)); else setBuffer(keypad.buffer + String(d)); }
-function backspace(){ if(keypad.buffer.length <= 1) setBuffer("0"); else setBuffer(keypad.buffer.slice(0,-1)); }
-function clearBuf(){ setBuffer("0"); }
-function applyBuf(){
-  const v = clampInt(parseInt(keypad.buffer,10));
-  if(typeof keypad.onApply === "function") keypad.onApply(v);
-  closeKeypad();
-}
-
-(function buildKeypad(){
+function buildKeypadGrid(){
   kbdGrid.innerHTML = "";
   for(let i=1;i<=9;i++){
     const b = document.createElement("button");
     b.className = "kbd-key";
     b.textContent = String(i);
-    b.onclick = ()=>pushDigit(i);
+    b.onclick = ()=>pushDigit(String(i));
     kbdGrid.appendChild(b);
   }
-  const blank1 = document.createElement("div");
-  const zero = document.createElement("button");
-  zero.className="kbd-key"; zero.textContent="0"; zero.onclick=()=>pushDigit(0);
-  const blank2 = document.createElement("div");
-  kbdGrid.append(blank1, zero, blank2);
-})();
+
+  if(keypad.mode === "dec"){
+    const comma = document.createElement("button");
+    comma.className="kbd-key";
+    comma.textContent=",";
+    comma.onclick = ()=>pushSep(",");
+    const zero = document.createElement("button");
+    zero.className="kbd-key"; zero.textContent="0"; zero.onclick=()=>pushDigit("0");
+    const blank = document.createElement("div");
+    kbdGrid.append(comma, zero, blank);
+  }else{
+    const blank1 = document.createElement("div");
+    const zero = document.createElement("button");
+    zero.className="kbd-key"; zero.textContent="0"; zero.onclick=()=>pushDigit("0");
+    const blank2 = document.createElement("div");
+    kbdGrid.append(blank1, zero, blank2);
+  }
+}
+
+function openKeypad(title, currentValue, onApply, opts={}){
+  keypad.open = true;
+  keypad.title = title;
+  keypad.onApply = onApply;
+  keypad.mode = (opts.mode === "dec") ? "dec" : "int";
+
+  const cur = (currentValue === "" || currentValue === null || currentValue === undefined) ? "0" : String(currentValue);
+  keypad.buffer = (keypad.mode==="int")
+    ? String(clampInt(cur))
+    : normalizeDecString(cur);
+
+  kbdTarget.textContent = title;
+  kbdValue.textContent = keypad.buffer;
+  buildKeypadGrid();
+  modal.classList.add("open");
+}
+
+function normalizeDecString(s){
+  s = String(s).trim();
+  if(!s) return "0";
+  s = s.replace(".", ",");
+  s = s.replace(/[^\d,]/g, "");
+  const parts = s.split(",");
+  const a = parts[0] || "0";
+  const b = (parts[1] || "").slice(0,2);
+  return b.length ? `${stripLeadingZeros(a)},${b}` : stripLeadingZeros(a);
+}
+function stripLeadingZeros(a){
+  a = String(a).replace(/^0+(?=\d)/, "");
+  return a === "" ? "0" : a;
+}
+
+function closeKeypad(){ keypad.open = false; modal.classList.remove("open"); }
+function setBuffer(v){ keypad.buffer = v; kbdValue.textContent = keypad.buffer; }
+
+function pushDigit(d){
+  if(keypad.mode==="int"){
+    if(keypad.buffer === "0") setBuffer(String(d));
+    else setBuffer(keypad.buffer + String(d));
+    return;
+  }
+  // dec
+  let s = keypad.buffer;
+  if(s === "0") s = "";
+  if(s.includes(",")){
+    const [a,b] = s.split(",");
+    if((b||"").length >= 2) return;
+    setBuffer((a||"0") + "," + ((b||"") + d).slice(0,2));
+  }else{
+    setBuffer(stripLeadingZeros(s + d));
+  }
+}
+
+function pushSep(){
+  if(keypad.mode!=="dec") return;
+  if(keypad.buffer.includes(",")) return;
+  setBuffer(keypad.buffer + ",");
+}
+
+function backspace(){
+  if(keypad.buffer.length <= 1) { setBuffer("0"); return; }
+  const next = keypad.buffer.slice(0,-1);
+  if(next === "" || next === "-") setBuffer("0");
+  else setBuffer(next);
+}
+function clearBuf(){ setBuffer("0"); }
+
+function applyBuf(){
+  if(typeof keypad.onApply !== "function") { closeKeypad(); return; }
+
+  if(keypad.mode==="int"){
+    const v = clampInt(parseInt(keypad.buffer,10));
+    keypad.onApply(v);
+    closeKeypad();
+    return;
+  }
+
+  const s = normalizeDecString(keypad.buffer);
+  keypad.onApply(s);
+  closeKeypad();
+}
 
 btnClose.onclick = closeKeypad;
 btnClear.onclick = clearBuf;
@@ -680,12 +753,17 @@ modal.addEventListener("click", (e)=>{ if(e.target === modal) closeKeypad(); });
 window.addEventListener("keydown", (e)=>{
   if(!keypad.open) return;
 
-  if(e.key>="0" && e.key<="9"){ e.preventDefault(); pushDigit(e.key); return; }
-  if(e.key==="Backspace"){ e.preventDefault(); backspace(); return; }
-  if(e.key==="Delete"){ e.preventDefault(); clearBuf(); return; }
-  if(e.key.toLowerCase()==="c"){ e.preventDefault(); clearBuf(); return; }
-  if(e.key==="Escape"){ e.preventDefault(); closeKeypad(); return; }
-  if(e.key==="Enter"){ e.preventDefault(); applyBuf(); return; }
+  const k = e.key;
+
+  if(k>="0" && k<="9"){ e.preventDefault(); pushDigit(k); return; }
+  if(k==="Backspace"){ e.preventDefault(); backspace(); return; }
+  if(k==="Delete"){ e.preventDefault(); clearBuf(); return; }
+  if(k.toLowerCase()==="c"){ e.preventDefault(); clearBuf(); return; }
+  if(k==="Escape"){ e.preventDefault(); closeKeypad(); return; }
+  if(k==="Enter"){ e.preventDefault(); applyBuf(); return; }
+
+  // ✅ dec separator only in PP mode
+  if(keypad.mode==="dec" && (k==="," || k===".")){ e.preventDefault(); pushSep(","); return; }
 });
 
 /* =========================================================
@@ -776,7 +854,6 @@ const DUNGEONS = [
       { key:"Éklâme suprême", img:"Éklâme suprême.png" },
       { key:"Ceinture de Glourdorak", img:"ceinture glourdorak.png" },
     ],
-    // ✅ équipements dans Comtes/ + FIX rendu (on utilisera e.dir plus bas)
     equipments:[
       {key:"Coiffe du Comte Harebourg", img:"Coiffe du Comte Harebourg.png", dir:"Comtes/"},
       {key:"Anneau du Comte Harebourg", img:"Anneau du Comte Harebourg.png", dir:"Comtes/"},
@@ -1057,6 +1134,17 @@ const DUNGEONS = [
 ];
 
 /* =========================================================
+   ✅ Captures: uniquement Comte (Comptarbourg)
+   ========================================================= */
+const COMTE_CAPTURE = {
+  b4: {"Comte Harebourg":1,"Noctu":1,"Granduk":1,"Cyclo":1},
+  b5: {"Comte Harebourg":1,"Noctu":1,"Granduk":1,"Cyclo":1,"Strigide":1},
+  b6: {"Comte Harebourg":1,"Noctu":1,"Granduk":1,"Cyclo":1,"Strigide":1,"Sinistrofu":1},
+  b7: {"Comte Harebourg":1,"Noctu":2,"Granduk":1,"Cyclo":1,"Strigide":1,"Sinistrofu":1},
+  b8: {"Comte Harebourg":1,"Noctu":2,"Granduk":2,"Cyclo":1,"Strigide":1,"Sinistrofu":1},
+};
+
+/* =========================================================
    Storage per dungeon
    ========================================================= */
 const kDungeon = (id)=>`${LS_PREFIX}d:${id}`;
@@ -1065,7 +1153,7 @@ const kButin = (id)=>`${LS_PREFIX}butin:${id}`;
 function loadDungeon(id){
   try{
     const raw = localStorage.getItem(kDungeon(id));
-    if(!raw) return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0 };
+    if(!raw) return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0, captures:0 };
     const p = JSON.parse(raw);
     return {
       mobs: p.mobs||{},
@@ -1074,16 +1162,18 @@ function loadDungeon(id){
       eq: p.eq||{},
       eqP: p.eqP||{},
       runs: clampInt(p.runs ?? 0),
+      captures: clampInt(p.captures ?? 0), /* ✅ */
     };
   }catch{
-    return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0 };
+    return { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0, captures:0 };
   }
 }
 function saveDungeon(id, st){ localStorage.setItem(kDungeon(id), JSON.stringify(st)); }
 function ensureDungeonShape(d, st){
-  const out = st || { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0 };
+  const out = st || { mobs:{}, res:{}, resP:{}, eq:{}, eqP:{}, runs:0, captures:0 };
   out.mobs ||= {}; out.res ||= {}; out.resP ||= {}; out.eq ||= {}; out.eqP ||= {};
   out.runs = clampInt(out.runs ?? 0);
+  out.captures = clampInt(out.captures ?? 0);
 
   (d.mobs||[]).forEach(m=>{ if(!(m.key in out.mobs)) out.mobs[m.key]=0; });
   (d.resources||[]).forEach(r=>{ if(!(r.key in out.res)) out.res[r.key]=0; if(!(r.key in out.resP)) out.resP[r.key]=0; });
@@ -1095,10 +1185,9 @@ function loadButin(id){ return localStorage.getItem(kButin(id)) || "b8"; }
 function saveButin(id, b){ localStorage.setItem(kButin(id), b); }
 
 /* =========================================================
-   Songes (UPDATED: no hiding + bribes by intensity + 30 mini counters)
+   Songes (UNCHANGED)
    ========================================================= */
 const kSonges = `${LS_PREFIX}songes`;
-
 const SONGES = {
   intensities: [
     { id:"r1", label:"Rêve 1", img:"Reve 1.png", dir:"Songes/" },
@@ -1124,8 +1213,6 @@ const SONGES = {
     { key:"Corruption", img:"Légende de Corruption.png", dir:"Songes/" },
   ],
   bribesIcon: { key:"Bribes", img:"Bribe de rêve.png", dir:"Songes/" },
-
-  // ✅ 30 items légendaires (mini-compteurs) — dossier Songes/
   legendItems: [
     "Légende animale de Bakushana.png",
     "Légende animale de Kwakarticho.png",
@@ -1159,17 +1246,10 @@ const SONGES = {
     "Légende du Trompe-la-Mort.png",
   ]
 };
-
-function keyFromFile(filename){
-  return String(filename).replace(/\.[a-z0-9]+$/i, "");
-}
-
+function keyFromFile(filename){ return String(filename).replace(/\.[a-z0-9]+$/i, ""); }
 function blankSonges(){
   const s = { bribes:0, runs:{}, legends:{}, bribesI:{}, legendItems:{} };
-  SONGES.intensities.forEach(i=>{
-    s.runs[i.id]=0;
-    s.bribesI[i.id]=0;
-  });
+  SONGES.intensities.forEach(i=>{ s.runs[i.id]=0; s.bribesI[i.id]=0; });
   SONGES.legends.forEach(l=>s.legends[l.key]=0);
   SONGES.legendItems.forEach(f=> s.legendItems[keyFromFile(f)] = 0);
   return s;
@@ -1182,7 +1262,6 @@ function loadSonges(){
     const s = blankSonges();
 
     s.bribes = clampInt(p.bribes ?? 0);
-
     for(const i of SONGES.intensities){
       s.runs[i.id] = clampInt(p.runs?.[i.id] ?? 0);
       s.bribesI[i.id] = clampInt(p.bribesI?.[i.id] ?? 0);
@@ -1200,7 +1279,7 @@ function loadSonges(){
 function saveSonges(s){ localStorage.setItem(kSonges, JSON.stringify(s)); }
 
 /* =========================================================
-   PP (UNCHANGED CALC, UPDATED ICONS + "Shield authentificator")
+   PP
    ========================================================= */
 const PP_ICON = "Icône Calculateur PP.png";
 const kPP = `${LS_PREFIX}pp`;
@@ -1239,7 +1318,7 @@ function ppFinal(s){
 }
 
 /* =========================================================
-   Omega (UPDATED ICONS + message hidden)
+   Omega
    ========================================================= */
 const kOmega = `${LS_PREFIX}omega`;
 function loadOmega(){
@@ -1408,7 +1487,7 @@ function renderHome(){
 
       <div class="card">
         <div class="card-left">
-          <div class="thumb">📊</div>
+          <div class="thumb"><img class="navIcon" src="./Carac.png" alt=""></div>
           <div style="min-width:0">
             <h3>Statistiques</h3>
             <p>Vue globale : totals mobs/ressources/items + kamas</p>
@@ -1422,7 +1501,7 @@ function renderHome(){
           <div class="thumb"><img class="ppIcon" src="./Ic%C3%B4ne%20Calculateur%20PP.png" alt="PP"></div>
           <div style="min-width:0">
             <h3>Calcul PP</h3>
-            <p>Champs vides par défaut + pavé num</p>
+            <p>Champs vides par défaut + pavé num (décimales)</p>
           </div>
         </div>
         <div><button class="btn gold" onclick="location.hash='#/pp'">Ouvrir</button></div>
@@ -1484,6 +1563,7 @@ function renderDonjons(){
 function renderDungeon(d){
   const st = ensureDungeonShape(d, loadDungeon(d.id));
   const butin = loadButin(d.id);
+  const isComte = (d.id === "comte");
 
   const mobList = (d.mobs||[]).map(m=>{
     const v = clampInt(st.mobs[m.key]||0);
@@ -1560,12 +1640,19 @@ function renderDungeon(d){
         <button class="btn gold" data-act="runs:add">+ runs</button>
         <button class="btn" data-act="runs:pick">Saisir runs</button>
         <span class="pill">Runs: <b class="mono">${fmt.format(st.runs||0)}</b></span>
+
+        ${isComte ? `
+          <span class="pill">—</span>
+          <button class="btn gold" data-act="cap:add">+ capture</button>
+          <button class="btn" data-act="cap:pick">Saisir captures</button>
+          <span class="pill">Captures: <b class="mono">${fmt.format(st.captures||0)}</b></span>
+        ` : ``}
       </div>
 
       <div class="summary">
-        <div class="kpi"><div class="k"><img class="kamasIcon" style="opacity:0" src="./${encodeURI(ICONS.kamas)}" alt="">Mobs total</div><div class="v mono">${fmt.format(totalMobs)}</div></div>
-        <div class="kpi"><div class="k"><img class="kamasIcon" style="opacity:0" src="./${encodeURI(ICONS.kamas)}" alt="">Ressources total</div><div class="v mono">${fmt.format(totalResQty)}</div></div>
-        <div class="kpi"><div class="k"><img class="kamasIcon" style="opacity:0" src="./${encodeURI(ICONS.kamas)}" alt="">Équipements total</div><div class="v mono">${fmt.format(totalEqQty)}</div></div>
+        <div class="kpi"><div class="k">Mobs total</div><div class="v mono">${fmt.format(totalMobs)}</div></div>
+        <div class="kpi"><div class="k">Ressources total</div><div class="v mono">${fmt.format(totalResQty)}</div></div>
+        <div class="kpi"><div class="k">Équipements total</div><div class="v mono">${fmt.format(totalEqQty)}</div></div>
         <div class="kpi"><div class="k"><img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k">Kamas total</div><div class="v mono gold">${money(totalK)} <span class="kamasInline"><img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k"></span></div></div>
       </div>
     </div>
@@ -1620,20 +1707,32 @@ function renderDungeon(d){
     openKeypad("Nombre de runs à ajouter", lastRuns, (v)=>{
       lastRuns = v||1;
       applyRuns(d, st, lastRuns);
-    });
+    }, {mode:"int"});
   };
   handlers["runs:add"] = ()=>{ applyRuns(d, st, lastRuns || 1); };
+
+  // ✅ Capture uniquement Comte
+  let lastCaps = 1;
+  if(isComte){
+    handlers["cap:pick"] = ()=>{
+      openKeypad("Nombre de captures à ajouter", lastCaps, (v)=>{
+        lastCaps = v||1;
+        applyCapturesComte(st, v||1, loadButin(d.id));
+      }, {mode:"int"});
+    };
+    handlers["cap:add"] = ()=>{ applyCapturesComte(st, lastCaps || 1, loadButin(d.id)); };
+  }
 
   for(const m of d.mobs){
     handlers[`mob:+:${m.key}`] = ()=>{ st.mobs[m.key]=clampInt((st.mobs[m.key]||0)+1); saveDungeon(d.id, st); render(); };
     handlers[`mob:-:${m.key}`] = ()=>{ st.mobs[m.key]=clampInt((st.mobs[m.key]||0)-1); saveDungeon(d.id, st); render(); };
-    handlers[`mob:pick:${m.key}`] = ()=> openKeypad(m.key, st.mobs[m.key]||0, (v)=>{ st.mobs[m.key]=clampInt(v); saveDungeon(d.id, st); render(); });
+    handlers[`mob:pick:${m.key}`] = ()=> openKeypad(m.key, st.mobs[m.key]||0, (v)=>{ st.mobs[m.key]=clampInt(v); saveDungeon(d.id, st); render(); }, {mode:"int"});
   }
 
   for(const r of d.resources){
     handlers[`res:+:${r.key}`] = ()=>{ st.res[r.key]=clampInt((st.res[r.key]||0)+1); saveDungeon(d.id, st); render(); };
     handlers[`res:-:${r.key}`] = ()=>{ st.res[r.key]=clampInt((st.res[r.key]||0)-1); saveDungeon(d.id, st); render(); };
-    handlers[`res:pick:${r.key}`] = ()=> openKeypad(r.key, st.res[r.key]||0, (v)=>{ st.res[r.key]=clampInt(v); saveDungeon(d.id, st); render(); });
+    handlers[`res:pick:${r.key}`] = ()=> openKeypad(r.key, st.res[r.key]||0, (v)=>{ st.res[r.key]=clampInt(v); saveDungeon(d.id, st); render(); }, {mode:"int"});
     handlers[`res:price:${r.key}`] = (val)=>{
       const n = toNum(val);
       st.resP[r.key] = n>0 ? n : 0;
@@ -1645,7 +1744,7 @@ function renderDungeon(d){
   for(const e of d.equipments){
     handlers[`eq:+:${e.key}`] = ()=>{ st.eq[e.key]=clampInt((st.eq[e.key]||0)+1); saveDungeon(d.id, st); render(); };
     handlers[`eq:-:${e.key}`] = ()=>{ st.eq[e.key]=clampInt((st.eq[e.key]||0)-1); saveDungeon(d.id, st); render(); };
-    handlers[`eq:pick:${e.key}`] = ()=> openKeypad(e.key, st.eq[e.key]||0, (v)=>{ st.eq[e.key]=clampInt(v); saveDungeon(d.id, st); render(); });
+    handlers[`eq:pick:${e.key}`] = ()=> openKeypad(e.key, st.eq[e.key]||0, (v)=>{ st.eq[e.key]=clampInt(v); saveDungeon(d.id, st); render(); }, {mode:"int"});
     handlers[`eq:price:${e.key}`] = (val)=>{
       const n = toNum(val);
       st.eqP[e.key] = n>0 ? n : 0;
@@ -1671,8 +1770,21 @@ function applyRuns(d, st, runs){
   render();
 }
 
+function applyCapturesComte(st, captures, butin){
+  captures = clampInt(captures);
+  if(captures<=0) return;
+
+  const inc = COMTE_CAPTURE[butin] || {};
+  for(const [k,v] of Object.entries(inc)){
+    st.mobs[k] = clampInt((st.mobs[k]||0) + v*captures);
+  }
+  st.captures = clampInt((st.captures||0) + captures);
+  saveDungeon("comte", st);
+  render();
+}
+
 /* =========================================================
-   Songes (UPDATED)
+   Songes (UNCHANGED - ton code original)
    ========================================================= */
 const modalIntensity = $("#modalIntensity");
 const intGrid = $("#intGrid");
@@ -1689,7 +1801,6 @@ function openIntensityPicker(qty){
   intTitle.textContent = "Choisir l’intensité";
   modalIntensity.classList.add("open");
 
-  // build buttons
   intGrid.innerHTML = SONGES.intensities.map(it => `
     <button class="intBtn" data-int="${escapeHtml(it.id)}">
       <div class="i"><img data-dir="${escapeHtml(it.dir)}" data-file="${escapeHtml(it.img)}" alt=""></div>
@@ -1700,15 +1811,12 @@ function openIntensityPicker(qty){
     </button>
   `).join("");
 
-  // activate images & counts after renderSonges binds (safe here too)
   activateImages(modalIntensity);
 }
-
 function closeIntensityPicker(){
   pendingBribes = 0;
   modalIntensity.classList.remove("open");
 }
-
 intClose.onclick = closeIntensityPicker;
 intCancel.onclick = closeIntensityPicker;
 modalIntensity.addEventListener("click", (e)=>{ if(e.target === modalIntensity) closeIntensityPicker(); });
@@ -1743,7 +1851,6 @@ function renderSonges(){
     </div>
   `;
 
-  // ✅ No hiding: show ALL legends (even 0), no messages
   const legendsList = SONGES.legends.map(l=>{
     const v = clampInt(s.legends[l.key]||0);
     return renderCounterRow({
@@ -1753,7 +1860,6 @@ function renderSonges(){
     });
   }).join("");
 
-  // ✅ 30 mini counters
   const miniGrid = SONGES.legendItems.map(f=>{
     const k = keyFromFile(f);
     const v = clampInt(s.legendItems[k]||0);
@@ -1832,37 +1938,24 @@ function renderSonges(){
   for(const it of SONGES.intensities){
     handlers[`run:+:${it.id}`] = ()=>{ s.runs[it.id]=clampInt((s.runs[it.id]||0)+1); saveSonges(s); render(); };
     handlers[`run:-:${it.id}`] = ()=>{ s.runs[it.id]=clampInt((s.runs[it.id]||0)-1); saveSonges(s); render(); };
-    handlers[`run:pick:${it.id}`] = ()=> openKeypad(it.label, s.runs[it.id]||0, (v)=>{ s.runs[it.id]=clampInt(v); saveSonges(s); render(); });
+    handlers[`run:pick:${it.id}`] = ()=> openKeypad(it.label, s.runs[it.id]||0, (v)=>{ s.runs[it.id]=clampInt(v); saveSonges(s); render(); }, {mode:"int"});
   }
 
-  // ✅ Bribes: + / - stay fast, pick opens keypad then intensity picker
-  handlers["bribes:+"] = ()=>{
-    // fast +1 => ask intensity (still)
-    openIntensityPicker(1);
-  };
-  handlers["bribes:-"] = ()=>{
-    s.bribes = clampInt(s.bribes-1);
-    saveSonges(s);
-    render();
-  };
-  handlers["bribes:pick"] = ()=> openKeypad("Bribes", 0, (v)=>{
-    if(v<=0) return;
-    // open intensity picker to route bribes
-    openIntensityPicker(v);
-  });
+  handlers["bribes:+"] = ()=>{ openIntensityPicker(1); };
+  handlers["bribes:-"] = ()=>{ s.bribes = clampInt(s.bribes-1); saveSonges(s); render(); };
+  handlers["bribes:pick"] = ()=> openKeypad("Bribes", 0, (v)=>{ if(v>0) openIntensityPicker(v); }, {mode:"int"});
 
   for(const l of SONGES.legends){
     handlers[`leg:+:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)+1); saveSonges(s); render(); };
     handlers[`leg:-:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)-1); saveSonges(s); render(); };
-    handlers[`leg:pick:${l.key}`] = ()=> openKeypad(l.key, s.legends[l.key]||0, (v)=>{ s.legends[l.key]=clampInt(v); saveSonges(s); render(); });
+    handlers[`leg:pick:${l.key}`] = ()=> openKeypad(l.key, s.legends[l.key]||0, (v)=>{ s.legends[l.key]=clampInt(v); saveSonges(s); render(); }, {mode:"int"});
   }
 
-  // mini legend items
   for(const f of SONGES.legendItems){
     const k = keyFromFile(f);
     handlers[`li:+:${k}`] = ()=>{ s.legendItems[k]=clampInt((s.legendItems[k]||0)+1); saveSonges(s); render(); };
     handlers[`li:-:${k}`] = ()=>{ s.legendItems[k]=clampInt((s.legendItems[k]||0)-1); saveSonges(s); render(); };
-    handlers[`li:pick:${k}`] = ()=> openKeypad(k, s.legendItems[k]||0, (v)=>{ s.legendItems[k]=clampInt(v); saveSonges(s); render(); });
+    handlers[`li:pick:${k}`] = ()=> openKeypad(k, s.legendItems[k]||0, (v)=>{ s.legendItems[k]=clampInt(v); saveSonges(s); render(); }, {mode:"int"});
   }
 
   $("#btnResetSonges").onclick = ()=>{
@@ -1873,8 +1966,6 @@ function renderSonges(){
 
   bindActions(app, handlers);
 
-  // ===== intensity modal binding =====
-  // update counts shown inside modal
   const refreshModalCounts = ()=>{
     for(const it of SONGES.intensities){
       const el = document.getElementById(`bI:${it.id}`);
@@ -1882,38 +1973,6 @@ function renderSonges(){
     }
   };
 
-  // click choose intensity
-  app.addEventListener("click", ()=>{}); // keep passive
-
-  // open modal only if pending was set by handlers
-  const openIfPending = ()=>{
-    if(!modalIntensity.classList.contains("open")) return;
-    refreshModalCounts();
-    intGrid.querySelectorAll("[data-int]").forEach(btn=>{
-      btn.onclick = ()=>{
-        const id = btn.dataset.int;
-        if(!id || pendingBribes<=0) return;
-        const qty = clampInt(pendingBribes);
-
-        // apply to total + intensity
-        s.bribes = clampInt(s.bribes + qty);
-        s.bribesI[id] = clampInt((s.bribesI[id]||0) + qty);
-
-        saveSonges(s);
-        closeIntensityPicker();
-        render();
-      };
-    });
-  };
-
-  // if openIntensityPicker called, modal is open now
-  if(modalIntensity.classList.contains("open")){
-    refreshModalCounts();
-    openIfPending();
-  }
-
-  // intercept openIntensityPicker calls: render modal with fresh state
-  // (we rebuild modal on demand here)
   const originalOpen = openIntensityPicker;
   window.openIntensityPicker = (qty)=>{
     originalOpen(qty);
@@ -1936,13 +1995,12 @@ function renderSonges(){
 }
 
 /* =========================================================
-   Stats (UPDATED: icons + remove types legends + total legends pictos + Top ressources by avg price)
+   Stats (✅ Top ressources corrigé: valeur totale q*p partout)
    ========================================================= */
 function renderStats(){
   pagePill.textContent = "Stats";
 
   let mobsTotal=0, resQty=0, eqQty=0, kamasTotal=0;
-
   const resAgg = [];
   const eqAgg = [];
 
@@ -1951,55 +2009,39 @@ function renderStats(){
     kamasTotal += sumKamasFromDungeon(d, st);
 
     for(const m of d.mobs){
-      const v = clampInt(st.mobs[m.key]||0);
-      mobsTotal += v;
+      mobsTotal += clampInt(st.mobs[m.key]||0);
     }
     for(const r of d.resources){
       const q = clampInt(st.res[r.key]||0);
       const p = toNum(st.resP[r.key]||0);
       resQty += q;
-      resAgg.push({d, dir:d.imgDir, name:r.key, img:r.img, q, p});
+      resAgg.push({dir:d.imgDir, name:r.key, img:r.img, q, p, total:q*p});
     }
     for(const e of d.equipments){
       const q = clampInt(st.eq[e.key]||0);
       const p = toNum(st.eqP[e.key]||0);
       eqQty += q;
-      eqAgg.push({d, dir:(e.dir || d.imgDir), name:e.key, img:e.img, q, p});
+      eqAgg.push({dir:(e.dir||d.imgDir), name:e.key, img:e.img, q, p, total:q*p});
     }
   }
 
   const s = loadSonges();
   const runsTotal = Object.values(s.runs).reduce((a,b)=>a+clampInt(b),0);
-
   const totalLegends = Object.values(s.legends).reduce((a,b)=>a+clampInt(b),0);
 
-  // legends pictos row (only if >0)
-  const legendPictos = SONGES.legends
-    .filter(l => clampInt(s.legends[l.key]||0) > 0)
-    .map(l=>{
-      const v = clampInt(s.legends[l.key]||0);
-      return `
-        <span class="pill" style="max-width:none">
-          <img class="navIcon" data-dir="${escapeHtml(l.dir)}" data-file="${escapeHtml(l.img)}" alt="">
-          <b class="mono">${fmt.format(v)}</b>
-        </span>
-      `;
-    }).join("");
-
-  function statCard(title, sub, value, iconHtml){
+  function statCard(title, value){
     return `
       <div class="kpi">
-        <div class="k">${iconHtml||""}${escapeHtml(title)}</div>
+        <div class="k">${escapeHtml(title)}</div>
         <div class="v mono ${title.toLowerCase().includes("kamas")?'gold':''}">${value}</div>
-        ${sub?`<div class="hint" style="margin:8px 0 0">${sub}</div>`:""}
       </div>
     `;
   }
 
-  // ✅ Top ressources by avg price (p), take top 10, only where p>0
+  // ✅ Top ressources par valeur totale (q * prix/u)
   const topRes = resAgg
-    .filter(x => toNum(x.p) > 0)
-    .sort((a,b)=>toNum(b.p)-toNum(a.p))
+    .filter(x => x.total > 0)
+    .sort((a,b)=>b.total - a.total)
     .slice(0, 10);
 
   const hero = topRes[0] || null;
@@ -2009,16 +2051,16 @@ function renderStats(){
     <div class="section">
       <div class="topline">
         <div class="title">
-          <div class="thumb" style="width:44px;height:44px">📊</div>
+          <div class="thumb" style="width:44px;height:44px"><img class="navIcon" src="./Carac.png" alt=""></div>
           <div><h2>Statistiques</h2><p class="sub">Récap global propre en 1 page</p></div>
         </div>
       </div>
 
       <div class="summary">
-        ${statCard("Mobs total", "", fmt.format(mobsTotal), "")}
-        ${statCard("Ressources total", "", fmt.format(resQty), "")}
-        ${statCard("Équipements total", "", fmt.format(eqQty), "")}
-        ${statCard("Kamas total", "", `${money(kamasTotal)} ${kamasInlineHtml("")}`, `<img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k">`)}
+        ${statCard("Mobs total", fmt.format(mobsTotal))}
+        ${statCard("Ressources total", fmt.format(resQty))}
+        ${statCard("Équipements total", fmt.format(eqQty))}
+        ${statCard("Kamas total", `${money(kamasTotal)} ${kamasInlineHtml("")}`)}
       </div>
     </div>
 
@@ -2031,9 +2073,10 @@ function renderStats(){
           </div>
         </div>
         <div class="summary">
-          ${statCard("Runs total", "", fmt.format(runsTotal), `<img class="navIcon" src="./${encodeURI(ICONS.runs)}" alt="">`)}
-          ${statCard("Bribes", "", fmt.format(s.bribes), `<img class="navIcon" src="./${encodeURI(ICONS.bribesLeg)}" alt="">`)}
-          ${statCard("Total légendes", legendPictos ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${legendPictos}</div>` : "", fmt.format(totalLegends), "")}
+          ${statCard("Runs total", fmt.format(runsTotal))}
+          ${statCard("Bribes", fmt.format(s.bribes))}
+          ${statCard("Total légendes", fmt.format(totalLegends))}
+          ${statCard("Kamas total", `${money(kamasTotal)} ${kamasInlineHtml("")}`)}
         </div>
       </div>
 
@@ -2041,7 +2084,7 @@ function renderStats(){
         <div class="topline">
           <div class="title">
             <div class="thumb" style="width:44px;height:44px">🏆</div>
-            <div><h2>Top ressources</h2><p class="sub">Top prix moyen (décroissant)</p></div>
+            <div><h2>Top ressources</h2><p class="sub">par valeur totale (quantité × prix/u)</p></div>
           </div>
         </div>
 
@@ -2053,12 +2096,12 @@ function renderStats(){
                   <div class="ico"><img data-dir="${escapeHtml(hero.dir)}" data-file="${escapeHtml(hero.img)}" alt=""></div>
                   <div class="name">
                     <p class="n">${escapeHtml(hero.name)}</p>
-                    <p class="m">Prix moyen</p>
+                    <p class="m">Valeur totale</p>
                   </div>
                 </div>
-                <div class="price">${kamasInlineHtml(money(hero.p))}</div>
+                <div class="price">${kamasInlineHtml(money(hero.total))}</div>
               </div>
-            ` : `<div class="hint">Aucun prix moyen encore (mets des prix/u sur des ressources).</div>`
+            ` : `<div class="hint">Aucune valeur (mets des quantités + prix/u sur des ressources).</div>`
           }
 
           ${
@@ -2067,7 +2110,7 @@ function renderStats(){
                 ${others.map(x=>`
                   <div class="topResMini">
                     <div class="ico"><img data-dir="${escapeHtml(x.dir)}" data-file="${escapeHtml(x.img)}" alt=""></div>
-                    <div class="p">${kamasInlineHtml(money(x.p))}</div>
+                    <div class="p">${kamasInlineHtml(money(x.total))}</div>
                   </div>
                 `).join("")}
               </div>
@@ -2113,7 +2156,7 @@ function renderStats(){
 }
 
 /* =========================================================
-   PP (UPDATED icons + Shield rename)
+   PP (✅ décimales + icon challenge)
    ========================================================= */
 function renderPP(){
   pagePill.textContent = "PP";
@@ -2197,12 +2240,13 @@ function renderPP(){
 
   for(const key of Object.keys(labels)){
     handlers[`pp:pick:${key}`] = ()=>{
-      const cur = s[key]==="" ? 0 : clampInt(toNum(s[key]));
-      openKeypad(labels[key], cur, (v)=>{
-        s[key] = (v===0 ? "" : String(v));
+      const cur = (s[key]==="" ? "0" : String(s[key]));
+      openKeypad(labels[key], cur, (valStr)=>{
+        const n = toNum(valStr);
+        s[key] = (n===0 ? "" : String(valStr).replace(".", ","));
         savePP(s);
         render();
-      });
+      }, {mode:"dec"}); // ✅ decimals only here
     };
   }
 
@@ -2216,7 +2260,7 @@ function renderPP(){
 }
 
 /* =========================================================
-   Omega (UPDATED icons + message removed)
+   Omega (✅ XP tuile plus large)
    ========================================================= */
 function renderOmega(){
   pagePill.textContent = "Oméga";
@@ -2264,7 +2308,7 @@ function renderOmega(){
               <div><h2>XP requise</h2><p class="sub">entre actuel et objectif</p></div>
             </div>
           </div>
-          <div class="summary">
+          <div class="summary omegaSummary">
             <div class="kpi">
               <div class="k">XP totale</div>
               <div class="v mono gold">${money(xp)}</div>
@@ -2280,8 +2324,8 @@ function renderOmega(){
   `;
 
   const handlers = {};
-  handlers["om:cur"] = ()=> openKeypad("Oméga actuel", s.cur, (v)=>{ s.cur=clampInt(v); saveOmega(s); render(); });
-  handlers["om:tar"] = ()=> openKeypad("Oméga objectif", s.target, (v)=>{ s.target=clampInt(v); saveOmega(s); render(); });
+  handlers["om:cur"] = ()=> openKeypad("Oméga actuel", s.cur, (v)=>{ s.cur=clampInt(v); saveOmega(s); render(); }, {mode:"int"});
+  handlers["om:tar"] = ()=> openKeypad("Oméga objectif", s.target, (v)=>{ s.target=clampInt(v); saveOmega(s); render(); }, {mode:"int"});
 
   $("#btnResetOmega").onclick = ()=>{
     if(!confirm("Reset Oméga ? (0/0)")) return;
