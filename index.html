@@ -1213,17 +1213,7 @@ const SONGES = {
     { id:"c2", label:"Cauchemar 2", img:"Cauchemar 2.png", dir:"Songes/" },
     { id:"c3", label:"Cauchemar 3", img:"Cauchemar 3.png", dir:"Songes/" },
   ],
-  legends: [
-    { key:"Oto Mustam", img:"Légende d'Oto Mustam.png", dir:"Songes/" },
-    { key:"Menalt", img:"Légende de Menalt.png", dir:"Songes/" },
-    { key:"Mériana", img:"Légende de Mériana.png", dir:"Songes/" },
-    { key:"Jahash", img:"Légende de Jahash Jurgen.png", dir:"Songes/" },
-    { key:"Amayiro", img:"Légende d'Amayiro.png", dir:"Songes/" },
-    { key:"Servitude", img:"Légende de Servitude.png", dir:"Songes/" },
-    { key:"Guerre", img:"Légende de Guerre.png", dir:"Songes/" },
-    { key:"Misère", img:"Légende de Misère.png", dir:"Songes/" },
-    { key:"Corruption", img:"Légende de Corruption.png", dir:"Songes/" },
-  ],
+  
   bribesIcon: { key:"Bribes", img:"Bribe de rêve.png", dir:"Songes/" },
   legendItems: [
     "Légende animale de Bakushana.png",
@@ -1426,13 +1416,14 @@ function renderCounterRow({dir, img, name, sub, value, onMinus, onPlus, onPick})
       </div>
 
       <div class="ctrls">
-        <button class="btn small" data-act="${onPlus}">+</button>
-        <div class="num mono" data-act="${onPick}">${fmt.format(value)}</div>
         <button class="btn small" data-act="${onMinus}">-</button>
+        <div class="num mono" data-act="${onPick}">${fmt.format(value)}</div>
+        <button class="btn small" data-act="${onPlus}">+</button>
       </div>
     </div>
   `;
 }
+
 
 function renderPricedRow({dir, img, name, qty, price, subtotal, onMinus, onPlus, onPickQty, onPickPrice}){
   return `
@@ -1442,10 +1433,11 @@ function renderPricedRow({dir, img, name, qty, price, subtotal, onMinus, onPlus,
         <p class="n">${escapeHtml(name)}</p>
         <p class="m">Sous-total: ${kamasInlineHtml(money(subtotal))}</p>
       </div>
-      <div class="ctrls">
-        <button class="btn small" data-act="${onMinus}">-</button>
-        <div class="num mono" data-act="${onPickQty}">${fmt.format(qty)}</div>
-        <button class="btn small" data-act="${onPlus}">+</button>
+<div class="ctrls">
+  <button class="btn small" data-act="li:-:${escapeHtml(k)}">-</button>
+  <div class="num mono" data-act="li:pick:${escapeHtml(k)}">${fmt.format(v)}</div>
+  <button class="btn small" data-act="li:+:${escapeHtml(k)}">+</button>
+</div>
 
         <input class="price mono" data-act="${onPickPrice}" inputmode="decimal"
           value="${price?String(price).replace(".", ","):""}" placeholder="prix/u">
@@ -1868,14 +1860,6 @@ function renderSonges(){
     </div>
   `;
 
-  const legendsList = SONGES.legends.map(l=>{
-    const v = clampInt(s.legends[l.key]||0);
-    return renderCounterRow({
-      dir:l.dir, img:l.img, name:l.key, sub:"",
-      value:v,
-      onMinus:`leg:-:${l.key}`, onPlus:`leg:+:${l.key}`, onPick:`leg:pick:${l.key}`
-    });
-  }).join("");
 
  const miniGrid = SONGES.legendItems.map(f=>{
   const k = keyFromFile(f);
@@ -1958,8 +1942,6 @@ app.innerHTML = `
 
       <div class="list">${bribesRow}</div>
 
-      <div class="hint"><b>Légendes (grosses)</b> :</div>
-      <div class="list">${legendsList}</div>
 
       <div class="hint"><b>Items légendaires</b> (mini-compteurs) :</div>
       <div class="miniLegendGrid">${miniGrid}</div>
@@ -1980,11 +1962,6 @@ app.innerHTML = `
   handlers["bribes:-"] = ()=>{ s.bribes = clampInt(s.bribes-1); saveSonges(s); render(); };
   handlers["bribes:pick"] = ()=> openKeypad("Bribes", 0, (v)=>{ if(v>0) openIntensityPicker(v); }, {mode:"int"});
 
-  for(const l of SONGES.legends){
-    handlers[`leg:+:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)+1); saveSonges(s); render(); };
-    handlers[`leg:-:${l.key}`] = ()=>{ s.legends[l.key]=clampInt((s.legends[l.key]||0)-1); saveSonges(s); render(); };
-    handlers[`leg:pick:${l.key}`] = ()=> openKeypad(l.key, s.legends[l.key]||0, (v)=>{ s.legends[l.key]=clampInt(v); saveSonges(s); render(); }, {mode:"int"});
-  }
 
   for(const f of SONGES.legendItems){
     const k = keyFromFile(f);
