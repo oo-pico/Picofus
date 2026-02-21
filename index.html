@@ -377,6 +377,9 @@
           <img class="navIcon" src="./Baguette%20Range.png" alt="Songes">
         </button>
 
+<button class="btn small" id="btnAnomalie" title="Anomalie">
+<img class="navIcon" src="./Anomalie/Ic%C3%B4ne%20anomalie.png" alt="Anomalie">
+</button>
         <!-- ✅ Stats picto -->
         <button class="btn small" id="btnStats" title="Stats">
           <img class="navIcon" src="./Carac.png" alt="Stats">
@@ -475,6 +478,78 @@ function escapeHtml(s){
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
+/* =========================================================
+   ✅ THOUSANDS SEPARATOR (FR) - 1 bloc à copier/coller
+   - Format visuel : 1234567 -> 1 234 567
+   - Compatible avec tes calculs (toNum enlève déjà les espaces)
+   ========================================================= */
+
+// 1) Séparateur de milliers pour tout affichage (div.num, totals, etc.)
+// => tu l'as déjà via fmt.format(...)
+// (rien à changer si tu utilises bien fmt.format partout)
+
+
+// 2) Auto-format des INPUT prix/u au blur (et Enter)
+function formatInputThousands(inputEl){
+  if(!inputEl) return;
+
+  // Empêche les formats chelous : on garde chiffres + , .
+  const raw = String(inputEl.value ?? "").trim();
+  if(raw === "") return;
+
+  // On parse via toNum (qui supporte virgule et enlève espaces)
+  const n = toNum(raw);
+  if(!Number.isFinite(n) || n <= 0){
+    inputEl.value = "";
+    return;
+  }
+
+  // Si c'est un entier -> on met 1 234 567
+  // Si décimal -> 1 234 567,89 (max 2 décimales)
+  const isInt = Math.abs(n - Math.round(n)) < 1e-9;
+
+  if(isInt){
+    inputEl.value = fmt.format(Math.round(n));
+  }else{
+    // 2 décimales max, sans forcer les zéros
+    const fixed = n.toFixed(2).replace(".", ",");            // "1234,50"
+    const [a,b] = fixed.split(",");
+    const aFmt = fmt.format(parseInt(a,10) || 0);           // "1 234"
+    const bTrim = (b || "").replace(/0+$/,"");              // "5" ou "" si .00
+    inputEl.value = bTrim ? `${aFmt},${bTrim}` : aFmt;
+  }
+}
+
+// 3) Branche ça sur TOUS les inputs prix/u actuels (et futurs)
+function enableThousandsOnPrices(root=document){
+  root.querySelectorAll('input.price').forEach(inp=>{
+    if(inp.dataset.thousands === "1") return;
+    inp.dataset.thousands = "1";
+
+    // Enter = blur (donc format)
+    inp.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){
+        e.preventDefault();
+        inp.blur();
+      }
+    });
+
+    // Blur = format
+    inp.addEventListener("blur", ()=>{
+      formatInputThousands(inp);
+      // On déclenche un change pour que ton handler data-act récupère la valeur formatée
+      inp.dispatchEvent(new Event("change", { bubbles:true }));
+    });
+  });
+}
+
+// 4) Hook propre : après chaque render/bind, on ré-active
+// 👉 Ajoute juste cette ligne à la FIN de bindActions(container, handlers)
+const _bindActions = bindActions;
+bindActions = function(container, handlers){
+  _bindActions(container, handlers);
+  enableThousandsOnPrices(container);
+};
 }
 
 /* =========================================================
@@ -634,153 +709,187 @@ function activateImages(container, defaultDir){
     setImgWithFallback(img, img.dataset.dir || defaultDir || "", img.dataset.file || "");
   });
 }
-
 /* =========================================================
-   Keypad (int + decimal mode ONLY when needed)
+   Keypad (✅ FIX 50 -> 150 + décimales) - UNIQUE
+   Compatible avec TON HTML modal (#kbdClose/#kbdOk etc.)
    ========================================================= */
 const modal = $("#modal");
 const kbdTarget = $("#kbdTarget");
-const kbdValue = $("#kbdValue");
-const kbdGrid = $("#kbdGrid");
-const btnClose = $("#kbdClose");
-const btnClear = $("#kbdClear");
-const btnBack = $("#kbdBack");
-const btnOk = $("#kbdOk");
+const kbdValue  = $("#kbdValue");
+const kbdGrid   = $("#kbdGrid");
+const btnClose  = $("#kbdClose");
+const btnClear  = $("#kbdClear");
+const btnBack   = $("#kbdBack");
+const btnOk     = $("#kbdOk");
 
-let keypad = { open:false, buffer:"0", onApply:null, title:"", mode:"int" };
+let keypad = {
+  open:false,
+  mode:"int",        // "int" ou "dec"
+  buffer:"0",        // string affichée
+  fresh:true,        // ✅ 1er chiffre remplace la valeur
+  onApply:null
+};
 
-function buildKeypadGrid(){
-  kbdGrid.innerHTML = "";
-  for(let i=1;i<=9;i++){
-    const b = document.createElement("button");
-    b.className = "kbd-key";
-    b.textContent = String(i);
-    b.onclick = ()=>pushDigit(String(i));
-    kbdGrid.appendChild(b);
-  }
-
-  if(keypad.mode === "dec"){
-    const comma = document.createElement("button");
-    comma.className="kbd-key";
-    comma.textContent=",";
-    comma.onclick = ()=>pushSep(",");
-    const zero = document.createElement("button");
-    zero.className="kbd-key"; zero.textContent="0"; zero.onclick=()=>pushDigit("0");
-    const blank = document.createElement("div");
-    kbdGrid.append(comma, zero, blank);
-  }else{
-    const blank1 = document.createElement("div");
-    const zero = document.createElement("button");
-    zero.className="kbd-key"; zero.textContent="0"; zero.onclick=()=>pushDigit("0");
-    const blank2 = document.createElement("div");
-    kbdGrid.append(blank1, zero, blank2);
-  }
+function setBuffer(s){
+  keypad.buffer = String(s ?? "0");
+  if(keypad.buffer === "") keypad.buffer = "0";
+  kbdValue.textContent = keypad.buffer;
 }
 
 function openKeypad(title, currentValue, onApply, opts={}){
   keypad.open = true;
-  keypad.title = title;
-  keypad.onApply = onApply;
   keypad.mode = (opts.mode === "dec") ? "dec" : "int";
+  keypad.onApply = onApply;
 
-  const cur = (currentValue === "" || currentValue === null || currentValue === undefined) ? "0" : String(currentValue);
-  keypad.buffer = (keypad.mode==="int")
-    ? String(clampInt(cur))
-    : normalizeDecString(cur);
+  // ✅ On affiche la valeur actuelle, mais 1er digit = remplace (fresh=true)
+  keypad.fresh = true;
+  setBuffer(
+    (currentValue === "" || currentValue === null || currentValue === undefined)
+      ? "0"
+      : String(currentValue).replace(".", ",")
+  );
 
-  kbdTarget.textContent = title;
-  kbdValue.textContent = keypad.buffer;
+  kbdTarget.textContent = title || "—";
   buildKeypadGrid();
   modal.classList.add("open");
 }
 
-function normalizeDecString(s){
-  s = String(s).trim();
-  if(!s) return "0";
-  s = s.replace(".", ",");
-  s = s.replace(/[^\d,]/g, "");
-  const parts = s.split(",");
-  const a = parts[0] || "0";
-  const b = (parts[1] || "").slice(0,2);
-  return b.length ? `${stripLeadingZeros(a)},${b}` : stripLeadingZeros(a);
-}
-function stripLeadingZeros(a){
-  a = String(a).replace(/^0+(?=\d)/, "");
-  return a === "" ? "0" : a;
+function closeKeypad(){
+  keypad.open = false;
+  modal.classList.remove("open");
 }
 
-function closeKeypad(){ keypad.open = false; modal.classList.remove("open"); }
-function setBuffer(v){ keypad.buffer = v; kbdValue.textContent = keypad.buffer; }
+function clearKeypad(){
+  keypad.fresh = true;
+  setBuffer("0");
+}
 
-function pushDigit(d){
-  if(keypad.mode==="int"){
-    if(keypad.buffer === "0") setBuffer(String(d));
-    else setBuffer(keypad.buffer + String(d));
-    return;
-  }
-  // dec
-  let s = keypad.buffer;
-  if(s === "0") s = "";
-  if(s.includes(",")){
-    const [a,b] = s.split(",");
-    if((b||"").length >= 2) return;
-    setBuffer((a||"0") + "," + ((b||"") + d).slice(0,2));
-  }else{
-    setBuffer(stripLeadingZeros(s + d));
-  }
+function backspaceKeypad(){
+  keypad.fresh = false;
+  let s = keypad.buffer || "0";
+  s = s.slice(0, -1);
+  if(s === "" || s === "-" || s === ",") s = "0";
+  setBuffer(s);
 }
 
 function pushSep(){
-  if(keypad.mode!=="dec") return;
-  if(keypad.buffer.includes(",")) return;
-  setBuffer(keypad.buffer + ",");
+  if(keypad.mode !== "dec") return;
+  keypad.fresh = false;
+  let s = keypad.buffer || "0";
+  if(!s.includes(",")) setBuffer(s + ",");
 }
 
-function backspace(){
-  if(keypad.buffer.length <= 1) { setBuffer("0"); return; }
-  const next = keypad.buffer.slice(0,-1);
-  if(next === "" || next === "-") setBuffer("0");
-  else setBuffer(next);
-}
-function clearBuf(){ setBuffer("0"); }
+function pushDigit(d){
+  d = String(d);
 
-function applyBuf(){
-  if(typeof keypad.onApply !== "function") { closeKeypad(); return; }
-
-  if(keypad.mode==="int"){
-    const v = clampInt(parseInt(keypad.buffer,10));
-    keypad.onApply(v);
-    closeKeypad();
+  // ✅ 1er chiffre : remplace tout (corrige 50->150)
+  if(keypad.fresh){
+    keypad.fresh = false;
+    if(keypad.mode === "dec"){
+      setBuffer(d); // ex: "6"
+    }else{
+      setBuffer(d);
+    }
     return;
   }
 
-  const s = normalizeDecString(keypad.buffer);
-  keypad.onApply(s);
+  if(keypad.mode === "int"){
+    const s = keypad.buffer || "0";
+    if(s === "0") setBuffer(d);
+    else setBuffer(s + d);
+    return;
+  }
+
+  // mode dec
+  let s = keypad.buffer || "0";
+
+  // si on a déjà une virgule, on limite à 2 décimales
+  if(s.includes(",")){
+    const [a, b=""] = s.split(",");
+    if(b.length >= 2) return;
+    setBuffer(a + "," + (b + d));
+  }else{
+    // pas de virgule => concat normal
+    if(s === "0") setBuffer(d);
+    else setBuffer(s + d);
+  }
+}
+
+function applyKeypad(){
+  let s = (keypad.buffer || "0").trim();
+
+  if(keypad.mode === "int"){
+    const n = parseInt(s.replace(/\s/g,""), 10);
+    keypad.onApply && keypad.onApply(Number.isFinite(n) ? n : 0);
+  }else{
+    const n = parseFloat(s.replace(/\s/g,"").replace(",", "."));
+    keypad.onApply && keypad.onApply(Number.isFinite(n) ? n : 0);
+  }
+
   closeKeypad();
 }
 
-btnClose.onclick = closeKeypad;
-btnClear.onclick = clearBuf;
-btnBack.onclick = backspace;
-btnOk.onclick = applyBuf;
-modal.addEventListener("click", (e)=>{ if(e.target === modal) closeKeypad(); });
+function buildKeypadGrid(){
+  kbdGrid.innerHTML = "";
 
+  // 1..9
+  for(let i=1;i<=9;i++){
+    const b = document.createElement("button");
+    b.className = "kbd-key";
+    b.textContent = String(i);
+    b.onclick = ()=>pushDigit(i);
+    kbdGrid.appendChild(b);
+  }
+
+  // dernière ligne
+  if(keypad.mode === "dec"){
+    const comma = document.createElement("button");
+    comma.className = "kbd-key";
+    comma.textContent = ",";
+    comma.onclick = pushSep;
+
+    const zero = document.createElement("button");
+    zero.className = "kbd-key";
+    zero.textContent = "0";
+    zero.onclick = ()=>pushDigit(0);
+
+    const empty = document.createElement("div");
+
+    kbdGrid.append(comma, zero, empty);
+  }else{
+    const empty1 = document.createElement("div");
+    const zero = document.createElement("button");
+    zero.className = "kbd-key";
+    zero.textContent = "0";
+    zero.onclick = ()=>pushDigit(0);
+    const empty2 = document.createElement("div");
+
+    kbdGrid.append(empty1, zero, empty2);
+  }
+}
+
+// boutons du modal
+btnClose.onclick = closeKeypad;
+btnClear.onclick = clearKeypad;
+btnBack.onclick  = backspaceKeypad;
+btnOk.onclick    = applyKeypad;
+
+// click sur l’overlay = ferme
+modal.addEventListener("click", (e)=>{
+  if(e.target === modal) closeKeypad();
+});
+
+// clavier physique (optionnel mais pratique)
 window.addEventListener("keydown", (e)=>{
   if(!keypad.open) return;
 
-  const k = e.key;
-
-  if(k>="0" && k<="9"){ e.preventDefault(); pushDigit(k); return; }
-  if(k==="Backspace"){ e.preventDefault(); backspace(); return; }
-  if(k==="Delete"){ e.preventDefault(); clearBuf(); return; }
-  if(k.toLowerCase()==="c"){ e.preventDefault(); clearBuf(); return; }
-  if(k==="Escape"){ e.preventDefault(); closeKeypad(); return; }
-  if(k==="Enter"){ e.preventDefault(); applyBuf(); return; }
-
-  // ✅ dec separator only in PP mode
-  if(keypad.mode==="dec" && (k==="," || k===".")){ e.preventDefault(); pushSep(","); return; }
+  if(e.key >= "0" && e.key <= "9"){ e.preventDefault(); pushDigit(e.key); }
+  else if(e.key === "Backspace"){ e.preventDefault(); backspaceKeypad(); }
+  else if(e.key === "Enter"){ e.preventDefault(); applyKeypad(); }
+  else if(e.key === "Escape"){ e.preventDefault(); closeKeypad(); }
+  else if((e.key === "," || e.key === ".") && keypad.mode==="dec"){ e.preventDefault(); pushSep(); }
+  else if(e.key === "Delete"){ e.preventDefault(); clearKeypad(); }
 });
-
 /* =========================================================
    Data: Donjons  (UNCHANGED)
    ========================================================= */
@@ -1579,6 +1688,88 @@ function loadButin(id){ return localStorage.getItem(kButin(id)) || "b8"; }
 function saveButin(id, b){ localStorage.setItem(kButin(id), b); }
 
 /* =========================================================
+   Anomalie (11 boss) + ressources globales partagées
+   - Boss: compteur par boss
+   - Ressources: 1 seul inventaire global (quantité + prix/u)
+   ========================================================= */
+
+const ANOMALY_DIR = "Anomalie/";
+
+// Ressources globales (identiques pour tous)
+const ANOMALY_RESOURCES = [
+  { key:"Relique de Bébémoth", img:"Relique de Bébémoth.png" },
+  { key:"Boucle intemporelle", img:"Boucle intemporelle.png" },
+  { key:"Boucle temporelle", img:"Boucle temporelle.png" },
+  { key:"Fragment d'anomalie", img:"Fragment d'anomalie.png" },
+];
+
+// 11 boss
+const ANOMALIES = [
+  { id:"corbeau_noir", name:"Corbeau Noir", img:"Corbeau Noir.png" },
+  { id:"percimol", name:"Percimol", img:"Percimol.png" },
+  { id:"dathura", name:"Dathura", img:"Dathura.png" },
+  { id:"champion_aurore_pourpre", name:"Champion de l'Aurore Pourpre", img:"Champion de l'Aurore Pourpre.png" },
+  { id:"leorictus_roi_grimacant", name:"Léorictus le Roi Grimaçant", img:"Léorictus le Roi Grimaçant.png" },
+  { id:"julith", name:"Julith", img:"Julith.png" },
+  { id:"larve_rushu", name:"Larve de Rushu", img:"Larve de Rushu.png" },
+  { id:"qilby", name:"Qilby", img:"Qilby.png" },
+  { id:"agonie_la_deteree", name:"Agonie la Déterrée", img:"Agonie la Déterrée.png" },
+  { id:"shuccube", name:"Shuccube", img:"Shuccube.png" },
+  { id:"noximilien_horloger", name:"Noximilien l'Horloger", img:"Noximilien l'Horloger.png" },
+];
+
+// Storage keys
+const kAnomBoss = (id)=>`${LS_PREFIX}anom:boss:${id}`;
+const kAnomRes  = `${LS_PREFIX}anom:res`;
+
+function loadAnomBoss(id){
+  try{
+    const raw = localStorage.getItem(kAnomBoss(id));
+    return clampInt(raw ?? 0);
+  }catch{ return 0; }
+}
+function saveAnomBoss(id, v){
+  localStorage.setItem(kAnomBoss(id), String(clampInt(v)));
+}
+
+function blankAnomRes(){
+  const st = { res:{}, resP:{} };
+  for(const r of ANOMALY_RESOURCES){
+    st.res[r.key]=0;
+    st.resP[r.key]=0;
+  }
+  return st;
+}
+function loadAnomRes(){
+  try{
+    const raw = localStorage.getItem(kAnomRes);
+    if(!raw) return blankAnomRes();
+    const p = JSON.parse(raw);
+    const st = blankAnomRes();
+    st.res = {...st.res, ...(p.res||{})};
+    st.resP = {...st.resP, ...(p.resP||{})};
+    // clamp
+    for(const k of Object.keys(st.res)) st.res[k]=clampInt(st.res[k]);
+    for(const k of Object.keys(st.resP)) st.resP[k]=toNum(st.resP[k])>0?toNum(st.resP[k]):0;
+    return st;
+  }catch{
+    return blankAnomRes();
+  }
+}
+function saveAnomRes(st){
+  localStorage.setItem(kAnomRes, JSON.stringify(st));
+}
+
+function sumKamasFromAnomRes(st){
+  let total = 0;
+  for(const r of ANOMALY_RESOURCES){
+    const q = clampInt(st.res[r.key]||0);
+    const p = toNum(st.resP[r.key]||0);
+    total += q*p;
+  }
+  return total;
+}
+/* =========================================================
    Songes (UNCHANGED)
    ========================================================= */
 const kSonges = `${LS_PREFIX}songes`;
@@ -1732,6 +1923,7 @@ const pagePill = $("#pagePill");
 $("#btnHome").onclick   = ()=>location.hash = "#/";
 $("#btnDonjons").onclick= ()=>location.hash = "#/donjons";
 $("#btnSonges").onclick = ()=>location.hash = "#/songes";
+$("#btnAnomalie").onclick = ()=>location.hash = "#/anomalie";
 $("#btnStats").onclick  = ()=>location.hash = "#/stats";
 $("#btnPP").onclick     = ()=>location.hash = "#/pp";
 $("#btnOmega").onclick  = ()=>location.hash = "#/omega";
@@ -1754,7 +1946,10 @@ function route(){
   if(h==="/stats") return {page:"stats"};
   if(h==="/pp") return {page:"pp"};
   if(h==="/omega") return {page:"omega"};
+if(h==="/anomalie") return {page:"anomalie"};
   const m = h.match(/^\/d\/(.+)$/);
+const a = h.match(/^\/a\/(.+)$/);
+if(a) return {page:"anomaly", id: decodeURIComponent(a[1])};
   if(m) return {page:"dungeon", id: decodeURIComponent(m[1])};
   return {page:"home"};
 }
@@ -1879,6 +2074,19 @@ function renderHome(){
         <div><button class="btn gold" onclick="location.hash='#/songes'">Ouvrir</button></div>
       </div>
 
+<div class="card">
+  <div class="card-left">
+    <div class="thumb">
+<img data-dir="Anomalie/" data-file="Icône anomalie.png" alt="Anomalie">
+    </div>
+    <div style="min-width:0">
+      <h3>Anomalie</h3>
+      <p>Boss + ressources globales</p>
+    </div>
+  </div>
+  <div><button class="btn gold" onclick="location.hash='#/anomalie'">Ouvrir</button></div>
+</div>
+
       <div class="card">
         <div class="card-left">
           <div class="thumb"><img class="navIcon" src="./Carac.png" alt=""></div>
@@ -1955,6 +2163,181 @@ function renderDonjons(){
 
   app.innerHTML = `<div class="grid">${cards}</div>`;
   activateImages(app);
+}
+function renderAnomalie(){
+  pagePill.textContent = "Anomalie";
+
+  const cards = ANOMALIES.map(a=>`
+    <div class="card">
+      <div class="card-left">
+        <div class="thumb">
+          <img data-dir="${escapeHtml(ANOMALY_DIR)}" data-file="${escapeHtml(a.img)}" alt="">
+        </div>
+        <div style="min-width:0">
+          <h3>${escapeHtml(a.name)}</h3>
+          <p>Boss (compteur) • ressources globales</p>
+        </div>
+      </div>
+      <div>
+        <button class="btn gold" onclick="location.hash='#/a/${encodeURIComponent(a.id)}'">Ouvrir</button>
+      </div>
+    </div>
+  `).join("");
+
+  app.innerHTML = `<div class="grid">${cards}</div>`;
+  activateImages(app);
+}
+
+function renderAnomalyBoss(a){
+  pagePill.textContent = a.name;
+
+  // boss local
+  const bossCount = loadAnomBoss(a.id);
+
+  // ressources globales
+  const g = loadAnomRes();
+
+  const bossRow = renderCounterRow({
+    dir: ANOMALY_DIR,
+    img: a.img,
+    name: a.name,
+    sub: "Compteur boss",
+    value: bossCount,
+    onMinus: "aboss:-",
+    onPlus: "aboss:+",
+    onPick: "aboss:pick",
+  });
+
+  const resList = ANOMALY_RESOURCES.map(r=>{
+    const q = clampInt(g.res[r.key]||0);
+    const p = toNum(g.resP[r.key]||0);
+    return renderPricedRow({
+      dir: ANOMALY_DIR,
+      img: r.img,
+      name: r.key,
+      qty: q,
+      price: (g.resP[r.key] ? g.resP[r.key] : ""),
+      subtotal: q*p,
+      onMinus: `ares:-:${r.key}`,
+      onPlus:  `ares:+:${r.key}`,
+      onPickQty:`ares:pick:${r.key}`,
+      onPickPrice:`ares:price:${r.key}`,
+    });
+  }).join("");
+
+  const totalResQty = sumQty(g.res);
+  const totalK = sumKamasFromAnomRes(g);
+
+  app.innerHTML = `
+    <div class="section">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb"><img data-dir="${escapeHtml(ANOMALY_DIR)}" data-file="${escapeHtml(a.img)}" alt=""></div>
+          <div>
+            <h2>${escapeHtml(a.name)}</h2>
+            <p class="sub">Boss + ressources globales (partagées entre les 11)</p>
+          </div>
+        </div>
+        <div class="seg">
+          <button class="btn" onclick="location.hash='#/anomalie'">← Retour</button>
+          <button class="btn bad" id="btnResetAnomBoss">Reset boss</button>
+          <button class="btn bad" id="btnResetAnomRes">Reset ressources</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="section" style="margin:0">
+          <div class="topline">
+            <div class="title">
+              <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.mobs)}" alt=""></div>
+              <div><h2>Boss</h2><p class="sub">+/- ou pavé numérique</p></div>
+            </div>
+          </div>
+          <div class="list">${bossRow}</div>
+        </div>
+
+        <div class="section" style="margin:0">
+          <div class="topline">
+            <div class="title">
+              <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.ressources)}" alt=""></div>
+              <div><h2>Ressources (global)</h2><p class="sub">Quantité + prix/u + sous-total</p></div>
+            </div>
+          </div>
+
+          <div class="summary" style="margin-top:0">
+            <div class="kpi"><div class="k">Ressources total</div><div class="v mono">${fmt.format(totalResQty)}</div></div>
+            <div class="kpi"><div class="k"><img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k">Kamas total</div><div class="v mono gold">${money(totalK)} <span class="kamasInline"><img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k"></span></div></div>
+          </div>
+
+          <div class="list">${resList}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const handlers = {};
+
+  // Boss: même UX que runs (dernier + saisie)
+  let lastBoss = 1;
+  handlers["aboss:+"] = ()=>{
+    const cur = loadAnomBoss(a.id);
+    saveAnomBoss(a.id, cur + (lastBoss||1));
+    render();
+  };
+  handlers["aboss:-"] = ()=>{
+    const cur = loadAnomBoss(a.id);
+    saveAnomBoss(a.id, clampInt(cur-1));
+    render();
+  };
+  handlers["aboss:pick"] = ()=>{
+    openKeypad(`Boss: ${a.name}`, lastBoss, (v)=>{
+      lastBoss = v||1;
+      const cur = loadAnomBoss(a.id);
+      saveAnomBoss(a.id, cur + lastBoss);
+      render();
+    }, {mode:"int"});
+  };
+
+  // Ressources globales
+  for(const r of ANOMALY_RESOURCES){
+    handlers[`ares:+:${r.key}`] = ()=>{
+      g.res[r.key]=clampInt((g.res[r.key]||0)+1);
+      saveAnomRes(g);
+      render();
+    };
+    handlers[`ares:-:${r.key}`] = ()=>{
+      g.res[r.key]=clampInt((g.res[r.key]||0)-1);
+      saveAnomRes(g);
+      render();
+    };
+    handlers[`ares:pick:${r.key}`] = ()=>{
+      openKeypad(r.key, g.res[r.key]||0, (v)=>{
+        g.res[r.key]=clampInt(v);
+        saveAnomRes(g);
+        render();
+      }, {mode:"int"});
+    };
+    handlers[`ares:price:${r.key}`] = (val)=>{
+      const n = toNum(val);
+      g.resP[r.key] = n>0 ? n : 0;
+      saveAnomRes(g);
+      render();
+    };
+  }
+
+  $("#btnResetAnomBoss").onclick = ()=>{
+    if(!confirm(`Reset boss "${a.name}" ?`)) return;
+    localStorage.removeItem(kAnomBoss(a.id));
+    render();
+  };
+
+  $("#btnResetAnomRes").onclick = ()=>{
+    if(!confirm("Reset ressources anomalies (global) ?")) return;
+    localStorage.removeItem(kAnomRes);
+    render();
+  };
+
+  bindActions(app, handlers);
 }
 
 function renderDungeon(d){
@@ -2771,6 +3154,7 @@ function render(){
   if(r.page==="home") return renderHome();
   if(r.page==="donjons") return renderDonjons();
   if(r.page==="songes") return renderSonges();
+if(r.page==="anomalie") return renderAnomalie();
   if(r.page==="stats") return renderStats();
   if(r.page==="pp") return renderPP();
   if(r.page==="omega") return renderOmega();
@@ -2780,6 +3164,11 @@ function render(){
     pagePill.textContent = d.name;
     return renderDungeon(d);
   }
+if(r.page==="anomaly"){
+  const a = ANOMALIES.find(x=>x.id===r.id);
+  if(!a){ location.hash="#/anomalie"; return; }
+  return renderAnomalyBoss(a);
+}
   renderHome();
 }
 /* =========================================================
@@ -2908,7 +3297,21 @@ renderStats = function renderStatsPatched(){
       eqAgg.push({dir:(e.dir||d.imgDir), name:e.key, img:e.img, q, p, total:q*p});
     }
   }
+// ✅ Ajout ressources anomalies (globales) dans Stats + Top ressources
+const an = loadAnomRes();
+kamasTotal += sumKamasFromAnomRes(an);
 
+for(const r of ANOMALY_RESOURCES){
+  const q = clampInt(an.res[r.key]||0);
+  const p = toNum(an.resP[r.key]||0);
+  resQty += q;
+  resAgg.push({dir:ANOMALY_DIR, name:r.key, img:r.img, q, p, total:q*p});
+}
+// ✅ Boss anomalies (total)
+let anomBossTotal = 0;
+for(const a of ANOMALIES){
+  anomBossTotal += clampInt(loadAnomBoss(a.id) || 0);
+}
   // Songes rates
   const s = loadSonges();
   const runsSonges = SONGES.intensities.reduce((sum,it)=>sum + clampInt(s.runs[it.id]||0), 0);
@@ -2950,12 +3353,12 @@ renderStats = function renderStatsPatched(){
         </div>
       </div>
 
-      <div class="summary">
-        ${statCard("Runs donjons (total)", fmt.format(G.runsTotal))}
-        ${statCard("Kamas / run (moyenne)", G.runsTotal>0 ? money(G.kmPerRun) + " " + kamasInlineHtml("") : "—", true)}
-        ${statCard("Songes : légendes / run", runsSonges>0 ? legendsPerRun.toFixed(3) : "—")}
-        ${statCard("Songes : bribes / run", runsSonges>0 ? bribesPerRun.toFixed(3) : "—")}
-      </div>
+<div class="summary">
+  ${statCard("Runs donjons (total)", fmt.format(G.runsTotal))}
+  ${statCard("Boss anomalies (total)", fmt.format(anomBossTotal))}
+  ${statCard("Kamas / run (moyenne)", G.runsTotal>0 ? money(G.kmPerRun) + " " + kamasInlineHtml("") : "—", true)}
+  ${statCard("Songes : légendes / run", runsSonges>0 ? legendsPerRun.toFixed(3) : "—")}
+</div>
 
       <div class="summary" style="margin-top:10px">
         ${statCard("1ère activité", fmtDate(meta.first))}
