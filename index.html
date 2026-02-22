@@ -393,7 +393,9 @@
   <img class="navIcon" src="./ornement omega.png" alt="Oméga">
 </button>
 
-
+<button class="btn small" id="btnExport" title="Exporter sauvegarde"><img class="navIcon" src="./Xelor.png" alt="Export"> Export</button>
+<button class="btn small" id="btnImport" title="Importer sauvegarde"><img class="navIcon" src="./fuite.png" alt="Import"> Import</button>
+<input type="file" id="importFile" accept="application/json" style="display:none">
         <button class="btn small bad" id="btnResetAll" title="Reset tout">🧹 Reset</button>
       </div>
     </header>
@@ -469,7 +471,15 @@ const LS_PREFIX = "picofus:v5:";
 const $ = (q, el=document)=>el.querySelector(q);
 
 function clampInt(x){ x = Math.trunc(Number(x)||0); return x<0?0:x; }
-function toNum(x){ const n = Number(String(x).replace(",", ".")); return Number.isFinite(n)?n:0; }
+function toNum(x){
+  // accepte "4 600 000", NBSP, NNBSP, etc.
+  const s = String(x ?? "")
+    .replace(/[\s\u00A0\u202F]/g, "")
+    .replace(/,/g, ".");
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+
 function money(x){ return fmt.format(Math.round(toNum(x))); }
 function escapeHtml(s){
   return String(s ?? "")
@@ -478,6 +488,7 @@ function escapeHtml(s){
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
+}
 /* =========================================================
    ✅ THOUSANDS SEPARATOR (FR) - 1 bloc à copier/coller
    - Format visuel : 1234567 -> 1 234 567
@@ -541,15 +552,6 @@ function enableThousandsOnPrices(root=document){
       inp.dispatchEvent(new Event("change", { bubbles:true }));
     });
   });
-}
-
-// 4) Hook propre : après chaque render/bind, on ré-active
-// 👉 Ajoute juste cette ligne à la FIN de bindActions(container, handlers)
-const _bindActions = bindActions;
-bindActions = function(container, handlers){
-  _bindActions(container, handlers);
-  enableThousandsOnPrices(container);
-};
 }
 
 /* =========================================================
@@ -1706,6 +1708,7 @@ const ANOMALY_RESOURCES = [
 
 // 11 boss
 const ANOMALIES = [
+
   { id:"corbeau_noir", name:"Corbeau Noir", img:"Corbeau Noir.png" },
   { id:"percimol", name:"Percimol", img:"Percimol.png" },
   { id:"dathura", name:"Dathura", img:"Dathura.png" },
@@ -1719,9 +1722,23 @@ const ANOMALIES = [
   { id:"noximilien_horloger", name:"Noximilien l'Horloger", img:"Noximilien l'Horloger.png" },
 ];
 
+function getAnomKey(id){ 
+  return `ANOM:${id}`; 
+}
+
+function isAnomKey(key){ 
+  return typeof key === "string" && key.startsWith("ANOM:"); 
+}
+
+function ensureBucket(key){
+  if(!STATE.dungeons) STATE.dungeons = {};
+  if(!STATE.dungeons[key]){
+    STATE.dungeons[key] = { runs:0, mobs:0, ress:0, items:0, kamas:0 };
+  }
+}
 // Storage keys
 const kAnomBoss = (id)=>`${LS_PREFIX}anom:boss:${id}`;
-const kAnomRes  = `${LS_PREFIX}anom:res`;
+const kAnomRes  = (id)=>`${LS_PREFIX}anom:res:${id}`;
 
 function loadAnomBoss(id){
   try{
@@ -1741,9 +1758,9 @@ function blankAnomRes(){
   }
   return st;
 }
-function loadAnomRes(){
+function loadAnomRes(id){
   try{
-    const raw = localStorage.getItem(kAnomRes);
+    const raw = localStorage.getItem(kAnomRes(id));
     if(!raw) return blankAnomRes();
     const p = JSON.parse(raw);
     const st = blankAnomRes();
@@ -1757,8 +1774,8 @@ function loadAnomRes(){
     return blankAnomRes();
   }
 }
-function saveAnomRes(st){
-  localStorage.setItem(kAnomRes, JSON.stringify(st));
+function saveAnomRes(id, st){
+  localStorage.setItem(kAnomRes(id), JSON.stringify(st));
 }
 
 function sumKamasFromAnomRes(st){
@@ -1929,6 +1946,47 @@ $("#btnStats").onclick  = ()=>location.hash = "#/stats";
 $("#btnPP").onclick     = ()=>location.hash = "#/pp";
 $("#btnOmega").onclick  = ()=>location.hash = "#/omega";
 
+/* =========================================================
+   ✅ Backup / Restore (export/import JSON)
+   - Export: télécharge un .json de tes clés LS_PREFIX
+   - Import: réinjecte et reload
+   ========================================================= */
+function exportBackup(){
+  const data = { v: 1, prefix: LS_PREFIX, t: Date.now(), items: {} };
+  for(const k of Object.keys(localStorage)){
+    if(k.startsWith(LS_PREFIX)){
+      data.items[k] = localStorage.getItem(k);
+    }
+  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `picofus-backup-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 500);
+}
+
+function importBackupFromText(txt){
+  let data;
+  try{ data = JSON.parse(txt); }catch{ alert("JSON invalide"); return; }
+  if(!data || !data.items || typeof data.items !== "object"){
+    alert("Backup invalide (items manquant)");
+    return;
+  }
+  // wipe prefix puis restore
+  for(const k of Object.keys(localStorage)){
+    if(k.startsWith(LS_PREFIX)) localStorage.removeItem(k);
+  }
+  for(const [k,v] of Object.entries(data.items)){
+    if(String(k).startsWith(LS_PREFIX)){
+      localStorage.setItem(k, String(v ?? ""));
+    }
+  }
+  alert("Import OK ✅");
+  location.reload();
+}
 $("#btnResetAll").onclick = ()=>{
   if(!confirm("Reset TOUT (donjons + songes + stats + PP + oméga) ?")) return;
   for(const k of Object.keys(localStorage)){
@@ -1938,6 +1996,17 @@ $("#btnResetAll").onclick = ()=>{
   savePP(blankPP());
   render();
 };
+$("#btnExport").onclick = exportBackup;
+
+const importFile = $("#importFile");
+$("#btnImport").onclick = ()=> importFile.click();
+
+importFile.addEventListener("change", async ()=>{
+  const f = importFile.files && importFile.files[0];
+  if(!f) return;
+  const txt = await f.text();
+  importBackupFromText(txt);
+});
 
 function route(){
   const h = (location.hash || "#/").slice(1);
@@ -2038,13 +2107,65 @@ function bindActions(container, handlers){
         if(e.key==="Enter"){ e.preventDefault(); el.blur(); }
       });
     }else{
-      el.addEventListener("click", ()=>handlers[act]());
+      el.addEventListener("click", (ev)=>handlers[act](ev));
     }
   });
 
   activateImages(container);
 }
+/* =========================================================
+   THOUSANDS SEPARATOR (FR) - prix/u inputs
+   ========================================================= */
 
+function formatInputThousands(inputEl){
+  if(!inputEl) return;
+  const raw = String(inputEl.value ?? "").trim();
+  if(raw === "") return;
+
+  const n = toNum(raw);
+  if(!Number.isFinite(n) || n <= 0){
+    inputEl.value = "";
+    return;
+  }
+
+  const isInt = Math.abs(n - Math.round(n)) < 1e-9;
+
+  if(isInt){
+    inputEl.value = fmt.format(Math.round(n));
+  }else{
+    const fixed = n.toFixed(2).replace(".", ",");
+    const [a,b] = fixed.split(",");
+    const aFmt = fmt.format(parseInt(a,10) || 0);
+    const bTrim = (b || "").replace(/0+$/,"");
+    inputEl.value = bTrim ? `${aFmt},${bTrim}` : aFmt;
+  }
+}
+
+function enableThousandsOnPrices(root=document){
+  root.querySelectorAll('input.price').forEach(inp=>{
+    if(inp.dataset.thousands === "1") return;
+    inp.dataset.thousands = "1";
+
+    inp.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){
+        e.preventDefault();
+        inp.blur();
+      }
+    });
+
+    inp.addEventListener("blur", ()=>{
+      formatInputThousands(inp);
+      inp.dispatchEvent(new Event("change", { bubbles:true }));
+    });
+  });
+}
+
+// Hook: après chaque bindActions
+const _bindActions = bindActions;
+bindActions = function(container, handlers){
+  _bindActions(container, handlers);
+  enableThousandsOnPrices(container);
+};
 /* =========================================================
    Pages
    ========================================================= */
@@ -2176,7 +2297,7 @@ function renderAnomalie(){
         </div>
         <div style="min-width:0">
           <h3>${escapeHtml(a.name)}</h3>
-          <p>Boss (compteur) • ressources globales</p>
+          <p>Boss (compteur) • ressources</p>
         </div>
       </div>
       <div>
@@ -2196,7 +2317,7 @@ function renderAnomalyBoss(a){
   const bossCount = loadAnomBoss(a.id);
 
   // ressources globales
-  const g = loadAnomRes();
+  const g = loadAnomRes(a.id);
 
   const bossRow = renderCounterRow({
     dir: ANOMALY_DIR,
@@ -2236,7 +2357,7 @@ function renderAnomalyBoss(a){
           <div class="thumb"><img data-dir="${escapeHtml(ANOMALY_DIR)}" data-file="${escapeHtml(a.img)}" alt=""></div>
           <div>
             <h2>${escapeHtml(a.name)}</h2>
-            <p class="sub">Boss + ressources globales (partagées entre les 11)</p>
+            <p class="sub">Boss + ressources (indépendantes)</p>
           </div>
         </div>
         <div class="seg">
@@ -2261,7 +2382,7 @@ function renderAnomalyBoss(a){
           <div class="topline">
             <div class="title">
               <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.ressources)}" alt=""></div>
-              <div><h2>Ressources (global)</h2><p class="sub">Quantité + prix/u + sous-total</p></div>
+              <div><h2>Ressources</h2><p class="sub">Quantité + prix/u + sous-total</p></div>
             </div>
           </div>
 
@@ -2280,12 +2401,28 @@ function renderAnomalyBoss(a){
 
   // Boss: même UX que runs (dernier + saisie)
   let lastBoss = 1;
-  handlers["aboss:+"] = ()=>{
+  handlers["aboss:+"] = (ev)=>{
+    if(ev && ev.shiftKey){
+      return openKeypad(`Ajouter boss: ${a.name}`, lastBoss, (v)=>{
+        lastBoss = v||1;
+        const cur = loadAnomBoss(a.id);
+        saveAnomBoss(a.id, cur + (lastBoss||1));
+        render();
+      }, {mode:"int"});
+    }
     const cur = loadAnomBoss(a.id);
     saveAnomBoss(a.id, cur + (lastBoss||1));
     render();
   };
-  handlers["aboss:-"] = ()=>{
+  handlers["aboss:-"] = (ev)=>{
+    if(ev && ev.shiftKey){
+      return openKeypad(`Retirer boss: ${a.name}`, 1, (v)=>{
+        const n = clampInt(v);
+        const cur = loadAnomBoss(a.id);
+        saveAnomBoss(a.id, clampInt(cur - n));
+        render();
+      }, {mode:"int"});
+    }
     const cur = loadAnomBoss(a.id);
     saveAnomBoss(a.id, clampInt(cur-1));
     render();
@@ -2303,25 +2440,25 @@ function renderAnomalyBoss(a){
   for(const r of ANOMALY_RESOURCES){
     handlers[`ares:+:${r.key}`] = ()=>{
       g.res[r.key]=clampInt((g.res[r.key]||0)+1);
-      saveAnomRes(g);
+      saveAnomRes(a.id, g);
       render();
     };
     handlers[`ares:-:${r.key}`] = ()=>{
       g.res[r.key]=clampInt((g.res[r.key]||0)-1);
-      saveAnomRes(g);
+      saveAnomRes(a.id, g);
       render();
     };
     handlers[`ares:pick:${r.key}`] = ()=>{
       openKeypad(r.key, g.res[r.key]||0, (v)=>{
         g.res[r.key]=clampInt(v);
-        saveAnomRes(g);
+        saveAnomRes(a.id, g);
         render();
       }, {mode:"int"});
     };
     handlers[`ares:price:${r.key}`] = (val)=>{
       const n = toNum(val);
       g.resP[r.key] = n>0 ? n : 0;
-      saveAnomRes(g);
+      saveAnomRes(a.id, g);
       render();
     };
   }
@@ -2333,8 +2470,8 @@ function renderAnomalyBoss(a){
   };
 
   $("#btnResetAnomRes").onclick = ()=>{
-    if(!confirm("Reset ressources anomalies (global) ?")) return;
-    localStorage.removeItem(kAnomRes);
+    if(!confirm("Reset ressources anomalie ?")) return;
+    localStorage.removeItem(kAnomRes(a.id));
     render();
   };
 
@@ -2419,12 +2556,14 @@ function renderDungeon(d){
 
       <div class="seg">
         <button class="btn gold" data-act="runs:add">+ runs</button>
+        <button class="btn" data-act="runs:sub">- runs</button>
         <button class="btn" data-act="runs:pick">Saisir runs</button>
         <span class="pill">Runs: <b class="mono">${fmt.format(st.runs||0)}</b></span>
 
         ${isComte ? `
           <span class="pill">—</span>
           <button class="btn gold" data-act="cap:add">+ capture</button>
+          <button class="btn" data-act="cap:sub">- capture</button>
           <button class="btn" data-act="cap:pick">Saisir captures</button>
           <span class="pill">Captures: <b class="mono">${fmt.format(st.captures||0)}</b></span>
         ` : ``}
@@ -2485,12 +2624,29 @@ function renderDungeon(d){
 
   let lastRuns = 1;
   handlers["runs:pick"] = ()=>{
+    // saisie "delta" pour ajouter
     openKeypad("Nombre de runs à ajouter", lastRuns, (v)=>{
       lastRuns = v||1;
       applyRuns(d, st, lastRuns);
     }, {mode:"int"});
   };
-  handlers["runs:add"] = ()=>{ applyRuns(d, st, lastRuns || 1); };
+  handlers["runs:add"] = (ev)=>{
+    // Shift+clic => pavé numérique direct
+    if(ev && ev.shiftKey){
+      return handlers["runs:pick"]();
+    }
+    applyRuns(d, st, lastRuns || 1);
+  };
+  handlers["runs:sub"] = (ev)=>{
+    const subOne = ()=>{ applyRuns(d, st, - (lastRuns || 1)); };
+    if(ev && ev.shiftKey){
+      return openKeypad("Nombre de runs à retirer", lastRuns, (v)=>{
+        lastRuns = v||1;
+        applyRuns(d, st, -(lastRuns||1));
+      }, {mode:"int"});
+    }
+    subOne();
+  };
 
   // ✅ Capture uniquement Comte
   let lastCaps = 1;
@@ -2498,21 +2654,69 @@ function renderDungeon(d){
     handlers["cap:pick"] = ()=>{
       openKeypad("Nombre de captures à ajouter", lastCaps, (v)=>{
         lastCaps = v||1;
-        applyCapturesComte(st, v||1, loadButin(d.id));
+        applyCapturesComte(st, lastCaps||1, loadButin(d.id));
       }, {mode:"int"});
     };
-    handlers["cap:add"] = ()=>{ applyCapturesComte(st, lastCaps || 1, loadButin(d.id)); };
+    handlers["cap:add"] = (ev)=>{
+      if(ev && ev.shiftKey) return handlers["cap:pick"]();
+      applyCapturesComte(st, lastCaps || 1, loadButin(d.id));
+    };
+    handlers["cap:sub"] = (ev)=>{
+      if(ev && ev.shiftKey){
+        return openKeypad("Nombre de captures à retirer", lastCaps, (v)=>{
+          lastCaps = v||1;
+          applyCapturesComte(st, -(lastCaps||1), loadButin(d.id));
+        }, {mode:"int"});
+      }
+      applyCapturesComte(st, -(lastCaps || 1), loadButin(d.id));
+    };
   }
 
   for(const m of d.mobs){
-    handlers[`mob:+:${m.key}`] = ()=>{ st.mobs[m.key]=clampInt((st.mobs[m.key]||0)+1); saveDungeon(d.id, st); render(); };
-    handlers[`mob:-:${m.key}`] = ()=>{ st.mobs[m.key]=clampInt((st.mobs[m.key]||0)-1); saveDungeon(d.id, st); render(); };
+    handlers[`mob:+:${m.key}`] = (ev)=>{
+      if(ev && ev.shiftKey){
+        return openKeypad(`Ajouter: ${m.key}`, 1, (v)=>{
+          const n = clampInt(v);
+          st.mobs[m.key]=clampInt((st.mobs[m.key]||0)+n);
+          saveDungeon(d.id, st); render();
+        }, {mode:"int"});
+      }
+      st.mobs[m.key]=clampInt((st.mobs[m.key]||0)+1); saveDungeon(d.id, st); render();
+    };
+    handlers[`mob:-:${m.key}`] = (ev)=>{
+      if(ev && ev.shiftKey){
+        return openKeypad(`Retirer: ${m.key}`, 1, (v)=>{
+          const n = clampInt(v);
+          st.mobs[m.key]=clampInt((st.mobs[m.key]||0)-n);
+          saveDungeon(d.id, st); render();
+        }, {mode:"int"});
+      }
+      st.mobs[m.key]=clampInt((st.mobs[m.key]||0)-1); saveDungeon(d.id, st); render();
+    };
     handlers[`mob:pick:${m.key}`] = ()=> openKeypad(m.key, st.mobs[m.key]||0, (v)=>{ st.mobs[m.key]=clampInt(v); saveDungeon(d.id, st); render(); }, {mode:"int"});
   }
 
   for(const r of d.resources){
-    handlers[`res:+:${r.key}`] = ()=>{ st.res[r.key]=clampInt((st.res[r.key]||0)+1); saveDungeon(d.id, st); render(); };
-    handlers[`res:-:${r.key}`] = ()=>{ st.res[r.key]=clampInt((st.res[r.key]||0)-1); saveDungeon(d.id, st); render(); };
+    handlers[`res:+:${r.key}`] = (ev)=>{
+      if(ev && ev.shiftKey){
+        return openKeypad(`Ajouter: ${r.key}`, 1, (v)=>{
+          const n = clampInt(v);
+          st.res[r.key]=clampInt((st.res[r.key]||0)+n);
+          saveDungeon(d.id, st); render();
+        }, {mode:"int"});
+      }
+      st.res[r.key]=clampInt((st.res[r.key]||0)+1); saveDungeon(d.id, st); render();
+    };
+    handlers[`res:-:${r.key}`] = (ev)=>{
+      if(ev && ev.shiftKey){
+        return openKeypad(`Retirer: ${r.key}`, 1, (v)=>{
+          const n = clampInt(v);
+          st.res[r.key]=clampInt((st.res[r.key]||0)-n);
+          saveDungeon(d.id, st); render();
+        }, {mode:"int"});
+      }
+      st.res[r.key]=clampInt((st.res[r.key]||0)-1); saveDungeon(d.id, st); render();
+    };
     handlers[`res:pick:${r.key}`] = ()=> openKeypad(r.key, st.res[r.key]||0, (v)=>{ st.res[r.key]=clampInt(v); saveDungeon(d.id, st); render(); }, {mode:"int"});
     handlers[`res:price:${r.key}`] = (val)=>{
       const n = toNum(val);
@@ -2523,8 +2727,26 @@ function renderDungeon(d){
   }
 
   for(const e of d.equipments){
-    handlers[`eq:+:${e.key}`] = ()=>{ st.eq[e.key]=clampInt((st.eq[e.key]||0)+1); saveDungeon(d.id, st); render(); };
-    handlers[`eq:-:${e.key}`] = ()=>{ st.eq[e.key]=clampInt((st.eq[e.key]||0)-1); saveDungeon(d.id, st); render(); };
+    handlers[`eq:+:${e.key}`] = (ev)=>{
+      if(ev && ev.shiftKey){
+        return openKeypad(`Ajouter: ${e.key}`, 1, (v)=>{
+          const n = clampInt(v);
+          st.eq[e.key]=clampInt((st.eq[e.key]||0)+n);
+          saveDungeon(d.id, st); render();
+        }, {mode:"int"});
+      }
+      st.eq[e.key]=clampInt((st.eq[e.key]||0)+1); saveDungeon(d.id, st); render();
+    };
+    handlers[`eq:-:${e.key}`] = (ev)=>{
+      if(ev && ev.shiftKey){
+        return openKeypad(`Retirer: ${e.key}`, 1, (v)=>{
+          const n = clampInt(v);
+          st.eq[e.key]=clampInt((st.eq[e.key]||0)-n);
+          saveDungeon(d.id, st); render();
+        }, {mode:"int"});
+      }
+      st.eq[e.key]=clampInt((st.eq[e.key]||0)-1); saveDungeon(d.id, st); render();
+    };
     handlers[`eq:pick:${e.key}`] = ()=> openKeypad(e.key, st.eq[e.key]||0, (v)=>{ st.eq[e.key]=clampInt(v); saveDungeon(d.id, st); render(); }, {mode:"int"});
     handlers[`eq:price:${e.key}`] = (val)=>{
       const n = toNum(val);
@@ -2538,8 +2760,8 @@ function renderDungeon(d){
 }
 
 function applyRuns(d, st, runs){
-  runs = clampInt(runs);
-  if(runs<=0) return;
+  runs = parseInt(runs,10);
+  if(!Number.isFinite(runs) || runs===0) return;
 
   const b = loadButin(d.id);
   const inc = d.butins?.[b] || {};
@@ -2552,8 +2774,8 @@ function applyRuns(d, st, runs){
 }
 
 function applyCapturesComte(st, captures, butin){
-  captures = clampInt(captures);
-  if(captures<=0) return;
+  captures = parseInt(captures,10);
+  if(!Number.isFinite(captures) || captures===0) return;
 
   const inc = COMTE_CAPTURE[butin] || {};
   for(const [k,v] of Object.entries(inc)){
@@ -2779,193 +3001,6 @@ app.innerHTML = `
 }
 
 /* =========================================================
-   Stats (✅ Top ressources corrigé: valeur totale q*p partout)
-   ========================================================= */
-function renderStats(){
-  pagePill.textContent = "Stats";
-
-  let mobsTotal=0, resQty=0, eqQty=0, kamasTotal=0;
-  const resAgg = [];
-  const eqAgg = [];
-
-  for(const d of DUNGEONS){
-    const st = ensureDungeonShape(d, loadDungeon(d.id));
-    kamasTotal += sumKamasFromDungeon(d, st);
-
-    for(const m of d.mobs){
-      mobsTotal += clampInt(st.mobs[m.key]||0);
-    }
-    for(const r of d.resources){
-      const q = clampInt(st.res[r.key]||0);
-      const p = toNum(st.resP[r.key]||0);
-      resQty += q;
-      resAgg.push({dir:d.imgDir, name:r.key, img:r.img, q, p, total:q*p});
-    }
-    for(const e of d.equipments){
-      const q = clampInt(st.eq[e.key]||0);
-      const p = toNum(st.eqP[e.key]||0);
-      eqQty += q;
-      eqAgg.push({dir:(e.dir||d.imgDir), name:e.key, img:e.img, q, p, total:q*p});
-    }
-  }
-
-  const s = loadSonges();
-  const runsTotal = SONGES.intensities.reduce((sum,it)=>sum + clampInt(s.runs[it.id]||0), 0);
-
-  // ✅ Total légendes = somme des 30 mini-carrés
-  const totalLegends = Object.values(s.legendItems).reduce((a,b)=>a+clampInt(b),0);
-
-  // ✅ Aperçu pictos (répétés) max 6, mêmes icônes que les 30 mini carrés
-  function legendsPreviewHtml(max=6){
-    const icons = [];
-    for(const f of SONGES.legendItems){
-      const k = keyFromFile(f);
-      const c = clampInt(s.legendItems[k] || 0);
-      for(let i=0;i<c && icons.length<max;i++){
-        icons.push(f);
-      }
-      if(icons.length>=max) break;
-    }
-    if(!icons.length) return "";
-    return `<div class="legendPreview">` + icons.map(file =>
-      `<img src="${encodeURI("./Songes/"+file)}" alt="">`
-    ).join("") + `</div>`;
-  }
-
-
-  function statCard(title, value){
-    return `
-      <div class="kpi">
-        <div class="k">${escapeHtml(title)}</div>
-        <div class="v mono ${title.toLowerCase().includes("kamas")?'gold':''}">${value}</div>
-      </div>
-    `;
-  }
-
-  // ✅ Top ressources par valeur totale (q * prix/u)
-  const topRes = resAgg
-    .filter(x => x.total > 0)
-    .sort((a,b)=>b.total - a.total)
-    .slice(0, 10);
-
-  const hero = topRes[0] || null;
-  const others = topRes.slice(1);
-
-  app.innerHTML = `
-    <div class="section">
-      <div class="topline">
-        <div class="title">
-          <div class="thumb" style="width:44px;height:44px"><img class="navIcon" src="./Carac.png" alt=""></div>
-          <div><h2>Statistiques</h2><p class="sub">Récap global propre en 1 page</p></div>
-        </div>
-      </div>
-
-      <div class="summary">
-        ${statCard("Mobs total", fmt.format(mobsTotal))}
-        ${statCard("Ressources total", fmt.format(resQty))}
-        ${statCard("Équipements total", fmt.format(eqQty))}
-        ${statCard("Kamas total", `${money(kamasTotal)} ${kamasInlineHtml("")}`)}
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="section">
-        <div class="topline">
-          <div class="title">
-            <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.songes)}" alt=""></div>
-            <div><h2>Songes</h2><p class="sub">Stats rapides</p></div>
-          </div>
-        </div>
-        <div class="summary">
-          ${statCard("Runs total", fmt.format(runsTotal))}
-          ${statCard("Bribes", fmt.format(s.bribes))}
-          ${`
-            <div class="kpi">
-              <div class="k">Total légendes</div>
-              <div class="v mono">${fmt.format(totalLegends)}</div>
-              ${legendsPreviewHtml(6)}
-            </div>
-          `}
-          ${statCard("Kamas total", `${money(kamasTotal)} ${kamasInlineHtml("")}`)}
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="topline">
-          <div class="title">
-            <div class="thumb" style="width:44px;height:44px">🏆</div>
-            <div><h2>Top ressources</h2><p class="sub">par valeur totale (quantité × prix/u)</p></div>
-          </div>
-        </div>
-
-        <div class="topResWrap">
-          ${
-            hero ? `
-              <div class="topResHero">
-                <div class="L">
-                  <div class="ico"><img data-dir="${escapeHtml(hero.dir)}" data-file="${escapeHtml(hero.img)}" alt=""></div>
-                  <div class="name">
-                    <p class="n">${escapeHtml(hero.name)}</p>
-                    <p class="m">Valeur totale</p>
-                  </div>
-                </div>
-                <div class="price">${kamasInlineHtml(money(hero.total))}</div>
-              </div>
-            ` : `<div class="hint">Aucune valeur (mets des quantités + prix/u sur des ressources).</div>`
-          }
-
-          ${
-            others.length ? `
-              <div class="topResRow">
-                ${others.map(x=>`
-                  <div class="topResMini">
-                    <div class="ico"><img data-dir="${escapeHtml(x.dir)}" data-file="${escapeHtml(x.img)}" alt=""></div>
-                    <div class="p">${kamasInlineHtml(money(x.total))}</div>
-                  </div>
-                `).join("")}
-              </div>
-            ` : ``
-          }
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="topline">
-        <div class="title">
-          <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.donjons)}" alt=""></div>
-          <div><h2>Récap par donjon</h2><p class="sub">Mobs / ressources / items / kamas</p></div>
-        </div>
-      </div>
-      <div class="grid" id="donjonRecap"></div>
-    </div>
-  `;
-
-  const recap = $("#donjonRecap");
-  recap.innerHTML = DUNGEONS.map(d=>{
-    const st = ensureDungeonShape(d, loadDungeon(d.id));
-    const km = sumKamasFromDungeon(d, st);
-    return `
-      <div class="card">
-        <div class="card-left">
-          <div class="thumb"><img data-dir="${escapeHtml(d.imgDir)}" data-file="${escapeHtml(d.thumb)}" alt=""></div>
-          <div style="min-width:0">
-            <h3>${escapeHtml(d.name)}</h3>
-            <p>Mobs: <b class="mono">${fmt.format(sumQty(st.mobs))}</b> • Ress: <b class="mono">${fmt.format(sumQty(st.res))}</b> • Items: <b class="mono">${fmt.format(sumQty(st.eq))}</b></p>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="pill">${kamasInlineHtml(money(km))}</div>
-          <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(d.id)}'">Ouvrir</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  activateImages(app);
-}
-
-/* =========================================================
    PP (✅ décimales + icon challenge)
    ========================================================= */
 function renderPP(){
@@ -3156,7 +3191,7 @@ function render(){
   if(r.page==="donjons") return renderDonjons();
   if(r.page==="songes") return renderSonges();
 if(r.page==="anomalie") return renderAnomalie();
-  if(r.page==="stats") return renderStats();
+  if(r.page==="stats") { try{ return renderStats(); }catch(err){ console.error(err); app.innerHTML = `<div class="section"><div class="hint">Erreur Stats : ${escapeHtml(String(err && err.message ? err.message : err))}<br>Ouvre la console (F12) pour le détail.</div></div>`; return; } }
   if(r.page==="pp") return renderPP();
   if(r.page==="omega") return renderOmega();
   if(r.page==="dungeon"){
@@ -3248,10 +3283,38 @@ function fmtDate(ms){
 // --- Helpers pour stats rentabilité
 function getDungeonStats(d){
   const st = ensureDungeonShape(d, loadDungeon(d.id));
-  const runs = clampInt(st.runs||0);
+  const runs = clampInt(st.runs||0) + (d.id==="comte" ? clampInt(st.captures||0) : 0);
   const km = sumKamasFromDungeon(d, st);
   const kmPerRun = runs>0 ? (km / runs) : 0;
   return { d, st, runs, km, kmPerRun };
+}
+
+function getAnomalyStats(a){
+  const st = loadAnomRes(a.id);
+  const runs = clampInt(loadAnomBoss(a.id) || 0); // boss count = "runs" pour l'anomalie
+  const km = sumKamasFromAnomRes(st);
+  const kmPerRun = runs>0 ? (km / runs) : 0;
+
+  const d = {
+    id: a.id,
+    name: a.name,
+    imgDir: ANOMALY_DIR,
+    thumb: a.img,
+  };
+
+  return { d, runs, km, kmPerRun, st };
+}
+
+function getAllAnomaliesStats(){
+  return ANOMALIES.map(a=>getAnomalyStats(a));
+}
+
+function getAnomaliesTotals(){
+  const list = getAllAnomaliesStats();
+  let runsTotal = 0, kmTotal = 0;
+  for(const x of list){ runsTotal += clampInt(x.runs||0); kmTotal += toNum(x.km||0); }
+  const kmPerRun = runsTotal>0 ? (kmTotal / runsTotal) : 0;
+  return { list, runsTotal, kmTotal, kmPerRun };
 }
 
 function getGlobalDungeonStats(){
@@ -3265,12 +3328,14 @@ function getGlobalDungeonStats(){
     kmTotal += s.km;
     per.push(s);
   }
+
   const kmPerRun = runsTotal>0 ? (kmTotal / runsTotal) : 0;
   return { runsTotal, kmTotal, kmPerRun, per };
 }
 
 // --- Override propre de renderStats (1 seul endroit)
-const _renderStats_original = renderStats;
+// (safe) : renderStats peut ne pas exister dans cette version, donc on capture seulement si défini
+const _renderStats_original = (typeof renderStats === "function") ? renderStats : null;
 renderStats = function renderStatsPatched(){
   pagePill.textContent = "Stats";
 
@@ -3298,15 +3363,21 @@ renderStats = function renderStatsPatched(){
       eqAgg.push({dir:(e.dir||d.imgDir), name:e.key, img:e.img, q, p, total:q*p});
     }
   }
-// ✅ Ajout ressources anomalies (globales) dans Stats + Top ressources
-const an = loadAnomRes();
-kamasTotal += sumKamasFromAnomRes(an);
+// ✅ Ajout anomalies (par boss) dans Stats + Top ressources
+let kamasAnomTotal = 0;
+for(const a of ANOMALIES){
+  const an = loadAnomRes(a.id);
+  const kmA = sumKamasFromAnomRes(an);
+  kamasAnomTotal += kmA;
+  kamasTotal += kmA;
 
-for(const r of ANOMALY_RESOURCES){
-  const q = clampInt(an.res[r.key]||0);
-  const p = toNum(an.resP[r.key]||0);
-  resQty += q;
-  resAgg.push({dir:ANOMALY_DIR, name:r.key, img:r.img, q, p, total:q*p});
+  for(const r of ANOMALY_RESOURCES){
+    const q = clampInt(an.res[r.key]||0);
+    const p = toNum(an.resP[r.key]||0);
+    resQty += q;
+    // name distinct en stats (évite confusion si tu veux filtrer)
+    resAgg.push({dir:ANOMALY_DIR, name:r.key, img:r.img, q, p, total:q*p});
+  }
 }
 // ✅ Boss anomalies (total)
 let anomBossTotal = 0;
@@ -3322,8 +3393,13 @@ for(const a of ANOMALIES){
 
   // Donjons global + top
   const G = getGlobalDungeonStats();
-  const topByKPR = [...G.per].filter(x=>x.runs>0).sort((a,b)=>b.kmPerRun-a.kmPerRun).slice(0,3);
-  const topByKm  = [...G.per].filter(x=>x.km>0).sort((a,b)=>b.km-a.km).slice(0,3);
+const AT = getAnomaliesTotals();
+
+// mix donjons + anomalies
+const mixed = [...G.per, ...AT.list];
+
+const topByKPR = [...mixed].filter(x=>x.runs>0).sort((a,b)=>b.kmPerRun-a.kmPerRun).slice(0,3);
+const topByKm  = [...mixed].filter(x=>x.km>0).sort((a,b)=>b.km-a.km).slice(0,3);
 
   // Historique
   const meta = loadMeta();
@@ -3357,13 +3433,15 @@ for(const a of ANOMALIES){
 <div class="summary">
   ${statCard("Runs donjons (total)", fmt.format(G.runsTotal))}
   ${statCard("Boss anomalies (total)", fmt.format(anomBossTotal))}
+  ${statCard("Kamas générés (total)", `${money(kamasTotal)} ${kamasInlineHtml("")}`, true)}
   ${statCard("Kamas / run (moyenne)", G.runsTotal>0 ? money(G.kmPerRun) + " " + kamasInlineHtml("") : "—", true)}
-  ${statCard("Songes : légendes / run", runsSonges>0 ? legendsPerRun.toFixed(3) : "—")}
 </div>
 
       <div class="summary" style="margin-top:10px">
         ${statCard("1ère activité", fmtDate(meta.first))}
         ${statCard("Dernière activité", fmtDate(meta.last))}
+        ${statCard("Songes : légendes / run", runsSonges>0 ? legendsPerRun.toFixed(3) : "—")}
+        ${statCard("Songes : bribes / run", runsSonges>0 ? bribesPerRun.toFixed(3) : "—")}
         ${
           topByKPR[0]
             ? statCard("Top donjon (kamas/run)", `${escapeHtml(topByKPR[0].d.name)} • ${money(topByKPR[0].kmPerRun)} ${kamasInlineHtml("")}`, true)
@@ -3398,7 +3476,7 @@ for(const a of ANOMALIES){
                 </div>
                 <div class="ctrls">
                   <div class="pill">${kamasInlineHtml(money(x.kmPerRun))} / run</div>
-                  <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(x.d.id)}'">Ouvrir</button>
+<button class="btn gold" onclick="location.hash='${ANOMALIES.some(a=>a.id===x.d.id) ? "#/a/"+encodeURIComponent(x.d.id) : "#/d/"+encodeURIComponent(x.d.id)}'">Ouvrir</button>
                 </div>
               </div>
             `).join("") : `<div class="hint">Fais au moins 1 run + mets des prix/u pour voir la rentabilité.</div>`
@@ -3417,7 +3495,7 @@ for(const a of ANOMALIES){
                 </div>
                 <div class="ctrls">
                   <div class="pill">${kamasInlineHtml(money(x.km))}</div>
-                  <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(x.d.id)}'">Ouvrir</button>
+<button class="btn gold" onclick="location.hash='${ANOMALIES.some(a=>a.id===x.d.id) ? "#/a/"+encodeURIComponent(x.d.id) : "#/d/"+encodeURIComponent(x.d.id)}'">Ouvrir</button>
                 </div>
               </div>
             `).join("") : `<div class="hint">Aucune valeur : mets des quantités + prix/u.</div>`
@@ -3476,19 +3554,55 @@ for(const a of ANOMALIES){
     </div>
   `;
 
-  // Recap (comme ton code actuel)
+  // Recap (donjons + 11 anomalies)
   const recap = $("#donjonRecap");
-  recap.innerHTML = DUNGEONS.map(d=>{
-    const st = ensureDungeonShape(d, loadDungeon(d.id));
-    const km = sumKamasFromDungeon(d, st);
-    return `
+
+  const anList = getAllAnomaliesStats();
+  const recapCards = [];
+
+// ✅ Anomalies (11 cartes) — triées par kamas total
+for(const x of anList){
+  const resQtyA = sumQty(x.st.res);
+  recapCards.push({
+    km: x.km,
+    html: `
+      <div class="card">
+        <div class="card-left">
+          <div class="thumb"><img data-dir="${escapeHtml(x.d.imgDir)}" data-file="${escapeHtml(x.d.thumb)}" alt=""></div>
+          <div style="min-width:0">
+            <h3>${escapeHtml(x.d.name)}</h3>
+            <p>
+              Boss: <b class="mono">${fmt.format(x.runs)}</b> •
+              Ress: <b class="mono">${fmt.format(resQtyA)}</b> •
+              Kamas: <b class="mono">${money(x.km)}</b>
+            </p>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="pill">${kamasInlineHtml(money(x.km))}</div>
+          <button class="btn gold" onclick="location.hash='#/a/${encodeURIComponent(x.d.id)}'">Ouvrir</button>
+        </div>
+      </div>
+    `
+  });
+}
+
+// ✅ Donjons — triés par kamas total (inclut captures pour Comte)
+for(const d of DUNGEONS){
+  const st = ensureDungeonShape(d, loadDungeon(d.id));
+  const km = sumKamasFromDungeon(d, st);
+  const runsShown = clampInt(st.runs||0) + (d.id==="comte" ? clampInt(st.captures||0) : 0);
+
+  recapCards.push({
+    km,
+    html: `
       <div class="card">
         <div class="card-left">
           <div class="thumb"><img data-dir="${escapeHtml(d.imgDir)}" data-file="${escapeHtml(d.thumb)}" alt=""></div>
           <div style="min-width:0">
             <h3>${escapeHtml(d.name)}</h3>
             <p>
-              Runs: <b class="mono">${fmt.format(clampInt(st.runs||0))}</b> •
+              Runs: <b class="mono">${fmt.format(runsShown)}</b> •
               Mobs: <b class="mono">${fmt.format(sumQty(st.mobs))}</b> •
               Ress: <b class="mono">${fmt.format(sumQty(st.res))}</b> •
               Items: <b class="mono">${fmt.format(sumQty(st.eq))}</b>
@@ -3500,9 +3614,14 @@ for(const a of ANOMALIES){
           <button class="btn gold" onclick="location.hash='#/d/${encodeURIComponent(d.id)}'">Ouvrir</button>
         </div>
       </div>
-    `;
-  }).join("");
+    `
+  });
+}
 
+// ✅ Tri : du + rentable (kamas total) au -
+recapCards.sort((a,b)=> (b.km||0) - (a.km||0));
+
+recap.innerHTML = recapCards.map(x=>x.html).join("");
   activateImages(app);
 };
 
