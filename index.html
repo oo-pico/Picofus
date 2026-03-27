@@ -339,6 +339,67 @@
 #modalIntensity .intBtn .i{ width:42px; height:42px; border-radius:14px; overflow:hidden; }
 #modalIntensity .intBtn .i img{ width:100%; height:100%; object-fit:contain; display:block; }
 
+
+    .monsterSearchWrap{display:flex;flex-direction:column;gap:12px}
+    .monsterSearchBar{
+      width:100%;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      outline:none;
+      font-size:15px;
+    }
+    .monsterSearchBar:focus{border-color:rgba(214,179,106,.55)}
+    .monsterSearchMeta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    .monsterSearchHint{color:var(--muted);font-size:12px}
+    .monsterResultList{display:flex;flex-direction:column;gap:10px}
+    .monsterResultBtn{
+      width:100%;
+      text-align:left;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      border-radius:16px;
+      padding:12px;
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .monsterResultBtn:hover{border-color:rgba(214,179,106,.45);background:rgba(214,179,106,.07)}
+    .monsterResultBtn .left{display:flex;align-items:center;gap:10px;min-width:0}
+    .monsterResultBtn .mini{width:42px;height:42px;border-radius:14px;flex:0 0 auto}
+    .monsterResultBtn .txt{min-width:0}
+    .monsterResultBtn .txt .n{margin:0;font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .monsterResultBtn .txt .m{margin:2px 0 0;font-size:12px;color:var(--muted)}
+    .monsterResultBtn .right{font-weight:900;font-variant-numeric:tabular-nums}
+    .monsterStatsGrid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      gap:10px;
+    }
+    .monsterStatBox{
+      border:1px solid var(--stroke);
+      border-radius:16px;
+      background:rgba(255,255,255,.02);
+      padding:10px;
+    }
+    .monsterStatBox .k{font-size:12px;color:var(--muted)}
+    .monsterStatBox .v{margin-top:6px;font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
+    .monsterResGrid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+      gap:10px;
+    }
+    .monsterResCard{
+      border:1px solid var(--stroke);
+      border-radius:16px;
+      background:rgba(255,255,255,.02);
+      padding:10px;
+    }
+    .monsterResCard .k{font-size:12px;color:var(--muted)}
+    .monsterResCard .v{margin-top:6px;font-size:15px;font-weight:900;font-variant-numeric:tabular-nums}
+
 /* Preview pictos Stats */
 .legendPreview{ margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; }
 .legendPreview img{
@@ -1872,6 +1933,139 @@ function loadSonges(){
 }
 function saveSonges(s){ localStorage.setItem(kSonges, JSON.stringify(s)); }
 
+function normalizeMonsterName(s){
+  return String(s || "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+const SONGE_MONSTERS = [
+  {
+    name:"Roi Imagami",
+    img:"Roi Imagami.png",
+    dir:"Songes/",
+    initiative:10000, fuite:100, tacle:120,
+    res:{neutre:{fixe:0,pct:22}, terre:{fixe:0,pct:18}, feu:{fixe:0,pct:-11}, eau:{fixe:0,pct:-8}, air:{fixe:0,pct:-21}},
+    repou:0, recri:0, esquivePA:80, esquivePM:80
+  },
+  {
+    name:"Ush Galesh (rouge)",
+    img:"Ush Galesh.png",
+    dir:"Songes/",
+    initiative:41906, fuite:125, tacle:125,
+    res:{neutre:{fixe:0,pct:20}, terre:{fixe:0,pct:10}, feu:{fixe:0,pct:20}, eau:{fixe:0,pct:20}, air:{fixe:0,pct:10}},
+    repou:0, recri:0, esquivePA:72, esquivePM:99
+  },
+  {
+    name:"Ush Galesh (noir)",
+    img:"Ush Galesh.png",
+    dir:"Songes/",
+    initiative:2626, fuite:125, tacle:72,
+    res:{neutre:{fixe:0,pct:20}, terre:{fixe:0,pct:20}, feu:{fixe:0,pct:10}, eau:{fixe:0,pct:10}, air:{fixe:0,pct:20}},
+    repou:0, recri:0, esquivePA:72, esquivePM:99
+  },
+  {
+    name:"Capitaine Ekarlatte",
+    img:"Capitaine Ekarlatte.png",
+    dir:"Songes/",
+    initiative:7804, fuite:245, tacle:76,
+    res:{neutre:{fixe:0,pct:12}, terre:{fixe:0,pct:23}, feu:{fixe:0,pct:7}, eau:{fixe:0,pct:14}, air:{fixe:0,pct:31}},
+    repou:0, recri:0, esquivePA:59, esquivePM:59
+  },
+  {
+    name:"Bethel Akarna",
+    img:"Bethel Akarna.png",
+    dir:"Bethel/",
+    initiative:53200, fuite:100, tacle:80,
+    res:{neutre:{fixe:0,pct:0}, terre:{fixe:0,pct:0}, feu:{fixe:0,pct:0}, eau:{fixe:0,pct:0}, air:{fixe:0,pct:0}},
+    repou:0, recri:0, esquivePA:80, esquivePM:100
+  },
+  {
+    name:"Solar",
+    img:"Solar.png",
+    dir:"Songes/",
+    initiative:53200, fuite:120, tacle:120,
+    res:{neutre:{fixe:0,pct:40}, terre:{fixe:0,pct:20}, feu:{fixe:0,pct:5}, eau:{fixe:0,pct:20}, air:{fixe:0,pct:5}},
+    repou:0, recri:0, esquivePA:80, esquivePM:80
+  },
+  {
+    name:"Nelween",
+    img:"Nelween.png",
+    dir:"Songes/",
+    initiative:7710, fuite:109, tacle:109,
+    res:{neutre:{fixe:0,pct:20}, terre:{fixe:0,pct:5}, feu:{fixe:0,pct:15}, eau:{fixe:0,pct:20}, air:{fixe:0,pct:15}},
+    repou:0, recri:0, esquivePA:152, esquivePM:152
+  },
+  {
+    name:"Déchireuse perturbée",
+    img:"Déchireuse perturbée.png",
+    dir:"Songes/",
+    initiative:13200, fuite:280, tacle:280,
+    res:{neutre:{fixe:0,pct:25}, terre:{fixe:0,pct:20}, feu:{fixe:0,pct:15}, eau:{fixe:0,pct:15}, air:{fixe:0,pct:20}},
+    repou:0, recri:0, esquivePA:130, esquivePM:130
+  },
+  {
+    name:"XLII",
+    img:"XLII.png",
+    dir:"Songes/",
+    initiative:36916, fuite:81, tacle:105,
+    res:{neutre:{fixe:0,pct:10}, terre:{fixe:0,pct:6}, feu:{fixe:0,pct:22}, eau:{fixe:0,pct:12}, air:{fixe:0,pct:30}},
+    repou:0, recri:0, esquivePA:68, esquivePM:92
+  },
+  {
+    name:"Père Ver",
+    img:"Père Ver.png",
+    dir:"Songes/",
+    initiative:33662, fuite:90, tacle:126,
+    res:{neutre:{fixe:0,pct:35}, terre:{fixe:0,pct:20}, feu:{fixe:0,pct:10}, eau:{fixe:0,pct:10}, air:{fixe:0,pct:50}},
+    repou:0, recri:0, esquivePA:114, esquivePM:90
+  },
+  {
+    name:"Kabahal",
+    img:"Kabahal.png",
+    dir:"Songes/",
+    initiative:10000, fuite:80, tacle:80,
+    res:{neutre:{fixe:0,pct:50}, terre:{fixe:0,pct:50}, feu:{fixe:0,pct:50}, eau:{fixe:0,pct:50}, air:{fixe:0,pct:50}},
+    repou:9999, recri:-200, esquivePA:64, esquivePM:64
+  },
+  {
+    name:"Kwakwa",
+    img:"Kwakwa.png",
+    dir:"Songes/",
+    initiative:9834, fuite:445, tacle:445,
+    res:{neutre:{fixe:0,pct:80}, terre:{fixe:0,pct:80}, feu:{fixe:0,pct:80}, eau:{fixe:0,pct:80}, air:{fixe:0,pct:80}},
+    repou:-280, recri:0, esquivePA:172, esquivePM:172
+  },
+  {
+    name:"Culbuteuf",
+    img:"Culbuteuf.png",
+    dir:"Songes/",
+    initiative:4200, fuite:170, tacle:220,
+    res:{neutre:{fixe:50,pct:25}, terre:{fixe:50,pct:-15}, feu:{fixe:50,pct:40}, eau:{fixe:50,pct:35}, air:{fixe:0,pct:-10}},
+    repou:0, recri:0, esquivePA:100, esquivePM:100
+  }
+];
+SONGE_MONSTERS.forEach(m=>{
+  m._norm = normalizeMonsterName(m.name);
+  m._aliases = [m._norm].concat((m.aliases||[]).map(normalizeMonsterName));
+});
+function searchSongeMonsters(q){
+  const nq = normalizeMonsterName(q);
+  if(!nq) return SONGE_MONSTERS.slice().sort((a,b)=>b.initiative-a.initiative || a.name.localeCompare(b.name, 'fr'));
+  return SONGE_MONSTERS.filter(m=>{
+    if(m._norm.includes(nq)) return true;
+    return (m._aliases||[]).some(a=>a.includes(nq));
+  }).sort((a,b)=>{
+    const aStarts = mStarts(a, nq), bStarts = mStarts(b, nq);
+    if(aStarts !== bStarts) return bStarts - aStarts;
+    return b.initiative - a.initiative || a.name.localeCompare(b.name, 'fr');
+  });
+}
+function mStarts(m, nq){ return Number(m._norm.startsWith(nq) || (m._aliases||[]).some(a=>a.startsWith(nq))); }
+
+
 /* =========================================================
    PP
    ========================================================= */
@@ -2013,6 +2207,7 @@ function route(){
   if(h==="/") return {page:"home"};
   if(h==="/donjons") return {page:"donjons"};
   if(h==="/songes") return {page:"songes"};
+  if(h==="/songes-monstres") return {page:"songesMonsters"};
   if(h==="/stats") return {page:"stats"};
   if(h==="/pp") return {page:"pp"};
   if(h==="/omega") return {page:"omega"};
@@ -2855,7 +3050,14 @@ function renderSonges(){
   `;
 
 
- const miniGrid = SONGES.legendItems.map(f=>{
+ const orderedLegendItems = SONGES.legendItems.slice().sort((a,b)=>{
+  const ka = keyFromFile(a), kb = keyFromFile(b);
+  const va = clampInt(s.legendItems[ka]||0), vb = clampInt(s.legendItems[kb]||0);
+  if(vb !== va) return vb - va;
+  return ka.localeCompare(kb, 'fr');
+ });
+
+ const miniGrid = orderedLegendItems.map(f=>{
   const k = keyFromFile(f);
   const v = clampInt(s.legendItems[k]||0);
   return `
@@ -2891,7 +3093,8 @@ app.innerHTML = `
         </div>
       </div>
       <div class="seg">
-        <button class="btn bad" id="btnResetSonges">Reset songes</button>
+        <button class="btn gold" id="btnSongesMonsters">Monstres Songes</button>
+          <button class="btn bad" id="btnResetSonges">Reset songes</button>
       </div>
     </div>
 
@@ -2964,6 +3167,8 @@ app.innerHTML = `
     handlers[`li:pick:${k}`] = ()=> openKeypad(k, s.legendItems[k]||0, (v)=>{ s.legendItems[k]=clampInt(v); saveSonges(s); render(); }, {mode:"int"});
   }
 
+  $("#btnSongesMonsters").onclick = ()=>{ location.hash = "#/songes-monstres"; };
+
   $("#btnResetSonges").onclick = ()=>{
     if(!confirm("Reset songes ?")) return;
     localStorage.removeItem(kSonges);
@@ -2998,6 +3203,130 @@ app.innerHTML = `
       };
     });
   };
+}
+
+
+function renderSongesMonsters(){
+  pagePill.textContent = "Monstres Songes";
+  const q = new URLSearchParams(location.hash.split("?")[1] || "").get("q") || "";
+  const results = searchSongeMonsters(q);
+  const selected = results[0] || null;
+
+  const resultHtml = results.slice(0, 20).map((m, idx)=>`
+    <button class="monsterResultBtn" data-monster="${escapeHtml(m.name)}">
+      <div class="left">
+        <div class="ico mini"><img data-dir="${escapeHtml(m.dir||'')}" data-file="${escapeHtml(m.img||'')}" alt=""></div>
+        <div class="txt">
+          <p class="n">${escapeHtml(m.name)}</p>
+          <p class="m">Ini ${fmt.format(m.initiative)} • Fuite ${fmt.format(m.fuite)} • Tacle ${fmt.format(m.tacle)}</p>
+        </div>
+      </div>
+      <div class="right">${idx===0 && q ? 'Meilleur match' : fmt.format(m.initiative)}</div>
+    </button>
+  `).join("");
+
+  const resCard = (label, val)=>`
+    <div class="monsterResCard">
+      <div class="k">${label}</div>
+      <div class="v">${fmt.format(val.fixe||0)} fixe • ${val.pct||0}%</div>
+    </div>
+  `;
+
+  let details = `
+    <div class="section" style="margin:0">
+      <div class="topline">
+        <div class="title">
+          <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.songes)}" alt=""></div>
+          <div><h2>Monstres Songes</h2><p class="sub">Base en cours de remplissage • recherche instantanée</p></div>
+        </div>
+        <div class="seg">
+          <button class="btn" id="btnBackSonges">Retour Songes</button>
+        </div>
+      </div>
+
+      <div class="monsterSearchWrap">
+        <input id="monsterSearch" class="monsterSearchBar" type="text" placeholder="Tape un monstre… ex: Roi Imagami, Ush Galesh, Capitaine Ekarlatte" value="${escapeHtml(q)}">
+        <div class="monsterSearchMeta">
+          <div class="monsterSearchHint">${fmt.format(SONGE_MONSTERS.length)} monstre(s) renseigné(s) pour l’instant dans la page. La base est prête à recevoir la suite.</div>
+          <div class="monsterSearchHint">Les 20 meilleurs résultats max s’affichent.</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  if(!selected){
+    details += `
+      <div class="row" style="margin-top:12px">
+        <div class="section" style="margin:0">
+          <div class="title"><div><h2>Résultats</h2><p class="sub">Aucun monstre trouvé</p></div></div>
+          <div class="hint">Essaie un autre nom ou complète la base plus tard.</div>
+        </div>
+        <div class="section" style="margin:0">
+          <div class="title"><div><h2>Fiche</h2><p class="sub">En attente</p></div></div>
+          <div class="hint">Dès qu’un monstre est trouvé, ses stats s’affichent ici.</div>
+        </div>
+      </div>
+    `;
+    app.innerHTML = details;
+    $("#btnBackSonges").onclick = ()=>location.hash = "#/songes";
+    $("#monsterSearch").addEventListener("input", (e)=>{
+      const val = e.target.value.trim();
+      location.hash = val ? `#/songes-monstres?q=${encodeURIComponent(val)}` : "#/songes-monstres";
+    });
+    activateImages(app);
+    return;
+  }
+
+  details += `
+    <div class="row" style="margin-top:12px">
+      <div class="section" style="margin:0">
+        <div class="title"><div><h2>Résultats</h2><p class="sub">${results.length} résultat(s)</p></div></div>
+        <div class="monsterResultList">${resultHtml || `<div class="hint">Aucun résultat.</div>`}</div>
+      </div>
+
+      <div class="section" style="margin:0">
+        <div class="topline">
+          <div class="title">
+            <div class="thumb" style="width:48px;height:48px"><img data-dir="${escapeHtml(selected.dir||'')}" data-file="${escapeHtml(selected.img||'')}" alt=""></div>
+            <div><h2>${escapeHtml(selected.name)}</h2><p class="sub">Fiche rapide du monstre</p></div>
+          </div>
+        </div>
+
+        <div class="monsterStatsGrid">
+          <div class="monsterStatBox"><div class="k">Initiative</div><div class="v">${fmt.format(selected.initiative)}</div></div>
+          <div class="monsterStatBox"><div class="k">Fuite</div><div class="v">${fmt.format(selected.fuite)}</div></div>
+          <div class="monsterStatBox"><div class="k">Tacle</div><div class="v">${fmt.format(selected.tacle)}</div></div>
+          <div class="monsterStatBox"><div class="k">Ré pou</div><div class="v">${fmt.format(selected.repou||0)}</div></div>
+          <div class="monsterStatBox"><div class="k">Ré cri</div><div class="v">${fmt.format(selected.recri||0)}</div></div>
+          <div class="monsterStatBox"><div class="k">Esquive PA / PM</div><div class="v">${fmt.format(selected.esquivePA||0)} / ${fmt.format(selected.esquivePM||0)}</div></div>
+        </div>
+
+        <div class="hint" style="margin-top:12px"><b>Résistances</b></div>
+        <div class="monsterResGrid">
+          ${resCard("Neutre", selected.res.neutre)}
+          ${resCard("Terre", selected.res.terre)}
+          ${resCard("Feu", selected.res.feu)}
+          ${resCard("Eau", selected.res.eau)}
+          ${resCard("Air", selected.res.air)}
+        </div>
+      </div>
+    </div>
+  `;
+
+  app.innerHTML = details;
+
+  $("#btnBackSonges").onclick = ()=>location.hash = "#/songes";
+  $("#monsterSearch").addEventListener("input", (e)=>{
+    const val = e.target.value.trim();
+    location.hash = val ? `#/songes-monstres?q=${encodeURIComponent(val)}` : "#/songes-monstres";
+  });
+  app.querySelectorAll("[data-monster]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const target = btn.dataset.monster || "";
+      location.hash = `#/songes-monstres?q=${encodeURIComponent(target)}`;
+    });
+  });
+  activateImages(app);
 }
 
 /* =========================================================
@@ -3190,6 +3519,7 @@ function render(){
   if(r.page==="home") return renderHome();
   if(r.page==="donjons") return renderDonjons();
   if(r.page==="songes") return renderSonges();
+  if(r.page==="songesMonsters") return renderSongesMonsters();
 if(r.page==="anomalie") return renderAnomalie();
   if(r.page==="stats") { try{ return renderStats(); }catch(err){ console.error(err); app.innerHTML = `<div class="section"><div class="hint">Erreur Stats : ${escapeHtml(String(err && err.message ? err.message : err))}<br>Ouvre la console (F12) pour le détail.</div></div>`; return; } }
   if(r.page==="pp") return renderPP();
