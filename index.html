@@ -1952,7 +1952,7 @@ const SONGE_MONSTERS = [
   },
   {
     name:"Ush Galesh (rouge)",
-    img:"Ush Galesh.png",
+    img:"Ush Galesh (rouge).png",
     dir:"Songes/",
     initiative:41906, fuite:125, tacle:125,
     res:{neutre:{fixe:0,pct:20}, terre:{fixe:0,pct:10}, feu:{fixe:0,pct:20}, eau:{fixe:0,pct:20}, air:{fixe:0,pct:10}},
@@ -1960,7 +1960,7 @@ const SONGE_MONSTERS = [
   },
   {
     name:"Ush Galesh (noir)",
-    img:"Ush Galesh.png",
+    img:"Ush Galesh (noir).png",
     dir:"Songes/",
     initiative:2626, fuite:125, tacle:72,
     res:{neutre:{fixe:0,pct:20}, terre:{fixe:0,pct:20}, feu:{fixe:0,pct:10}, eau:{fixe:0,pct:10}, air:{fixe:0,pct:20}},
@@ -2204,16 +2204,17 @@ importFile.addEventListener("change", async ()=>{
 
 function route(){
   const h = (location.hash || "#/").slice(1);
-  if(h==="/") return {page:"home"};
-  if(h==="/donjons") return {page:"donjons"};
-  if(h==="/songes") return {page:"songes"};
-  if(h==="/songes-monstres") return {page:"songesMonsters"};
-  if(h==="/stats") return {page:"stats"};
-  if(h==="/pp") return {page:"pp"};
-  if(h==="/omega") return {page:"omega"};
-if(h==="/anomalie") return {page:"anomalie"};
-  const m = h.match(/^\/d\/(.+)$/);
-const a = h.match(/^\/a\/(.+)$/);
+  const [pathOnly] = h.split("?");
+  if(pathOnly==="/") return {page:"home"};
+  if(pathOnly==="/donjons") return {page:"donjons"};
+  if(pathOnly==="/songes") return {page:"songes"};
+  if(pathOnly==="/songes-monstres") return {page:"songesMonsters"};
+  if(pathOnly==="/stats") return {page:"stats"};
+  if(pathOnly==="/pp") return {page:"pp"};
+  if(pathOnly==="/omega") return {page:"omega"};
+if(pathOnly==="/anomalie") return {page:"anomalie"};
+  const m = pathOnly.match(/^\/d\/(.+)$/);
+const a = pathOnly.match(/^\/a\/(.+)$/);
 if(a) return {page:"anomaly", id: decodeURIComponent(a[1])};
   if(m) return {page:"dungeon", id: decodeURIComponent(m[1])};
   return {page:"home"};
