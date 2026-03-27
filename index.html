@@ -1960,6 +1960,8 @@ function loadSonges(){
 }
 function saveSonges(s){ localStorage.setItem(kSonges, JSON.stringify(s)); }
 
+const SONGES_MONSTERS_VISIBLE = false;
+
 function normalizeMonsterName(s){
   return String(s || "")
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -12831,7 +12833,7 @@ function route(){
   if(pathOnly==="/") return {page:"home"};
   if(pathOnly==="/donjons") return {page:"donjons"};
   if(pathOnly==="/songes") return {page:"songes"};
-  if(pathOnly==="/songes-monstres") return {page:"songesMonsters"};
+  if(pathOnly==="/songes-monstres") return {page:(SONGES_MONSTERS_VISIBLE ? "songesMonsters" : "songes")};
   if(pathOnly==="/stats") return {page:"stats"};
   if(pathOnly==="/pp") return {page:"pp"};
   if(pathOnly==="/omega") return {page:"omega"};
@@ -13717,7 +13719,7 @@ app.innerHTML = `
         </div>
       </div>
       <div class="seg">
-        <button class="btn gold" id="btnSongesMonsters">Monstres Songes</button>
+        <button class="btn gold" id="btnSongesMonsters" style="display:none">Monstres Songes</button>
           <button class="btn bad" id="btnResetSonges">Reset songes</button>
       </div>
     </div>
@@ -13832,6 +13834,7 @@ app.innerHTML = `
 
 
 function renderSongesMonsters(){
+  if(!SONGES_MONSTERS_VISIBLE){ location.hash = "#/songes"; return; }
   pagePill.textContent = "Monstres Songes";
   const filters = parseMonsterFiltersFromHash();
   const results = searchSongeMonsters(filters);
@@ -13881,7 +13884,7 @@ function renderSongesMonsters(){
       <div class="topline">
         <div class="title">
           <div class="thumb" style="width:44px;height:44px"><img data-dir="" data-file="${escapeHtml(ICONS.songes)}" alt=""></div>
-          <div><h2 style="display:none">Monstres Songes</h2><p class="sub">Base complète intégrée dans la page • recherche + filtres</p></div>
+          <div><h2>Monstres Songes</h2><p class="sub">Base complète intégrée dans la page • recherche + filtres</p></div>
         </div>
         <div class="seg">
           <button class="btn" id="btnBackSonges">Retour Songes</button>
