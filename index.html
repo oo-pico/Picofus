@@ -1725,6 +1725,39 @@ id:"reine_voleurs",
 },
 
 
+  {
+    id:"gigalodon",
+    name:"Gigalodon",
+    imgDir:"",
+    thumb:"Gigalodon.png",
+    mobs:[
+      {key:"Gigalodon", img:"Gigalodon.png"},
+      {key:"Mureine", img:"Mureine.png"},
+      {key:"Exécrabe", img:"Exécrabe.png"},
+      {key:"Willorque", img:"Willorque.png"},
+    ],
+    butins:{
+      b4: {"Gigalodon":1,"Mureine":1,"Exécrabe":1,"Willorque":1},
+      b5: {"Gigalodon":1,"Mureine":1,"Exécrabe":1,"Willorque":1},
+      b6: {"Gigalodon":1,"Mureine":1,"Exécrabe":1,"Willorque":1},
+      b7: {"Gigalodon":1,"Mureine":1,"Exécrabe":1,"Willorque":1},
+      b8: {"Gigalodon":1,"Mureine":1,"Exécrabe":1,"Willorque":1},
+    },
+    resources:[
+      { key:"Coffre du Gouffre", img:"Coffre du Gouffre.png" },
+      { key:"Coffre majestueux du Gouffre", img:"Coffre majestueux du Gouffre.png" },
+      { key:"Lueur abyssale", img:"Lueur abyssale.png" },
+      { key:"Venin de Mureine", img:"Venin de Mureine.png" },
+      { key:"Carapace d'Exécrabe", img:"Carapace d'Exécrabe.png" },
+      { key:"Aileron de Willorque", img:"Aileron de Willorque.png" },
+      { key:"Visage de Mureine", img:"Visage de Mureine.png" },
+      { key:"Lancepince d'Exécrabe", img:"Lancepince d'Exécrabe.png" },
+      { key:"Dorsale de Willroque", img:"Dorsale de Willroque.png" },
+      { key:"Minilodon", img:"Minilodon.png" },
+    ],
+    equipments:[]
+  },
+
 ];
 
 /* =========================================================
@@ -13303,6 +13336,7 @@ function renderDungeon(d){
   const st = ensureDungeonShape(d, loadDungeon(d.id));
   const butin = loadButin(d.id);
   const isComte = (d.id === "comte");
+  const isGigalodon = (d.id === "gigalodon");
 
   const mobList = (d.mobs||[]).map(m=>{
     const v = clampInt(st.mobs[m.key]||0);
@@ -13358,7 +13392,7 @@ function renderDungeon(d){
           <div class="thumb"><img data-dir="${escapeHtml(d.imgDir)}" data-file="${escapeHtml(d.thumb)}" alt=""></div>
           <div>
             <h2>${escapeHtml(d.name)}</h2>
-            <p class="sub">Choisis le butin, puis ajoute tes runs (saisie rapide possible).</p>
+            <p class="sub">${isGigalodon ? "Suivi manuel des mobs et ressources." : "Choisis le butin, puis ajoute tes runs (saisie rapide possible)."}</p>
           </div>
         </div>
         <div class="seg">
@@ -13367,6 +13401,7 @@ function renderDungeon(d){
         </div>
       </div>
 
+      ${!isGigalodon ? `
       <div class="butinSelector">
         <span class="butinLabel">Butin</span>
         ${["b4","b5","b6","b7","b8"].map(b=>`
@@ -13389,6 +13424,7 @@ function renderDungeon(d){
           <span class="pill">Captures: <b class="mono">${fmt.format(st.captures||0)}</b></span>
         ` : ``}
       </div>
+      ` : ``}
 
       <div class="summary">
         <div class="kpi"><div class="k">Mobs total</div><div class="v mono">${fmt.format(totalMobs)}</div></div>
