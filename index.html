@@ -1756,7 +1756,38 @@ id:"reine_voleurs",
       { key:"Minilodon", img:"Minilodon.png" },
     ],
     equipments:[]
-  },
+  },,
+
+  {
+    id:"ombre",
+    name:"Ombre",
+    imgDir:"",
+    thumb:"Ombre.png",
+    mobs:[
+      {key:"Ombre", img:"Ombre.png"},
+      {key:"Sombléro", img:"Sombléro.png"},
+      {key:"Caznoar", img:"Caznoar.png"},
+      {key:"Brutopak", img:"Brutopak.png"},
+      {key:"Panterreur", img:"Panterreur.png"},
+      {key:"Noctulule", img:"Noctulule.png"},
+    ],
+    butins:{},
+    resources:[
+      {key:"Corne d'Ombre", img:"Corne d'Ombre.png"},
+      {key:"Masque du Vice", img:"Masque du Vice.png"},
+      {key:"Masque de la Vivacité", img:"Masque de la Vivacité.png"},
+      {key:"Masque de la Violence", img:"Masque de la Violence.png"},
+      {key:"Masque de la Vengeance", img:"Masque de la Vengeance.png"},
+      {key:"Masque du Vide", img:"Masque du Vide.png"},
+      {key:"Symbole des Obscuranti", img:"Symbole des Obscuranti.png"},
+      {key:"Éclat Obscur", img:"Éclat Obscur.png"},
+      {key:"Viande Noire", img:"Viande Noire.png"},
+      {key:"Bidoche Noire", img:"Bidoche Noire.png"},
+      {key:"Éklâme majestueuse", img:"Éklâme majestueuse.png"},
+      {key:"Casque d'Ombre", img:"Casque d'Ombre.png"},
+    ],
+    equipments:[]
+  }
 
 ];
 
@@ -13337,6 +13368,7 @@ function renderDungeon(d){
   const butin = loadButin(d.id);
   const isComte = (d.id === "comte");
   const isGigalodon = (d.id === "gigalodon");
+  const hasButins = Object.keys(d.butins || {}).length > 0;
 
   const mobList = (d.mobs||[]).map(m=>{
     const v = clampInt(st.mobs[m.key]||0);
@@ -13392,7 +13424,7 @@ function renderDungeon(d){
           <div class="thumb"><img data-dir="${escapeHtml(d.imgDir)}" data-file="${escapeHtml(d.thumb)}" alt=""></div>
           <div>
             <h2>${escapeHtml(d.name)}</h2>
-            <p class="sub">${isGigalodon ? "Suivi manuel des mobs et ressources." : "Choisis le butin, puis ajoute tes runs (saisie rapide possible)."}</p>
+            <p class="sub">${(!hasButins || isGigalodon) ? "Suivi manuel des mobs et ressources." : "Choisis le butin, puis ajoute tes runs (saisie rapide possible)."}</p>
           </div>
         </div>
         <div class="seg">
@@ -13401,7 +13433,7 @@ function renderDungeon(d){
         </div>
       </div>
 
-      ${!isGigalodon ? `
+      ${(!isGigalodon && hasButins) ? `
       <div class="butinSelector">
         <span class="butinLabel">Butin</span>
         ${["b4","b5","b6","b7","b8"].map(b=>`
