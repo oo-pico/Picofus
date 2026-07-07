@@ -1756,13 +1756,14 @@ id:"reine_voleurs",
       { key:"Minilodon", img:"Minilodon.png" },
     ],
     equipments:[]
-  },,
+  },
 
   {
     id:"ombre",
     name:"Ombre",
     imgDir:"",
     thumb:"Ombre.png",
+    manualOnly:true,
     mobs:[
       {key:"Ombre", img:"Ombre.png"},
       {key:"Sombléro", img:"Sombléro.png"},
@@ -1787,7 +1788,7 @@ id:"reine_voleurs",
       {key:"Casque d'Ombre", img:"Casque d'Ombre.png"},
     ],
     equipments:[]
-  }
+  },
 
 ];
 
@@ -13368,7 +13369,8 @@ function renderDungeon(d){
   const butin = loadButin(d.id);
   const isComte = (d.id === "comte");
   const isGigalodon = (d.id === "gigalodon");
-  const hasButins = Object.keys(d.butins || {}).length > 0;
+  const isManualOnly = (d.manualOnly === true);
+  const hasEquipments = (d.equipments||[]).length > 0;
 
   const mobList = (d.mobs||[]).map(m=>{
     const v = clampInt(st.mobs[m.key]||0);
@@ -13424,7 +13426,7 @@ function renderDungeon(d){
           <div class="thumb"><img data-dir="${escapeHtml(d.imgDir)}" data-file="${escapeHtml(d.thumb)}" alt=""></div>
           <div>
             <h2>${escapeHtml(d.name)}</h2>
-            <p class="sub">${(!hasButins || isGigalodon) ? "Suivi manuel des mobs et ressources." : "Choisis le butin, puis ajoute tes runs (saisie rapide possible)."}</p>
+            <p class="sub">${(isGigalodon || isManualOnly) ? "Suivi manuel des mobs et ressources." : "Choisis le butin, puis ajoute tes runs (saisie rapide possible)."}</p>
           </div>
         </div>
         <div class="seg">
@@ -13433,7 +13435,7 @@ function renderDungeon(d){
         </div>
       </div>
 
-      ${(!isGigalodon && hasButins) ? `
+      ${(!isGigalodon && !isManualOnly) ? `
       <div class="butinSelector">
         <span class="butinLabel">Butin</span>
         ${["b4","b5","b6","b7","b8"].map(b=>`
@@ -13488,6 +13490,7 @@ function renderDungeon(d){
       </div>
     </div>
 
+    ${hasEquipments ? `
     <div class="section">
       <div class="topline">
         <div class="title">
@@ -13497,6 +13500,7 @@ function renderDungeon(d){
       </div>
       <div class="list equipGrid">${eqList}</div>
     </div>
+    ` : ``}
   `;
 
   const handlers = {};
@@ -13649,6 +13653,7 @@ function renderDungeon(d){
 }
 
 function applyRuns(d, st, runs){
+  if(d.manualOnly === true) return;
   runs = parseInt(runs,10);
   if(!Number.isFinite(runs) || runs===0) return;
 
@@ -14721,3 +14726,4 @@ recap.innerHTML = recapCards.map(x=>x.html).join("");
 </script>
 </body>
 </html>
+
