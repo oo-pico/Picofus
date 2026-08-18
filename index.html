@@ -276,6 +276,13 @@
     }
     .miniLegend .ctrls{gap:6px}
     .miniLegend .num{min-width:54px;padding:7px 8px;border-radius:10px}
+    .miniLegend{align-items:flex-start;flex-direction:column}
+    .miniLegend .left{width:100%}
+    .miniLegend .ctrls{width:100%;justify-content:flex-start}
+    .miniLegend .legendPrice{width:100%;display:flex;gap:6px;align-items:center;margin-top:6px}
+    .miniLegend .legendPrice .price{width:100%;min-width:0}
+    .miniLegend .legendSubtotal{font-size:11px;color:var(--gold);font-weight:800;margin-top:4px}
+    .miniLegendGrid{grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));}
 
     .statGrid{
       display:grid;
@@ -697,6 +704,7 @@ const EMBEDDED_NEW_IMAGES = {"item_10240.png":"data:image/png;base64,iVBORw0KGgo
 function exactImagePath(dir, file){
   const d = String(dir || "").trim().replace(/^\.\//, "");
   const f = String(file || "").trim().replace(/^\.\//, "");
+  if(/^https?:\/\//i.test(f)) return f;
   if(d.replace(/\/+$/, "") === "Picofus_new_images" && EMBEDDED_NEW_IMAGES[f]){
     return EMBEDDED_NEW_IMAGES[f];
   }
@@ -1803,7 +1811,7 @@ id:"reine_voleurs",
       {key:"Kimbo", img:"picofus_0321.png", dir:"Picofus_images/"},
       {key:"Abrakleur Clair", img:"picofus_0001.png", dir:"Picofus_images/"},
       {key:"Meupette", img:"picofus_0368.png", dir:"Picofus_images/"},
-      {key:"Kaskargo", img:"picofus_0320.png", dir:"Picofus_images/"},
+      {key:"Kaskargo", img:"https://static.ankama.com/dofus/www/game/monsters/200/1044.w52h52.png", dir:""},
       {key:"Poolay", img:"picofus_0433.png", dir:"Picofus_images/"},
       {key:"Bitouf Aérien", img:"picofus_0073.png", dir:"Picofus_images/"},
     ],
@@ -1821,7 +1829,7 @@ id:"reine_voleurs",
       {key:"Cloaque du Poolay", img:"picofus_0193.png", dir:"Picofus_images/"},
       {key:"Coco du Bitouf aérien", img:"picofus_0195.png", dir:"Picofus_images/"},
       {key:"Croupion du Bitouf aérien", img:"picofus_0238.png", dir:"Picofus_images/"},
-      {key:"Viande Fraîche", img:"picofus_0514.png", dir:"Picofus_images/"},
+      {key:"Viande Fraîche", img:"https://doflex.fr/s/items/png/60bd57cfba86bbeab43c13c9c6e9bee3.png", dir:""},
       {key:"Bidoche Fraîche", img:"picofus_0068.png", dir:"Picofus_images/"},
       {key:"Éklâme majestueuse", img:"Éklâme majestueuse.png", dir:"./"},
     ],
@@ -2397,18 +2405,21 @@ const SONGES = {
     "Légende du Destin.png",
     "Légende du Miroir.png",
     "Légende du Trompe-la-Mort.png",
+    "Narkoffret Infini.png",
   ]
 };
 
 // Les légendes utilisent leurs PNG officiels dans le dossier Songes/.
 // Aucun remplacement par les images des boss.
-const SONGES_LEGEND_IMAGE_OVERRIDES = {};
+const SONGES_LEGEND_IMAGE_OVERRIDES = {
+  "Narkoffret Infini": {dir:"", img:"Narkoffret Infini.png"}
+};
 function keyFromFile(filename){ return String(filename).replace(/\.[a-z0-9]+$/i, ""); }
 function blankSonges(){
-  const s = { bribes:0, runs:{}, legends:{}, bribesI:{}, legendItems:{} };
+  const s = { bribes:0, runs:{}, legends:{}, bribesI:{}, legendItems:{}, legendPrices:{} };
   SONGES.intensities.forEach(i=>{ s.runs[i.id]=0; s.bribesI[i.id]=0; });
   SONGES.legends.forEach(l=>s.legends[l.key]=0);
-  SONGES.legendItems.forEach(f=> s.legendItems[keyFromFile(f)] = 0);
+  SONGES.legendItems.forEach(f=> { const k=keyFromFile(f); s.legendItems[k] = 0; s.legendPrices[k] = 0; });
   return s;
 }
 function loadSonges(){
@@ -2429,6 +2440,7 @@ function loadSonges(){
     for(const f of SONGES.legendItems){
       const k = keyFromFile(f);
       s.legendItems[k] = clampInt(p.legendItems?.[k] ?? 0);
+      s.legendPrices[k] = Math.max(0, toNum(p.legendPrices?.[k] ?? 0));
     }
     return s;
   }catch{ return blankSonges(); }
@@ -14077,12 +14089,13 @@ function openIntensityPicker(qty){
   intTitle.textContent = "Choisir l’intensité";
   modalIntensity.classList.add("open");
 
+  const currentSonges = loadSonges();
   intGrid.innerHTML = SONGES.intensities.map(it => `
     <button class="intBtn" data-int="${escapeHtml(it.id)}">
       <div class="i"><img data-dir="${escapeHtml(it.dir)}" data-file="${escapeHtml(it.img)}" alt=""></div>
       <div class="t">
         <p class="n">${escapeHtml(it.label)}</p>
-        <p class="s">Bribes: <b class="mono" id="bI:${escapeHtml(it.id)}">0</b></p>
+        <p class="s">Bribes: <b class="mono" id="bI:${escapeHtml(it.id)}">${fmt.format(clampInt(currentSonges.bribesI[it.id]||0))}</b></p>
       </div>
     </button>
   `).join("");
@@ -14096,6 +14109,19 @@ function closeIntensityPicker(){
 intClose.onclick = closeIntensityPicker;
 intCancel.onclick = closeIntensityPicker;
 modalIntensity.addEventListener("click", (e)=>{ if(e.target === modalIntensity) closeIntensityPicker(); });
+intGrid.onclick = (e)=>{
+  const btn = e.target.closest("[data-int]");
+  if(!btn || pendingBribes<=0) return;
+  const id = btn.dataset.int;
+  if(!id) return;
+  const q = clampInt(pendingBribes);
+  const currentSonges = loadSonges();
+  currentSonges.bribes = clampInt((currentSonges.bribes||0) + q);
+  currentSonges.bribesI[id] = clampInt((currentSonges.bribesI[id]||0) + q);
+  saveSonges(currentSonges);
+  closeIntensityPicker();
+  render();
+};
 
 function renderSonges(){
   pagePill.textContent = "Songes";
@@ -14138,17 +14164,26 @@ function renderSonges(){
  const miniGrid = orderedLegendItems.map(f=>{
   const k = keyFromFile(f);
   const v = clampInt(s.legendItems[k]||0);
+  const p = Math.max(0, toNum(s.legendPrices[k]||0));
+  const subtotal = v * p;
   const legendImg = SONGES_LEGEND_IMAGE_OVERRIDES[k] || {dir:"Songes/", img:f};
   return `
     <div class="miniLegend">
       <div class="left">
         <div class="ico"><img data-dir="${escapeHtml(legendImg.dir)}" data-file="${escapeHtml(legendImg.img)}" alt=""></div>
-        <div class="lab" title="${escapeHtml(k)}">${escapeHtml(k)}</div>
+        <div style="min-width:0;flex:1">
+          <div class="lab" title="${escapeHtml(k)}">${escapeHtml(k)}</div>
+          <div class="legendSubtotal">${kamasInlineHtml(money(subtotal))}</div>
+        </div>
       </div>
       <div class="ctrls">
-        <button class="btn small" data-act="li:+:${escapeHtml(k)}">+</button>
-        <div class="num mono" data-act="li:pick:${escapeHtml(k)}">${fmt.format(v)}</div>
         <button class="btn small" data-act="li:-:${escapeHtml(k)}">-</button>
+        <div class="num mono" data-act="li:pick:${escapeHtml(k)}">${fmt.format(v)}</div>
+        <button class="btn small" data-act="li:+:${escapeHtml(k)}">+</button>
+      </div>
+      <div class="legendPrice">
+        <input class="price mono" data-act="li:price:${escapeHtml(k)}" inputmode="decimal"
+          value="${p ? String(p).replace('.', ',') : ''}" placeholder="prix moyen/u">
       </div>
     </div>
   `;
@@ -14158,6 +14193,10 @@ function renderSonges(){
 
   // ✅ Total légendes = somme des 30 mini-carrés
   const totalLegends = Object.values(s.legendItems).reduce((a,b)=>a+clampInt(b),0);
+  const totalLegendValue = SONGES.legendItems.reduce((sum,f)=>{
+    const k = keyFromFile(f);
+    return sum + clampInt(s.legendItems[k]||0) * Math.max(0, toNum(s.legendPrices[k]||0));
+  }, 0);
 
 app.innerHTML = `
   <div class="section">
@@ -14189,6 +14228,10 @@ app.innerHTML = `
       <div class="kpi">
         <div class="k">Total items légendaires</div>
         <div class="v mono">${fmt.format(totalLegends)}</div>
+      </div>
+      <div class="kpi">
+        <div class="k"><img class="kamasIcon" src="./${encodeURI(ICONS.kamas)}" alt="k">Valeur légendaires</div>
+        <div class="v mono gold">${money(totalLegendValue)}</div>
       </div>
     </div>
   </div>
@@ -14244,6 +14287,7 @@ app.innerHTML = `
     handlers[`li:+:${k}`] = ()=>{ s.legendItems[k]=clampInt((s.legendItems[k]||0)+1); saveSonges(s); render(); };
     handlers[`li:-:${k}`] = ()=>{ s.legendItems[k]=clampInt((s.legendItems[k]||0)-1); saveSonges(s); render(); };
     handlers[`li:pick:${k}`] = ()=> openKeypad(k, s.legendItems[k]||0, (v)=>{ s.legendItems[k]=clampInt(v); saveSonges(s); render(); }, {mode:"int"});
+    handlers[`li:price:${k}`] = (val)=>{ s.legendPrices[k]=Math.max(0,toNum(val)); saveSonges(s); render(); };
   }
 
   $("#btnSongesMonsters").onclick = ()=>{ location.hash = "#/songes-monstres"; };
@@ -14256,32 +14300,6 @@ app.innerHTML = `
 
   bindActions(app, handlers);
 
-  const refreshModalCounts = ()=>{
-    for(const it of SONGES.intensities){
-      const el = document.getElementById(`bI:${it.id}`);
-      if(el) el.textContent = fmt.format(clampInt(s.bribesI[it.id]||0));
-    }
-  };
-
-  const originalOpen = openIntensityPicker;
-  window.openIntensityPicker = (qty)=>{
-    originalOpen(qty);
-    refreshModalCounts();
-    intGrid.querySelectorAll("[data-int]").forEach(btn=>{
-      btn.onclick = ()=>{
-        const id = btn.dataset.int;
-        if(!id || pendingBribes<=0) return;
-        const q = clampInt(pendingBribes);
-
-        s.bribes = clampInt(s.bribes + q);
-        s.bribesI[id] = clampInt((s.bribesI[id]||0) + q);
-
-        saveSonges(s);
-        closeIntensityPicker();
-        render();
-      };
-    });
-  };
 }
 
 
@@ -14857,6 +14875,11 @@ for(const a of ANOMALIES){
   const s = loadSonges();
   const runsSonges = SONGES.intensities.reduce((sum,it)=>sum + clampInt(s.runs[it.id]||0), 0);
   const totalLegends = Object.values(s.legendItems).reduce((a,b)=>a+clampInt(b),0);
+  const songesLegendValue = SONGES.legendItems.reduce((sum,f)=>{
+    const k = keyFromFile(f);
+    return sum + clampInt(s.legendItems[k]||0) * Math.max(0, toNum(s.legendPrices[k]||0));
+  }, 0);
+  kamasTotal += songesLegendValue;
   const legendsPerRun = runsSonges>0 ? (totalLegends / runsSonges) : 0;
   const bribesPerRun = runsSonges>0 ? (clampInt(s.bribes||0) / runsSonges) : 0;
 
@@ -14911,6 +14934,7 @@ const topByKm  = [...mixed].filter(x=>x.km>0).sort((a,b)=>b.km-a.km).slice(0,3);
         ${statCard("Dernière activité", fmtDate(meta.last))}
         ${statCard("Songes : légendes / run", runsSonges>0 ? legendsPerRun.toFixed(3) : "—")}
         ${statCard("Songes : bribes / run", runsSonges>0 ? bribesPerRun.toFixed(3) : "—")}
+        ${statCard("Songes : valeur légendaires", `${money(songesLegendValue)} ${kamasInlineHtml("")}`, true)}
         ${
           topByKPR[0]
             ? statCard("Top donjon (kamas/run)", `${escapeHtml(topByKPR[0].d.name)} • ${money(topByKPR[0].kmPerRun)} ${kamasInlineHtml("")}`, true)
@@ -15216,7 +15240,10 @@ recap.innerHTML = recapCards.map(x=>x.html).join("");
     }
     document.documentElement.lang = currentLang;
     const btn = document.getElementById("btnLanguage");
-    if (btn) btn.textContent = currentLang === "en" ? "🇬🇧 EN" : currentLang === "es" ? "🇪🇸 ES" : "🇫🇷 FR";
+    if (btn) {
+      const wanted = currentLang === "en" ? "🇬🇧 EN" : currentLang === "es" ? "🇪🇸 ES" : "🇫🇷 FR";
+      if(btn.textContent !== wanted) btn.textContent = wanted;
+    }
   }
 
   function refreshSoon() { requestAnimationFrame(() => applyLanguage(document.body)); }
@@ -15237,11 +15264,15 @@ recap.innerHTML = recapCards.map(x=>x.html).join("");
   const start = () => {
     const btn = document.getElementById("btnLanguage");
     if (btn) btn.addEventListener("click", () => setLanguage(currentLang === "fr" ? "en" : currentLang === "en" ? "es" : "fr"));
-    document.addEventListener("click", refreshSoon, true);
-    document.addEventListener("change", refreshSoon, true);
+    // Évite la boucle de traduction qui se ré-déclenchait sur ses propres
+    // changements de texte/attributs et faisait grimper fortement la mémoire.
     window.addEventListener("hashchange", refreshSoon);
-    const observer = new MutationObserver(() => requestAnimationFrame(safeApplyLanguage));
-    observer.observe(document.body, {childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:["title","placeholder","aria-label","alt"]});
+    let languageFrame = 0;
+    const observer = new MutationObserver(() => {
+      if(languageFrame) cancelAnimationFrame(languageFrame);
+      languageFrame = requestAnimationFrame(()=>{ languageFrame = 0; safeApplyLanguage(); });
+    });
+    observer.observe(document.body, {childList:true, subtree:true});
     safeApplyLanguage();
   };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
